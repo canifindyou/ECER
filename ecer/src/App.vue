@@ -1,81 +1,73 @@
 <template>
   <div id="app">
-    <el-container>
-      <el-header style="height:100px;padding:0">
-           <div class="head">
-      <img src="../static/pic/school1.png" class="head-img" alt="">
-      <img src="../static/pic/jieneng.png" class="head-jieneng" alt="">
-      <img src="../static/pic/jienengpic.png" class="head-jieneng-pic" alt="">
-           </div>
+    <el-container style="height: 100%">
+      <el-header style="height:80px;padding:0">
+        <div class="head">
+          <div style="margin: 0 50px">
+            <img src="../static/pic/school.png" class="head-img" alt="">
+            <div class="exit">退出系统</div>
+          </div>
+        </div>
       </el-header>
       <el-container>
-        <el-aside width="200px">
-          <el-menu :default-openeds="['1', '3']">
-      <el-submenu index="1">
-        <template slot="title"><i class="el-icon-message"></i>导航一</template>
-        <el-menu-item-group>
-          <template slot="title">分组一</template>
-          <el-menu-item index="1-1">选项1</el-menu-item>
-          <el-menu-item index="1-2">选项2</el-menu-item>
-        </el-menu-item-group>
-        <el-menu-item-group title="分组2">
-          <el-menu-item index="1-3">选项3</el-menu-item>
-        </el-menu-item-group>
-        <el-submenu index="1-4">
-          <template slot="title">选项4</template>
-          <el-menu-item index="1-4-1">选项4-1</el-menu-item>
-        </el-submenu>
-      </el-submenu>
-     <el-submenu index="1">
-        <template slot="title"><i class="el-icon-message"></i>导航一</template>
-        <el-menu-item-group>
-          <template slot="title">分组一</template>
-          <el-menu-item index="1-1">选项1</el-menu-item>
-          <el-menu-item index="1-2">选项2</el-menu-item>
-        </el-menu-item-group>
-        <el-menu-item-group title="分组2">
-          <el-menu-item index="1-3">选项3</el-menu-item>
-        </el-menu-item-group>
-        <el-submenu index="1-4">
-          <template slot="title">选项4</template>
-          <el-menu-item index="1-4-1">选项4-1</el-menu-item>
-        </el-submenu>
-      </el-submenu>
-      <el-submenu index="1">
-        <template slot="title"><i class="el-icon-message"></i>导航一</template>
-        <el-menu-item-group>
-          <template slot="title">分组一</template>
-          <el-menu-item index="1-1">选项1</el-menu-item>
-          <el-menu-item index="1-2">选项2</el-menu-item>
-        </el-menu-item-group>
-        <el-menu-item-group title="分组2">
-          <el-menu-item index="1-3">选项3</el-menu-item>
-        </el-menu-item-group>
-        <el-submenu index="1-4">
-          <template slot="title">选项4</template>
-          <el-menu-item index="1-4-1">选项4-1</el-menu-item>
-        </el-submenu>
-      </el-submenu>
-      <el-submenu index="1">
-        <template slot="title"><i class="el-icon-message"></i>导航一</template>
-        <el-menu-item-group>
-          <template slot="title">分组一</template>
-          <el-menu-item index="1-1">选项1</el-menu-item>
-          <el-menu-item index="1-2">选项2</el-menu-item>
-        </el-menu-item-group>
-        <el-menu-item-group title="分组2">
-          <el-menu-item index="1-3">选项3</el-menu-item>
-        </el-menu-item-group>
-        <el-submenu index="1-4">
-          <template slot="title">选项4</template>
-          <el-menu-item index="1-4-1">选项4-1</el-menu-item>
-        </el-submenu>
-      </el-submenu>
-    </el-menu>
+        <el-aside width="180px">
+          <el-menu :default-openeds="['1', '2']"
+                   :default-active="this.$router.path" router>
+            <template v-for="(item,index) in this.$router.options.routes">
+              <el-menu-item v-if="!item.childNode" :index="index.toString()">{{item.name}}</el-menu-item>
+              <el-submenu v-if="item.childNode" :index="index.toString()">
+                <template slot="title">{{item.name}}</template>
+                <!--                <template slot="title"><i :class="item.iconCls"></i><span slot="title">{{item.name}}</span></template>-->
+                <!--                <el-menu-item v-for="term in item.children" :key="term.path" :index="term.path" v-if="term.menuShow"-->
+                <!--                              :class="$route.path===term.path?'is-active':''">-->
+                <!--                  <i :class="term.iconCls"></i><span slot="title">{{term.name}}</span>-->
+                <!--                </el-menu-item>-->
+              </el-submenu>
+            </template>
 
+            <!--            <el-submenu index="1">-->
+            <!--              <template slot="title">实时数据</template>-->
+            <!--              <el-menu-item index="1-1">全部数据</el-menu-item>-->
+            <!--              <el-submenu index="1-2">-->
+            <!--                <template slot="title">文津校区</template>-->
+            <!--                <el-submenu index="1-2-1">-->
+            <!--                  <template slot="title">东二</template>-->
+            <!--                  <el-menu-item index="1-2-1-1">一层</el-menu-item>-->
+            <!--                  <el-menu-item index="1-2-1-2">二层</el-menu-item>-->
+            <!--                </el-submenu>-->
+            <!--                <el-submenu index="1-2-2">-->
+            <!--                  <template slot="title">东一</template>-->
+            <!--                  <el-menu-item index="1-2-2-1">一层</el-menu-item>-->
+            <!--                  <el-menu-item index="1-2-2-2">二层</el-menu-item>-->
+            <!--                </el-submenu>-->
+            <!--              </el-submenu>-->
+            <!--              <el-submenu index="1-3">-->
+            <!--                <template slot="title">新芜校区</template>-->
+            <!--                <el-submenu index="1-3-1">-->
+            <!--                  <template slot="title">A1</template>-->
+            <!--                  <el-menu-item index="1-3-1-1">一层</el-menu-item>-->
+            <!--                  <el-menu-item index="1-3-1-2">二层</el-menu-item>-->
+            <!--                </el-submenu>-->
+            <!--                <el-submenu index="1-3-2">-->
+            <!--                  <template slot="title">A2</template>-->
+            <!--                  <el-menu-item index="1-3-2-1">一层</el-menu-item>-->
+            <!--                  <el-menu-item index="1-3-2-2">二层</el-menu-item>-->
+            <!--                </el-submenu>-->
+            <!--              </el-submenu>-->
+            <!--            </el-submenu>-->
+            <!--            <el-submenu index="2">-->
+            <!--              <template slot="title">设置</template>-->
+            <!--              <el-menu-item index="2-1">分组管理</el-menu-item>-->
+            <!--              <el-menu-item index="2-2">设备品牌管理</el-menu-item>-->
+            <!--              <el-menu-item index="2-3">用户管理</el-menu-item>-->
+            <!--              <el-menu-item index="2-4">策略管理</el-menu-item>-->
+            <!--              <el-menu-item index="2-5">控制项设置</el-menu-item>-->
+            <!--              <el-menu-item index="2-6">全局配置</el-menu-item>-->
+            <!--            </el-submenu>-->
+          </el-menu>
         </el-aside>
         <el-main>
-          <router-view />
+          <router-view/>
         </el-main>
       </el-container>
     </el-container>
@@ -83,94 +75,65 @@
 </template>
 
 <script>
-export default {
-  name: "App"
-};
+  export default {
+    name: 'App',
+    methods: {
+      handleOpen (key, keyPath) {
+        console.log(key, keyPath)
+      },
+      handleClose (key, keyPath) {
+        console.log(key, keyPath)
+      }
+    },
+    mounted () {
+      console.log(this.$router.options.routes)
+      console.log(this.$router)
+    }
+  }
 </script>
 
 <style>
-/* #app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-} */
-* {
-  margin: 0;
-  padding: 0;
-}
+  * {
+    margin: 0;
+    padding: 0;
+  }
 
-
-
-
-.el-header, .el-footer {
-    /* background-color: #B3C0D1; */
-    color: #333;
-   
-  }
-  
-  .el-aside {
-    /* background-color: #D3DCE6; */
-    color: #333;
-    text-align: center;
-    line-height: 200px;
-    border: 1px #eee solid
-  }
-  
-  .el-main {
-    /* background-color: #E9EEF3; */
-    color: #333;
-    text-align: center;
-    line-height: 160px;
-  }
-  
-  body > .el-container {
-    margin-bottom: 40px;
-  }
-  
-  .el-container:nth-child(5) .el-aside,
-  .el-container:nth-child(6) .el-aside {
-    line-height: 260px;
-  }
-  
-  .el-container:nth-child(7) .el-aside {
-    line-height: 320px;
-  }
-  .head{
-    width:100%;
-    height: 100px;
-    background:#409EFF
-}
-.head .head-img{
-    height: 100px;
-    margin-left: 90px;
-}
-.head .head-jieneng{
-    position: absolute;
-    width: 300px;
-    right: 300px;
-    top:50px;
- 
-}
-.head .head-jieneng-pic{
-    position: absolute;
-    width: 100px;
-    right: 20px;
-    /* top:50px; */
-}
-.side{
+  html, body {
+    width: 100%;
     height: 100%;
-    width: 100px;
-    background: #222;
-    border:red solid 1px
-}
+  }
 
-@media (max-width:1200px)  {
-    .head .head-jieneng{
-     display:none;
-}
-}
-</style>
+  #app {
+    height: 100%;
+  }
+
+  /*el-header*/
+  .head {
+    width: 100%;
+    min-width: 1024px;
+    height: 80px;
+    line-height: 80px;
+    background-image: linear-gradient(to bottom left, #2b85ff, #409EFF)
+  }
+
+  .head-img {
+    float: left;
+    margin-top: 7px;
+    height: 65px;
+  }
+
+  .exit {
+    float: right;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 1px;
+  }
+
+  /*el-container*/
+  .el-aside {
+    line-height: 100px;
+    background: #eee;
+    overflow: hidden;
+  }
 </style>
