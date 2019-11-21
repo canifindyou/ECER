@@ -7,7 +7,7 @@
     name: 'mySet',
     data () {
       return {
-        showUserDia
+
       }
     }
   }
