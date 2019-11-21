@@ -1,34 +1,68 @@
 <template>
-    <el-aside width="180px">
-      <el-menu :default-active="this.$router.path" router>
-        <template v-for="(all,index) in this.$router.options.routes">
-          <template v-for="(item,index) in all.children">
-            <el-menu-item v-if="!item.childNode" :index="item.path">{{item.name}}</el-menu-item>
-            <el-submenu v-if="item.childNode" :index="item.path">
-              <template slot="title">{{item.name}}</template>
-              <template v-for="(kids,i) in item.children">
-                <el-menu-item :index="kids.path">{{kids.name}}</el-menu-item>
-              </template>
-            </el-submenu>
-          </template>
-          <!--              <template v-for="(item,index) in this.$router.options.routes">-->
-          <!--                <el-menu-item v-if="!item.childNode" :index="item.path">{{item.name}}</el-menu-item>-->
-          <!--                <el-submenu v-if="item.childNode" :index="item.path">-->
-          <!--                  <template slot="title">{{item.name}}</template>-->
-          <!--                  <template v-for="(kids,i) in item.children">-->
-          <!--                    <el-menu-item :index="kids.path">{{kids.name}}</el-menu-item>-->
-          <!--                  </template>-->
-          <!--                </el-submenu>-->
-        </template>
-      </el-menu>
-    </el-aside>
+  <el-aside width="180px">
+    <el-menu>
+      <el-submenu index="1">
+        <template slot="title">设备管理</template>
+       <el-tree :data="data" :props="defaultProps" @node-click="handleNodeClick"></el-tree>
+        </el-tree> 
+      </el-submenu>
+      <el-submenu index="2">
+        <template slot="title">设置</template>
+        <el-menu-item-group>
+          <template slot="title">分组一</template>
+          <el-menu-item index="1-1">选项1</el-menu-item>
+          <el-menu-item index="1-2">选项2</el-menu-item>
+        </el-menu-item-group>
+      </el-submenu>
+    </el-menu>
+  </el-aside>
 </template>
 
-<style>
-  /*el-container*/
-  .el-aside {
-    line-height: 100px;
-    background: #eee;
-    overflow: hidden;
+<script>
+export default {
+  data() {
+    return {
+      data: [
+        {
+          label: "新芜校区",
+          children: [
+            {
+              label: "A18",
+            }
+          ]
+        },
+        {
+          label: "文津校区",
+          children: [
+            {
+              label: "东一",
+            },
+          ]
+        },
+      ],
+      defaultProps: {
+        children: "children",
+        label: "label"
+      }
+    };
+  },
+  methods: {
+    handleNodeClick(data) {
+      console.log(data);
+    }
   }
+};
+</script>
+<style>
+/*el-container*/
+.el-aside {
+  line-height: 100px;
+  background: #eee;
+  overflow: hidden;
+}
+.el-tree{
+  padding-left: 25px;
+  font-size: 15px;
+  font-weight: 500
+}
 </style>

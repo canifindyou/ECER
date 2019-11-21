@@ -20,13 +20,13 @@ export default new Router({
       children: [
         {
           path: '/adminHome',
-          name: '首页',
+          name: '设备管理',
           components: {
             default: shouye,
             top: titleNav,
             aside: leftNav
           },
-          childNode: false
+          childNode: true
         },
         {
           path: '/adminSet',
