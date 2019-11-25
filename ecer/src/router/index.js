@@ -27,12 +27,14 @@ export default new Router({
             top: titleNav,
             aside: leftNav
           },
-          childNode: true
+          childNode: true,
+          needData:true,
         },
         {
           path: '/adminSet',
           name: '设置',
           childNode: true,
+          needData:false,
           components: {
             default: mySet,
             top: titleNav,
