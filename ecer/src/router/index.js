@@ -6,6 +6,7 @@ import leftNav from '@/page/nav/leftNav'
 import shouye from '@/page/shouye'
 import mySet from '@/page/mySet'
 import manageUsers from '@/page/setting/manageUsers'
+import deviceList from "@/page/deviceManage/adminHome"
 
 Vue.use(Router)
 
