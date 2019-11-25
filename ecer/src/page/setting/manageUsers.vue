@@ -1,63 +1,162 @@
 <template>
-  <div>
-    <el-dialog title="用户管理" :visible.sync="manageUsers">
+  <div class="user">
+    <el-dialog title="用户管理"
+               top="125px"
+               :visible.sync="manageUsers"
+               :close-on-press-escape="false"
+               :close-on-click-modal="false">
+      <hr class="boundary">
       <el-table
         :data="tableData"
-        border
-        style="width: 100%">
+        height="270px"
+        style="width: 90%">
         <el-table-column
-          prop="date"
-          label="日期"
-          width="180">
+          prop="userNum"
+          label="用户工号"
+          width="135px"
+          :show-overflow-tooltip="true">
         </el-table-column>
         <el-table-column
-          prop="name"
-          label="姓名"
-          width="180">
+          prop="userName"
+          label="用户姓名">
         </el-table-column>
         <el-table-column
-          prop="address"
-          label="地址">
+          prop="addTime"
+          label="添加时间"
+          width="110px"
+          :show-overflow-tooltip="true">
+        </el-table-column>
+        <el-table-column
+          label="操作"
+          width="180px">
+          <el-button size="small" @click="modifyUser=true">修 改</el-button>
+          <el-button size="small" type="danger">删 除</el-button>
         </el-table-column>
       </el-table>
-            <el-dialog
-              width="30%"
-              title="添加用户"
-              :visible.sync="innerVisible"
-              append-to-body>
-            </el-dialog>
+      <hr class="boundary">
+      <add-user :addUser="addUser"></add-user>
+      <el-dialog
+        width="30%"
+        title="修改用户"
+        :visible.sync="modifyUser"
+        append-to-body>
+      </el-dialog>
+      <!--      <el-dialog-->
+      <!--        width="30%"-->
+      <!--        title="删除用户"-->
+      <!--        :visible.sync="delUser"-->
+      <!--        append-to-body>-->
+      <!--      </el-dialog>-->
       <div slot="footer" class="dialog-footer">
         <el-button @click="outerVisible = false">关 闭</el-button>
-        <el-button type="success" @click="innerVisible = true">添 加</el-button>
+        <el-button type="success" @click="addUser = true">添 加</el-button>
       </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
+  import addUser from './users/addUser'
+
   export default {
+    components: {
+      addUser
+    },
     data () {
       return {
         manageUsers: true,
-        innerVisible: false,
+        addUser: false,
+        modifyUser: false,
         tableData: [{
-          date: '2016-05-02',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
+          userNum: '316202061035',
+          userName: '王小虎',
+          addTime: '2019-11-07'
         }, {
-          date: '2016-05-04',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1517 弄'
+          userNum: '11111',
+          userName: '王小虎',
+          addTime: '2019-11-07'
         }, {
-          date: '2016-05-01',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1519 弄'
+          userNum: '11111',
+          userName: '王小虎',
+          addTime: '2019-11-07'
         }, {
-          date: '2016-05-03',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1516 弄'
+          userNum: '11111',
+          userName: '王小虎',
+          addTime: '2019-11-07'
+        }, {
+          userNum: '11111',
+          userName: '王小虎',
+          addTime: '2019-11-07'
         }]
       }
     }
   }
 </script>
+
+<style scoped>
+  .user >>> .el-dialog {
+    width: 655px;
+    border-radius: 10px;
+  }
+
+  .user >>> .el-dialog__header {
+    padding: 17px 20px 10px;
+  }
+
+  .user >>> .el-dialog__title {
+    font-size: 22px;
+  }
+
+  .user >>> .el-dialog__headerbtn {
+    top: 15px;
+    font-size: 24px;
+  }
+
+  .user >>> .el-dialog__body {
+    padding: 0;
+  }
+
+  .boundary {
+    margin: 0 auto;
+    width: 96%;
+    background-color: #BBBBBB;
+    height: 1px;
+    border: none;
+  }
+
+  .el-table--fit {
+    margin: 10px auto;
+    border: 1px solid #BBBBBB;
+  }
+
+  .user >>> .el-table th.is-leaf {
+    text-align: center;
+    font-size: 16px;
+    padding: 7px;
+    border-bottom: 1px solid #BBBBBB;
+  }
+
+  .user >>> .el-table td {
+    text-align: center;
+    font-size: 16px;
+    padding: 7px 0;
+    border-bottom: 1px solid #BBBBBB;
+    word-break: keep-all;
+    white-space: nowrap;
+  }
+
+  .user >>> .el-dialog__footer {
+    padding: 12px 20px;
+  }
+
+  .user >>> .el-dialog__footer .el-button--default, .el-button--success {
+    margin: 0;
+    border-radius: 8px;
+    font-size: 16px;
+    padding: 10px 26px;
+  }
+
+  .el-button--success {
+    float: left;
+  }
+</style>
