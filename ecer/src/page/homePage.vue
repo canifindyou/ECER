@@ -4,7 +4,7 @@
     <router-view name="top"></router-view>
     <el-container>
       <router-view name="aside"></router-view>
-      <el-main>
+      <el-main style="padding:0">
         <router-view/>
       </el-main>
     </el-container>

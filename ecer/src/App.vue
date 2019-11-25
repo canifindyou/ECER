@@ -20,6 +20,18 @@
     width: 100%;
     height: 100%;
   }
+  .el-input {
+    position: relative;
+    font-size: 14px;
+    display: inline-block;
+    width: 120px;
+    /* width: 100%; */
+}
+.el-table__expanded-cell[class*=cell] {
+    padding: 0;
+    text-align: center;
+    height: 50px;
+}
 
   #app {
     width: 100%;
