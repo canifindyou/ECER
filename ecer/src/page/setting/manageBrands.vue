@@ -1,8 +1,8 @@
 <template>
   <div class="user">
-    <el-dialog title="用户管理"
+    <el-dialog title="设备品牌管理"
                top="125px"
-               :visible.sync="manageUsers"
+               :visible.sync="manageBrands"
                :close-on-press-escape="false"
                :close-on-click-modal="false">
       <hr class="boundary">
@@ -11,36 +11,30 @@
         height="270px"
         style="width: 90%">
         <el-table-column
-          prop="userNum"
-          label="用户工号"
+          prop="brandId"
+          label="编号"
           width="135px"
           :show-overflow-tooltip="true">
         </el-table-column>
         <el-table-column
-          prop="userName"
-          label="用户姓名">
+          prop="brandName"
+          label="品牌">
         </el-table-column>
         <el-table-column
-          prop="addTime"
-          label="添加时间"
+          prop="deviceType"
+          label="型号"
           width="110px"
           :show-overflow-tooltip="true">
         </el-table-column>
         <el-table-column
           label="操作"
           width="180px">
-          <el-button size="small" @click="modifyUser=true">修 改</el-button>
+          <el-button size="small" @click="modifyBrand=true">修 改</el-button>
           <el-button size="small" type="danger">删 除</el-button>
         </el-table-column>
       </el-table>
       <hr class="boundary">
-      <add-user :addUser="addUser"></add-user>
-      <el-dialog
-        width="30%"
-        title="修改用户"
-        :visible.sync="modifyUser"
-        append-to-body>
-      </el-dialog>
+      <add-brand :addBrand="addBrand"></add-brand>
       <!--      <el-dialog-->
       <!--        width="30%"-->
       <!--        title="删除用户"-->
@@ -49,44 +43,35 @@
       <!--      </el-dialog>-->
       <div slot="footer" class="dialog-footer">
         <el-button @click="outerVisible = false">关 闭</el-button>
-        <el-button type="success" @click="addUser = true">添 加</el-button>
+        <el-button type="success" @click="addBrand = true">添 加</el-button>
       </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
-  import addUser from './users/addUser'
+  import addBrand from './brands/addBrand'
 
   export default {
     components: {
-      addUser
+      addBrand
     },
     data () {
       return {
-        manageUsers: true,
-        addUser: false,
-        modifyUser: false,
+        manageBrands: true,
+        addBrand:false,
         tableData: [{
-          userNum: '316202061035',
-          userName: '王小虎',
-          addTime: '2019-11-07'
+          brandId: '1',
+          brandName: '美的',
+          deviceType: '1111'
         }, {
-          userNum: '11111',
-          userName: '王小虎',
-          addTime: '2019-11-07'
-        }, {
-          userNum: '11111',
-          userName: '王小虎',
-          addTime: '2019-11-07'
-        }, {
-          userNum: '11111',
-          userName: '王小虎',
-          addTime: '2019-11-07'
-        }, {
-          userNum: '11111',
-          userName: '王小虎',
-          addTime: '2019-11-07'
+          brandId: '2',
+          brandName: '美的',
+          deviceType: '2222'
+        },{
+          brandId: '3',
+          brandName: '格力',
+          deviceType: '1111'
         }]
       }
     }

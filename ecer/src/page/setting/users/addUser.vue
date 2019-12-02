@@ -43,6 +43,10 @@
       </el-form-item>
     </el-form>
     <hr class="boundary">
+    <div slot="footer" class="dialog-footer">
+      <el-button>取 消</el-button>
+      <el-button type="primary">保 存</el-button>
+    </div>
   </el-dialog>
 </template>
 
@@ -71,41 +75,7 @@
 </script>
 
 <style scoped>
-  .el-dialog__wrapper >>> .el-dialog {
-    width: 395px;
-    border-radius: 8px;
-  }
-
-  .el-dialog__wrapper >>> .el-dialog__header {
-    padding: 0;
-  }
-
-  .el-dialog__wrapper >>> .el-dialog__header {
-    padding: 10px 15px 7px;
-  }
-
-  .el-dialog__wrapper >>> .el-dialog__title {
-    font-size: 20px;
-  }
-
-  .el-dialog__wrapper >>> .el-dialog__headerbtn {
-    top: 10px;
-    right: 10px;
-    font-size: 22px;
-  }
-
-  .el-dialog__wrapper >>> .el-dialog__body {
-    padding: 0;
-  }
-
-  .boundary {
-    margin: 0 auto;
-    width: 94%;
-    background-color: #BBBBBB;
-    height: 1px;
-    border: none;
-  }
-
+  @import "../../../assets/public/subModal.css";
   .el-form {
     margin: 10px auto;
     width: 300px;
@@ -132,14 +102,14 @@
     border: 1px solid #BBB;
   }
 
-  .el-dialog__wrapper >>> .el-collapse-item__header[0] {
+  .el-dialog__wrapper >>> .el-collapse-item__header {
     height: 30px;
     background: #BBB;
   }
 
-  /*.el-collapse-item[data-v-0b05019f] >>> .el-collapse-item__header {*/
-  /*  background: transparent;*/
-  /*}*/
+  .el-collapse-item[data-v-0b05019f] >>> .el-collapse-item__header {
+    background: transparent;
+  }
 
   .buildings {
     background: #BBB;
@@ -147,9 +117,5 @@
 
   .el-dialog__wrapper >>> .el-checkbox ::after {
     transition: none !important;
-  }
-
-  .el-dialog__wrapper >>> .el-dialog__footer {
-    padding: 12px 20px;
   }
 </style>
