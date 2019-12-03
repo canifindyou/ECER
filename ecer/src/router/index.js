@@ -13,12 +13,13 @@ import historyData from "@/page/dataHistory/historyData"
 import instructHistory from "@/page/dataHistory/instructControllerHistory.vue"
 import selfControlStatus from "@/page/dataHistory/selfControlStatus.vue"
 import userHome from "@/page/userHome"
-import manageGroups from '@/page/ setting/manageGroups'
-import manageStrategies from '@/page/ setting/manageStrategies'
-import manageBrands from '@/page/ setting/manageBrands'
+import manageGroups from '@/page/setting/manageGroups'
+import manageStrategies from '@/page/setting/manageStrategies'
+import manageBrands from '@/page/setting/manageBrands'
 Vue.use(Router);
 
 export default new Router({
+  mode: 'history',
   routes: [{
     path: "/admin",
     type: "admin",
