@@ -19,19 +19,12 @@ export default {
   list-style: none;
 }
 
-html,
-body {
+html, body {
   width: 100%;
   height: 100%;
   min-width: 100%;
 }
-/* .el-input {
-    position: relative;
-    font-size: 14px;
-    display: inline-block;
-    width: 150px;
-    /* width: 100%; */
-/* } */
+
  #app {
   width: 100%;
   min-width: 1024px;
