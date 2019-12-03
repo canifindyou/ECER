@@ -2,7 +2,7 @@
   <el-aside width="180px">
     <el-menu :default-active="this.$router.path" router @open="open">
       <!-- <template v-for="all in this.$router.options.routes"> -->
-      <template v-for="item in this.$router.options.routes[roles].children">
+      <template v-for="item in this.$router.options.routes[id].children">
         <el-submenu :index="item.path">
           <!-- :index="item.path" -->
           <template slot="title">{{ item.name }}</template>
@@ -39,7 +39,6 @@ export default {
   data() {
     return {
       id: "",
-      route: this.$router.options.routes[localStorage.getItem("id")].children,
       code: "A18",
       clickIndex: "",
       sideData: [
@@ -99,13 +98,13 @@ export default {
   
   },
   mounted() {
-   
    if(this.$route.path.split("/")[1] == "user"){
-     this.roles = 1
+     this.id = 1
    }else{
-     this.roles = 0
+     this.id = 0
    }
    console.log(this.roles )
+   console.log(this.$router.options.routes)
   }
 };
 </script>
