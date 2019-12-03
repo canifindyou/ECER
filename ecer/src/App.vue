@@ -8,16 +8,7 @@
 
 export default {
   name: "App",
-  methods: {
-//     toolFn() {
-      
-//      this.roles  = this.$route.path.split("/")[1]
-//      console.log( this.roles)
-//     }
-//   },
-//  mounted() {
-//     this.toolFn();
-  }
+
 }
 </script>
 
