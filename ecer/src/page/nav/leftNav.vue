@@ -2,7 +2,7 @@
   <el-aside width="180px">
     <el-menu :default-active="this.$router.path" router @open="open">
       <!-- <template v-for="all in this.$router.options.routes"> -->
-      <template v-for="item in this.$router.options.routes[0].children">
+      <template v-for="item in this.$router.options.routes[roles].children">
         <el-submenu :index="item.path">
           <!-- :index="item.path" -->
           <template slot="title">{{ item.name }}</template>
@@ -16,7 +16,7 @@
                 @click="test(secondItem.label, secondItem.index)"
                 >{{ secondItem.label }}</el-menu-item
               >
-              <!--  -->
+              <!-- :index="secondItem.index" -->
             </el-submenu>
           </template>
 
@@ -38,6 +38,8 @@
 export default {
   data() {
     return {
+      id: "",
+      route: this.$router.options.routes[localStorage.getItem("id")].children,
       code: "A18",
       clickIndex: "",
       sideData: [
@@ -72,21 +74,38 @@ export default {
     test(flag, index) {
       this.code = flag;
       console.log(flag, index);
-      console.log(this.$router.options.routes[1]);
-      this.$router.push({
-        path: "/adminHome",
+      if (this.roles == "admin") {
+        this.$router.push({
+          path: "/admin/adminHome",
+          query: {
+            code: this.code
+          }
+        });
+      }else{
+          this.$router.push({
+        path: "/user/userHome",
         query: {
           code: this.code
         }
       });
+      }
     },
 
     handleSelect(key, keyPath) {
       // console.log(key);
     }
   },
+  watch: {
+  
+  },
   mounted() {
-    console.log(this.$router.options.routes);
+   
+   if(this.$route.path.split("/")[1] == "user"){
+     this.roles = 1
+   }else{
+     this.roles = 0
+   }
+   console.log(this.roles )
   }
 };
 </script>
