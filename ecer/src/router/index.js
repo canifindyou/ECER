@@ -26,16 +26,16 @@ export default new Router({
     component: homePage,
     redirect: "/adminHome",
     children: [{
-        path: "/adminHome",
-        name: "设备管理",
-        components: {
-          default: deviceList,
-          top: titleNav,
-          aside: leftNav
-        },
-        childNode: true,
-        needData: true
+      path: "/adminHome",
+      name: "设备管理",
+      components: {
+        default: deviceList,
+        top: titleNav,
+        aside: leftNav
       },
+      childNode: true,
+      needData: true
+    },
       {
         path: "/waringInfo",
         name: "报警通知",
@@ -68,16 +68,16 @@ export default new Router({
           name: "历史数据",
           component: historyData
         },
-        {
-          path: "/dataHistory/instructHistory",
-          name: "历史指令",
-          component: instructHistory
-        },
-        {
-          path: "/dataHistory/selfControlStatus",
-          name: "自控状态",
-          component: selfControlStatus
-        }]
+          {
+            path: "/dataHistory/instructHistory",
+            name: "历史指令",
+            component: instructHistory
+          },
+          {
+            path: "/dataHistory/selfControlStatus",
+            name: "自控状态",
+            component: selfControlStatus
+          }]
 
       },
       {
@@ -126,25 +126,25 @@ export default new Router({
 
     ]
   },
-{
-    path: "/user",
-    type: "user",
-    name: "user",
-    component: homePage,
-    redirect: "/userHome",
-    children:[
-      {
-        path: "/userHome",
-        name: "设备管理",
-        components: {
-          default: userHome,
-          top: titleNav,
-          aside: leftNav
+    {
+      path: "/user",
+      type: "user",
+      name: "user",
+      component: homePage,
+      redirect: "/userHome",
+      children:[
+        {
+          path: "/userHome",
+          name: "设备管理",
+          components: {
+            default: userHome,
+            top: titleNav,
+            aside: leftNav
+          },
+          childNode: true,
+          needData: true
         },
-        childNode: true,
-        needData: true
-      },
 
-    ]
-}]
+      ]
+    }]
 });

@@ -45,8 +45,7 @@
 
   .el-form {
     margin: 25px auto;
-    width: 330px;
-    /*height: 130px;*/
+    width: 320px;
   }
 
   .el-form-item {

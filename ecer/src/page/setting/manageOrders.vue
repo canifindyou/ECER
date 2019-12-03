@@ -1,0 +1,205 @@
+<template>
+  <div class="user">
+    <el-dialog title="指令模板管理"
+               top="110px"
+               :visible.sync="manageOrders"
+               :close-on-press-escape="false"
+               :close-on-click-modal="false">
+      <hr class="boundary">
+      <div class="body">
+        <el-card class="cardGroups">
+          <div slot="header" class="clearfix">
+            <span>参数预设</span>
+          </div>
+          <div class="ordersName" v-for="(item,index) in templateData"
+               @click="selectOrder(item.templateId,item.templateName)">
+            {{item.templateName}}
+          </div>
+          <div class="cardFooter"><i class="el-icon-delete"></i><i class="el-icon-edit"></i></div>
+        </el-card>
+        <div class="strategyContent">
+          <el-table
+            :data="tableData"
+            height="270px">
+            <el-table-column
+              prop="orderId"
+              label="编号"
+              width="135px"
+              :show-overflow-tooltip="true">
+            </el-table-column>
+            <el-table-column
+              prop="orderName"
+              label="指令名称">
+            </el-table-column>
+          </el-table>
+        </div>
+      </div>
+      <hr class="boundary">
+      <add-strategy :addStrategy="addStrategy"></add-strategy>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="outerVisible = false">关 闭</el-button>
+        <el-button type="success" @click="addUser = true">导入指令模板</el-button>
+      </div>
+    </el-dialog>
+  </div>
+</template>
+
+<script>
+  import addStrategy from './strategies/addStrategy'
+
+  export default {
+    components: {
+      addStrategy
+    },
+    data () {
+      return {
+        manageOrders: true,
+        addStrategy: false,
+        templateData: [{
+          'templateId': '1',
+          'templateName': '格力空调', 'templateInfo': [{
+            orderId: '1',
+            orderName: '开机',
+          }, {
+            orderId: '2',
+            orderName: '恒温制冷26度',
+          }, {
+            orderId: '3',
+            orderName: '恒温制热20度',
+          }]
+        }, {
+          'templateId': '2',
+          'templateName': '美的空调', 'templateInfo': [{
+            orderId: '1',
+            orderName: '开机',
+          }, {
+            orderId: '2',
+            orderName: '恒温制冷26度',
+          }, {
+            orderId: '3',
+            orderName: '恒温制热20度',
+          }]
+        }],
+        tableData: []
+      }
+    },
+    methods: {
+      // 选中预设
+      selectOrder (id, name) {
+        console.log(id)
+        this.tableData = []
+        this.$nextTick(function () {
+          let ordersName = document.getElementsByClassName('ordersName')
+          for (let i = 0; i < ordersName.length; i++) {
+            let campus = ordersName[i].innerText.replace(/\s/g, '')// 清除按钮导致的回车
+            if (name === campus) {//被选中
+              ordersName[i].style.background = '#BBB'
+            } else {
+              ordersName[i].style.background = '#FFF'
+            }
+          }
+        })
+        for (let i = 0; i < this.templateData.length; i++) {
+          if (id === this.templateData[i].templateId) {
+            this.tableData = this.templateData[i].templateInfo
+          }
+        }
+      },
+    },
+    mounted () {
+      this.selectOrder(this.templateData[0].templateId, this.templateData[0].templateName)
+    }
+  }
+</script>
+
+<style scoped>
+  @import '../../assets/public/model.css';
+
+  .user >>> .el-dialog {
+    width: 660px;
+  }
+
+  .body {
+    margin: 15px auto;
+    width: 95%;
+    height: 280px;
+  }
+
+  .cardGroups {
+    position: relative;
+    float: left;
+    margin: 0 0 0 9px;
+    width: 33%;
+    height: 100%;
+    border: 1px solid #BBBBBB;
+  }
+
+  .cardGroups >>> .el-card__header {
+    font-size: 16px;
+    padding: 5px;
+    text-align: center;
+    background: #E8E8E8;
+    border-bottom: 1px solid #BBBBBB;
+  }
+
+  .cardGroups >>> .el-card__body {
+    height: 100%;
+    overflow-y: auto;
+    padding: 0;
+    text-align: center;
+  }
+
+  .ordersName {
+    padding: 5px;
+    border-bottom: 1px solid #BBBBBB;
+  }
+
+  .cardFooter {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 30px;
+    line-height: 30px;
+    border-top: 1px solid #BBBBBB;
+  }
+
+  .el-icon-edit {
+    float: right;
+    margin: 5px 0;
+    font-size: 20px;
+    color: #78AC3C;
+  }
+
+  .el-icon-delete {
+    float: right;
+    margin: 5px 7px 5px 5px;
+    font-size: 20px;
+    color: #AC3C3C;
+  }
+
+  .strategyContent {
+    float: right;
+    margin: 0 9px 0 0;
+    width: 61%;
+    height: 100%;
+    overflow-y: auto;
+    border: 1px solid #BBBBBB;
+    border-radius: 4px;
+  }
+
+  .user >>> .el-table th.is-leaf {
+    text-align: center;
+    font-size: 14px;
+    padding: 3px;
+    border-bottom: 1px solid #BBBBBB;
+  }
+
+  .user >>> .el-table td {
+    text-align: center;
+    font-size: 14px;
+    padding: 5px 0;
+    border-bottom: 1px solid #BBBBBB;
+    word-break: keep-all;
+    white-space: nowrap;
+  }
+</style>
