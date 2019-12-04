@@ -1,93 +1,111 @@
 <template>
-  <div class="user">
-    <el-dialog title="用户管理"
-               top="125px"
-               :visible.sync="manageUsers"
-               :close-on-press-escape="false"
-               :close-on-click-modal="false">
-      <hr class="boundary">
-      <el-table
-        :data="tableData"
-        height="270px"
-        style="width: 90%">
-        <el-table-column
-          prop="userNum"
-          label="用户工号"
-          width="135px"
-          :show-overflow-tooltip="true">
-        </el-table-column>
-        <el-table-column
-          prop="userName"
-          label="用户姓名">
-        </el-table-column>
-        <el-table-column
-          prop="addTime"
-          label="添加时间"
-          width="110px"
-          :show-overflow-tooltip="true">
-        </el-table-column>
-        <el-table-column
-          label="操作"
-          width="180px">
+  <el-dialog title="用户管理"
+             top="125px"
+             :visible.sync="manageUsers"
+             :close-on-press-escape="false"
+             :close-on-click-modal="false"
+             :before-close="closeAllModel">
+    <hr class="boundary">
+    <el-table
+      :data="tableData"
+      height="270px"
+      style="width: 90%">
+      <el-table-column
+        prop="userNum"
+        label="用户工号"
+        width="135px"
+        :show-overflow-tooltip="true">
+      </el-table-column>
+      <el-table-column
+        prop="userName"
+        label="用户姓名">
+      </el-table-column>
+      <el-table-column
+        prop="addTime"
+        label="添加时间"
+        width="110px"
+        :show-overflow-tooltip="true">
+      </el-table-column>
+      <el-table-column
+        label="操作"
+        width="180px">
+        <template slot-scope="scope">
           <el-button size="small" @click="modifyUser=true">修 改</el-button>
-          <el-button size="small" type="danger">删 除</el-button>
-        </el-table-column>
-      </el-table>
-      <hr class="boundary">
-      <add-user :addUser="addUser"></add-user>
-      <el-dialog
-        width="30%"
-        title="修改用户"
-        :visible.sync="modifyUser"
-        append-to-body>
-      </el-dialog>
-      <!--      <el-dialog-->
-      <!--        width="30%"-->
-      <!--        title="删除用户"-->
-      <!--        :visible.sync="delUser"-->
-      <!--        append-to-body>-->
-      <!--      </el-dialog>-->
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="outerVisible = false">关 闭</el-button>
-        <el-button type="success" @click="addUser = true">添 加</el-button>
-      </div>
-    </el-dialog>
-  </div>
+          <el-button size="small" type="danger" @click="showDelModel(scope.row.id)">删 除</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <hr class="boundary">
+    <add-user :addUser="addUser" @closeModel="closeModel"></add-user>
+    <del-user :delUser="delUser" :delId="delId" @closeModel="closeModel"></del-user>
+    <div slot="footer" class="dialog-footer">
+      <el-button @click="closeAllModel">关 闭</el-button>
+      <el-button type="success" @click="showAddModel">添 加</el-button>
+    </div>
+  </el-dialog>
 </template>
 
 <script>
   import addUser from './users/addUser'
+  import delUser from './users/delUser'
 
   export default {
     components: {
-      addUser
+      addUser,
+      delUser
     },
     data () {
       return {
         manageUsers: true,
         addUser: false,
-        modifyUser: false,
+        delId: 0,
+        delUser: false,
         tableData: [{
+          id: '1',
           userNum: '316202061035',
           userName: '王小虎',
           addTime: '2019-11-07'
         }, {
+          id: '2',
           userNum: '11111',
           userName: '王小虎',
           addTime: '2019-11-07'
         }, {
+          id: '3',
           userNum: '11111',
           userName: '王小虎',
           addTime: '2019-11-07'
         }, {
+          id: '4',
           userNum: '11111',
           userName: '王小虎',
           addTime: '2019-11-07'
         }, {
+          id: '5',
           userNum: '11111',
           userName: '王小虎',
           addTime: '2019-11-07'
         }]
+      }
+    },
+    methods: {
+      showAddModel () {
+        this.addUser = true
+      },
+
+      showDelModel (id) {
+        this.delId = id
+        this.delUser = true
+      },
+
+      closeModel () {
+        this.addUser = false
+        this.delId = 0
+        this.delUser = false
+      },
+
+      closeAllModel () {
+        this.manageUsers = false
       }
     }
   }
@@ -96,7 +114,7 @@
 <style scoped>
   @import '../../assets/public/model.css';
 
-  .user >>> .el-dialog {
+  .el-dialog__wrapper >>> .el-dialog {
     width: 655px;
   }
 
@@ -105,19 +123,30 @@
     border: 1px solid #BBBBBB;
   }
 
-  .user >>> .el-table th.is-leaf {
+  .el-dialog__wrapper >>> .el-table th.is-leaf {
     text-align: center;
     font-size: 16px;
     padding: 7px;
     border-bottom: 1px solid #BBBBBB;
   }
 
-  .user >>> .el-table td {
+  .el-dialog__wrapper >>> .el-table td {
     text-align: center;
     font-size: 16px;
     padding: 7px 0;
     border-bottom: 1px solid #BBBBBB;
     word-break: keep-all;
     white-space: nowrap;
+  }
+
+  .el-button--success {
+    float: left;
+  }
+
+  .el-dialog__footer .el-button--default, .el-button--success {
+    margin: 0;
+    border-radius: 8px;
+    font-size: 15px;
+    padding: 10px 26px;
   }
 </style>

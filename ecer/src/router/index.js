@@ -19,6 +19,7 @@ import manageBrands from '@/page/setting/manageBrands'
 import manageOrders from '@/page/setting/manageOrders'
 import globalControl from '@/page/setting/globalControl'
 import userDeviceList from '@/page/user/userHome'
+import userStrategies from '@/page/setting/userStrategies'
 
 Vue.use(Router)
 
@@ -189,6 +190,24 @@ export default new Router({
               component: selfControlStatus
             }]
         },
+        {
+          path: '/user/userSet',
+          name: '设置',
+          childNode: true,
+          needData: false,
+          components: {
+            default: mySet,
+            top: titleNav,
+            aside: leftNav
+          },
+          children: [
+            {
+              path: '/user/userSet/manageStrategies',
+              name: '策略管理',
+              component: userStrategies
+            }
+          ]
+        }
       ]
     }]
 })

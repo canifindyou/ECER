@@ -1,5 +1,4 @@
 .el-dialog__wrapper >>> .el-dialog {
-  width: 395px;
   border-radius: 8px;
 }
 
@@ -12,9 +11,9 @@
 }
 
 .el-dialog__wrapper >>> .el-dialog__headerbtn {
-  top: 10px;
-  right: 10px;
-  font-size: 22px;
+  top: 13px;
+  right: 13px;
+  font-size: 20px;
 }
 
 .el-dialog__wrapper >>> .el-dialog__body {
@@ -23,7 +22,7 @@
 
 .boundary {
   margin: 0 auto;
-  width: 97%;
+  width: 95%;
   background-color: #BBBBBB;
   height: 1px;
   border: none;
@@ -31,11 +30,4 @@
 
 .el-dialog__wrapper >>> .el-dialog__footer {
   padding: 12px 20px;
-}
-
-.el-dialog__wrapper >>> .el-button--default, .el-button--success,.el-button {
-  margin: 0 0 0 10px;
-  border-radius: 8px;
-  font-size: 16px;
-  padding: 10px 20px;
 }

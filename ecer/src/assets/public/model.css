@@ -1,21 +1,21 @@
-.user >>> .el-dialog {
+.el-dialog__wrapper >>> .el-dialog {
   border-radius: 10px;
 }
 
-.user >>> .el-dialog__header {
+.el-dialog__wrapper >>> .el-dialog__header {
   padding: 17px 20px 10px;
 }
 
-.user >>> .el-dialog__title {
+.el-dialog__wrapper >>> .el-dialog__title {
   font-size: 22px;
 }
 
-.user >>> .el-dialog__headerbtn {
+.el-dialog__wrapper >>> .el-dialog__headerbtn {
   top: 15px;
   font-size: 24px;
 }
 
-.user >>> .el-dialog__body {
+.el-dialog__wrapper >>> .el-dialog__body {
   padding: 0;
 }
 
@@ -27,17 +27,6 @@
   border: none;
 }
 
-.user >>> .el-dialog__footer {
+.el-dialog__wrapper >>> .el-dialog__footer {
   padding: 12px 20px;
-}
-
-.user >>> .el-dialog__footer .el-button--default, .el-button--success {
-  margin: 0;
-  border-radius: 8px;
-  font-size: 16px;
-  padding: 10px 26px;
-}
-
-.el-button--success {
-  float: left;
 }

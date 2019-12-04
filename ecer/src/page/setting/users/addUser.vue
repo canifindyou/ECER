@@ -5,6 +5,7 @@
     :visible.sync="addUser"
     :close-on-press-escape="false"
     :close-on-click-modal="false"
+    :before-close="closeModel"
     append-to-body>
     <hr class="boundary">
     <el-form :label-position="labelPosition" label-width="90px">
@@ -44,7 +45,7 @@
     </el-form>
     <hr class="boundary">
     <div slot="footer" class="dialog-footer">
-      <el-button>取 消</el-button>
+      <el-button @click="closeModel">取 消</el-button>
       <el-button type="primary">保 存</el-button>
     </div>
   </el-dialog>
@@ -70,12 +71,22 @@
           'classroom': [{'name': '209', 'device': ['1', '2']}, {'name': '210', 'device': ['1', '2']}]
         }]
       }
-    }
+    },
+    methods: {
+      closeModel () {
+        this.addUser = false
+        this.$emit('closeModel')
+      }
+    },
   }
 </script>
 
 <style scoped>
   @import "../../../assets/public/subModal.css";
+  .el-dialog__wrapper >>> .el-dialog {
+     width: 395px;
+   }
+
   .el-form {
     margin: 10px auto;
     width: 300px;
@@ -117,5 +128,12 @@
 
   .el-dialog__wrapper >>> .el-checkbox ::after {
     transition: none !important;
+  }
+
+  .el-button {
+    margin: 0 0 0 10px;
+    border-radius: 8px;
+    font-size: 15px;
+    padding: 10px 20px;
   }
 </style>

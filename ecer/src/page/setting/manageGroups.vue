@@ -1,75 +1,79 @@
 <template>
-  <div class="user">
-    <el-dialog title="分组管理"
-               top="110px"
-               :visible.sync="manageGroups"
-               :close-on-press-escape="false"
-               :close-on-click-modal="false">
-      <hr class="boundary">
-      <div class="body">
-        <el-card class="cardGroups">
-          <div slot="header" class="clearfix">
-            <span>校区</span>
+  <el-dialog title="分组管理"
+             top="110px"
+             :visible.sync="manageGroups"
+             :close-on-press-escape="false"
+             :close-on-click-modal="false"
+             :before-close="closeAllModel">
+    <hr class="boundary">
+    <div class="body">
+      <el-card class="cardGroups">
+        <div slot="header" class="clearfix">
+          <span>校区</span>
+        </div>
+        <div v-for="(item,index) in allCampuses" class="campusesList" @click="selectCampus(item.id,item.name,index)">
+          {{item.name}}
+          <div v-show="showCampusOperate===index" class="operation">
+            <i class="el-icon-edit" @click="modifyCampus(index,item.name)"></i>
+            <i class="el-icon-delete" @click="delCampus(item.id)"></i>
           </div>
-          <div v-for="(item,index) in allCampuses" class="campusesList" @click="selectCampus(item.id,item.name,index)">
-            {{item.name}}
-            <div v-show="showCampusOperate===index" class="operation">
-              <i class="el-icon-edit" @click="modifyCampus(index,item.name)"></i>
-              <i class="el-icon-delete" @click="delCampus(item.id)"></i>
-            </div>
+        </div>
+        <div class="cardFooter"><i class="el-icon-circle-plus" @click="addCampus()"></i></div>
+      </el-card>
+      <el-card class="cardGroups">
+        <div slot="header" class="clearfix">
+          <span>楼栋(层数)</span>
+        </div>
+        <div v-for="(item,index) in buildingsData" class="buildingsList"
+             @click="selectBuilding(item.id,item.name,index)">
+          {{item.name}} ({{item.floor}})
+          <div v-show="showBuildingOperate===index" class="operation">
+            <i class="el-icon-edit" @click="modifyBuilding(index,item.name,item.floor)"></i>
+            <i class="el-icon-delete" @click="delBuilding(item.id)"></i>
           </div>
-          <div class="cardFooter"><i class="el-icon-circle-plus" @click="addCampus()"></i></div>
-        </el-card>
-        <el-card class="cardGroups">
-          <div slot="header" class="clearfix">
-            <span>楼栋(层数)</span>
+        </div>
+        <div class="cardFooter"><i class="el-icon-circle-plus" @click="addBuilding()"></i></div>
+      </el-card>
+      <el-card class="cardGroups">
+        <div slot="header" class="clearfix">
+          <span id="className">教室</span>
+        </div>
+        <div v-for="(item,index) in classroomsData" class="classroomsList"
+             @click="selectClassroom(item.name,index)">
+          {{item.name}}
+          <div v-show="showClassroomOperate===index" class="operation">
+            <i class="el-icon-edit"></i>
+            <i class="el-icon-delete" @click="delClassroom(item.id)"></i>
           </div>
-          <div v-for="(item,index) in buildingsData" class="buildingsList"
-               @click="selectBuilding(item.id,item.name,index)">
-            {{item.name}} ({{item.floor}})
-            <div v-show="showBuildingOperate===index" class="operation">
-              <i class="el-icon-edit" @click="modifyBuilding(index,item.name,item.floor)"></i>
-              <i class="el-icon-delete" @click="delBuilding(item.id)"></i>
-            </div>
-          </div>
-          <div class="cardFooter"><i class="el-icon-circle-plus" @click="addBuilding()"></i></div>
-        </el-card>
-        <el-card class="cardGroups">
-          <div slot="header" class="clearfix">
-            <span id="className">教室</span>
-          </div>
-          <div v-for="(item,index) in classroomsData" class="classroomsList"
-               @click="selectClassroom(item.name,index)">
-            {{item.name}}
-            <div v-show="showClassroomOperate===index" class="operation">
-              <i class="el-icon-edit"></i>
-              <i class="el-icon-delete" @click="delClassroom(item.id)"></i>
-            </div>
-          </div>
-          <div class="cardFooter"><i class="el-icon-circle-plus" @click="addClassroom()"></i></div>
-        </el-card>
-      </div>
-      <hr class="boundary">
-      <del-group :delGroup="delGroup" :delGroupType="delGroupType" :deviceNum="deviceNum" @closeModel="closeModel"></del-group>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="success" @click="addUser = true">批量导入模板</el-button>
-        <el-button @click="outerVisible = false">关 闭</el-button>
-      </div>
-    </el-dialog>
-  </div>
+        </div>
+        <div class="cardFooter"><i class="el-icon-circle-plus" @click="addClassroom()"></i></div>
+      </el-card>
+    </div>
+    <hr class="boundary">
+    <del-group :delGroup="delGroup" :delGroupType="delGroupType" :deviceNum="deviceNum"
+               @closeModel="closeModel"></del-group>
+    <batch-addition :batchAddition="batchAddition" @closeModel="closeModel"></batch-addition>
+    <div slot="footer" class="dialog-footer">
+      <el-button type="success" @click="showBatchAddition">批量添加</el-button>
+      <el-button @click="closeAllModel">关 闭</el-button>
+    </div>
+  </el-dialog>
 </template>
 
 <script>
   import delGroup from './groups/delGroup'
+  import batchAddition from './groups/batchAddition'
 
   export default {
     components: {
-      delGroup
+      delGroup,
+      batchAddition
     },
     data () {
       return {
         manageGroups: true,
         delGroup: false,
+        batchAddition: false,
         allCampuses: [{'id': 1, 'name': '文津校区'}, {'id': 2, 'name': '新芜校区'}],
         campusesData: [],
         allBuildings: [
@@ -348,9 +352,18 @@
         this.delGroup = true
       },
 
+      showBatchAddition () {
+        this.batchAddition = true
+      },
+
       // 关闭子级模态框
       closeModel () {
         this.delGroup = false
+        this.batchAddition = false
+      },
+
+      closeAllModel () {
+        this.manageGroups = false
       }
     },
   }
@@ -376,14 +389,4 @@
     border-bottom: 1px solid #BBB;
     outline: none;
   }
-
-  /*.buildingsList input {*/
-  /*  width: 20%;*/
-  /*  padding: 0 0 3px 3px;*/
-  /*  border-top: 0;*/
-  /*  border-left: 0;*/
-  /*  border-right: 0;*/
-  /*  border-bottom: 1px solid #BBB;*/
-  /*  outline: none;*/
-  /*}*/
 </style>
