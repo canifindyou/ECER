@@ -20,12 +20,22 @@ import manageOrders from '@/page/setting/manageOrders'
 import globalControl from '@/page/setting/globalControl'
 import userDeviceList from '@/page/user/userHome'
 import userStrategies from '@/page/setting/userStrategies'
+import login from "@/page/login/login"
 
 Vue.use(Router)
 
 export default new Router({
-  mode: 'history',
+  // mode: 'hash',
   routes: [
+    {
+      path: '/',
+      redirect: '/login',
+    },
+       {
+        path: '/login',
+        component: login,
+       },
+
     {
       path: '/admin',
       type: 'admin',
@@ -61,7 +71,7 @@ export default new Router({
         },
         {
           path: '/admin/data',
-          name: '数据统计',
+          name: '历史数据',
           components: {
             default: data,
             top: titleNav,
@@ -71,7 +81,7 @@ export default new Router({
           needData: false,
           children: [{
             path: '/admin/dataHistory/dataHistory',
-            name: '历史数据',
+            name: '历史状态',
             component: historyData
           },
             {
@@ -167,7 +177,7 @@ export default new Router({
         },
         {
           path: '/user/data',
-          name: '数据统计',
+          name: '历史数据',
           components: {
             default: data,
             top: titleNav,
@@ -177,7 +187,7 @@ export default new Router({
           needData: false,
           children: [{
             path: '/user/dataHistory/dataHistory',
-            name: '历史数据',
+            name: '历史状态',
             component: historyData
           },
             {

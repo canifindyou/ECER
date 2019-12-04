@@ -86,31 +86,31 @@
       }
     },
     methods: {
-      open (key) {
+      open(key) {
         // if (key === "3" || key === "4") {
         //   console.log("事件已触发");
         // }
         // let dom = document.getElementsByClassName("el-submenu__title")
-        console.log(key)
+        console.log(key);
         // dom[key].style.color = "red"
       },
-      test (flag, index) {
-        this.code = flag
-        console.log(flag, index)
-        if (this.roles == 'admin') {
+      test(flag, index) {
+        this.code = flag;
+        console.log(flag, index);
+        if (this.$route.path.split("/")[1] == "admin") {
           this.$router.push({
-            path: '/admin/adminHome',
+            path: "/admin/adminHome",
             query: {
               code: this.code
             }
-          })
-        } else {
+          });
+        }else{
           this.$router.push({
-            path: '/user/userHome',
+            path: "/user/userHome",
             query: {
               code: this.code
             }
-          })
+          });
         }
       },
 
@@ -122,12 +122,14 @@
         // console.log(key);
       }
     },
-    watch: {},
+    watch: {
+
+    },
     mounted () {
       if (this.$route.path.split('/')[1] == 'user') {
-        this.id = 1
+        this.id = 3
       } else {
-        this.id = 0
+        this.id = 2
       }
       console.log(this.roles)
       console.log(this.$router.options.routes)

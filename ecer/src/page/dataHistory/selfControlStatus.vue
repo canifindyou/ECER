@@ -8,14 +8,16 @@
           </el-table-column>
           <el-table-column
             align="center"
-            prop="selfControllStatus"
             label="自控状态"
+            prop="setStatus"
+            :formatter="format"
           >
+          <!--prop="selfStatus"  -->
           </el-table-column>
           <el-table-column align="center" prop="setStatus" label="设置">
             <template slot-scope="props">
             <el-switch
-              v-model="props.row.selfControl"
+              v-model="props.row.setStatus"
               active-color="#13ce66"
               inactive-color="#ff3342"
               @change="switchChange($event, props.$index)"
@@ -48,12 +50,12 @@ export default {
         {
           name: "空调一",
           selfControllStatus: "开启",
-          setStatus: true
+          setStatus: false
         },
         {
           name: "空调一",
           selfControllStatus: "开启",
-          setStatus: true
+          setStatus: false
         },
         {
           name: "空调一",
@@ -72,6 +74,14 @@ export default {
       },
       searchClick(){
 
+      },
+      format(name,flag,flag2){
+       
+       if(name.setStatus){
+         return "开启"
+       }else{
+         return "关闭"
+       }
       }
   }
 };
