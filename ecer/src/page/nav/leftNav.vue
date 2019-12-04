@@ -73,7 +73,7 @@ export default {
     test(flag, index) {
       this.code = flag;
       console.log(flag, index);
-      if (this.roles == "admin") {
+      if (this.$route.path.split("/")[1] == "admin") {
         this.$router.push({
           path: "/admin/adminHome",
           query: {

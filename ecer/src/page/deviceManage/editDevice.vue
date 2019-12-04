@@ -104,6 +104,7 @@
             v-model="id"
             placeholder="请输入内容"
             size="small"
+            style="width:215px"
           ></el-input>
         </li>
         <li class="dialogContentItem">
@@ -112,6 +113,7 @@
             v-model="ip"
             placeholder="请输入内容"
             size="small"
+            style="width:215px"
           ></el-input>
         </li>
         <li class="dialogContentItem ">
@@ -120,6 +122,7 @@
             v-model="name"
             placeholder="请输入内容"
             size="small"
+            style="width:215px"
           ></el-input>
         </li>
       </ul>

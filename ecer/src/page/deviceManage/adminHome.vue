@@ -242,6 +242,7 @@
             v-model="addId"
             placeholder="请输入内容"
             size="small"
+            style="width:215px"
           ></el-input>
         </li>
         <li class="dialogContentItem">
@@ -250,6 +251,7 @@
             v-model="addIp"
             placeholder="请输入内容"
             size="small"
+            style="width:215px"
           ></el-input>
         </li>
         <li class="dialogContentItem ">
@@ -258,6 +260,7 @@
             v-model="addName"
             placeholder="请输入内容"
             size="small"
+            style="width:215px"
           ></el-input>
         </li>
       </ul>
