@@ -92,22 +92,25 @@
 
 <style scoped>
   @import "../../../assets/public/subModal.css";
+  .el-dialog__wrapper >>> .el-dialog {
+    width: 430px;
+  }
 
   .body {
     position: relative;
-    height: 160px;
+    height: 150px;
     text-align: center;
   }
 
   .tip {
-    line-height: 160px;
-    font-size: 25px;
+    line-height: 150px;
+    font-size: 23px;
     letter-spacing: 1px;
   }
 
   .specialTip {
     position: absolute;
-    top: 99px;
+    top: 93px;
     /*left: 10px;*/
     left: 5%;
     right: 5%;
@@ -123,5 +126,12 @@
     text-align: center;
     font-size: 22px;
     letter-spacing: 1.5px;
+  }
+
+  .el-button {
+    margin: 0 0 0 10px;
+    border-radius: 8px;
+    font-size: 15px;
+    padding: 10px 20px;
   }
 </style>

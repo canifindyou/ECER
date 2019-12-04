@@ -1,60 +1,60 @@
 <template>
-  <div class="user">
-    <el-dialog title="指令模板管理"
-               top="110px"
-               :visible.sync="manageOrders"
-               :close-on-press-escape="false"
-               :close-on-click-modal="false">
-      <hr class="boundary">
-      <div class="body">
-        <el-card class="cardGroups">
-          <div slot="header" class="clearfix">
-            <span>参数预设</span>
-          </div>
-          <div class="ordersName" v-for="(item,index) in templateData"
-               @click="selectOrder(item.templateId,item.templateName)">
-            {{item.templateName}}
-          </div>
-          <div class="cardFooter"><i class="el-icon-delete"></i><i class="el-icon-edit"></i></div>
-        </el-card>
-        <div class="strategyContent">
-          <el-table
-            :data="tableData"
-            height="270px">
-            <el-table-column
-              prop="orderId"
-              label="编号"
-              width="135px"
-              :show-overflow-tooltip="true">
-            </el-table-column>
-            <el-table-column
-              prop="orderName"
-              label="指令名称">
-            </el-table-column>
-          </el-table>
+  <el-dialog title="指令模板管理"
+             top="110px"
+             :visible.sync="manageOrders"
+             :close-on-press-escape="false"
+             :close-on-click-modal="false"
+             :before-close="closeAllModel">
+    <hr class="boundary">
+    <div class="body">
+      <el-card class="cardGroups">
+        <div slot="header" class="clearfix">
+          <span>参数预设</span>
         </div>
+        <div class="ordersName" v-for="(item,index) in templateData"
+             @click="selectOrder(item.templateId,item.templateName)">
+          {{item.templateName}}
+        </div>
+        <div class="cardFooter"><i class="el-icon-delete" @click="showDelModel"></i><i class="el-icon-edit"></i></div>
+      </el-card>
+      <div class="strategyContent">
+        <el-table
+          :data="tableData"
+          height="270px">
+          <el-table-column
+            prop="orderId"
+            label="编号"
+            width="135px"
+            :show-overflow-tooltip="true">
+          </el-table-column>
+          <el-table-column
+            prop="orderName"
+            label="指令名称">
+          </el-table-column>
+        </el-table>
       </div>
-      <hr class="boundary">
-      <add-strategy :addStrategy="addStrategy"></add-strategy>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="outerVisible = false">关 闭</el-button>
-        <el-button type="success" @click="addUser = true">导入指令模板</el-button>
-      </div>
-    </el-dialog>
-  </div>
+    </div>
+    <hr class="boundary">
+    <del-order :delOrder="delOrder" :delId="delId" @closeModel="closeModel"></del-order>
+    <div slot="footer" class="dialog-footer">
+      <el-button @click="closeAllModel">关 闭</el-button>
+      <el-button type="success" @click="">导入指令模板</el-button>
+    </div>
+  </el-dialog>
 </template>
 
 <script>
-  import addStrategy from './strategies/addStrategy'
+  import delOrder from './orders/delOrder'
 
   export default {
     components: {
-      addStrategy
+      delOrder
     },
     data () {
       return {
         manageOrders: true,
-        addStrategy: false,
+        delId: 0,
+        delOrder:false,
         templateData: [{
           'templateId': '1',
           'templateName': '格力空调', 'templateInfo': [{
@@ -86,7 +86,7 @@
     methods: {
       // 选中预设
       selectOrder (id, name) {
-        console.log(id)
+        this.delId = id
         this.tableData = []
         this.$nextTick(function () {
           let ordersName = document.getElementsByClassName('ordersName')
@@ -105,6 +105,19 @@
           }
         }
       },
+
+      showDelModel () {
+        this.delOrder = true
+      },
+
+      // 关闭子级模态框
+      closeModel () {
+        this.delOrder = false
+      },
+
+      closeAllModel () {
+        this.manageOrders = false
+      }
     },
     mounted () {
       this.selectOrder(this.templateData[0].templateId, this.templateData[0].templateName)
@@ -115,7 +128,7 @@
 <style scoped>
   @import '../../assets/public/model.css';
 
-  .user >>> .el-dialog {
+  .el-dialog__wrapper >>> .el-dialog {
     width: 660px;
   }
 
@@ -187,19 +200,34 @@
     border-radius: 4px;
   }
 
-  .user >>> .el-table th.is-leaf {
+  .el-dialog__wrapper >>> .el-table th.is-leaf {
     text-align: center;
     font-size: 14px;
     padding: 3px;
     border-bottom: 1px solid #BBBBBB;
   }
 
-  .user >>> .el-table td {
+  .el-dialog__wrapper >>> .el-table td {
     text-align: center;
     font-size: 14px;
     padding: 5px 0;
     border-bottom: 1px solid #BBBBBB;
     word-break: keep-all;
     white-space: nowrap;
+  }
+
+  .el-button--default, .el-button--success {
+    margin: 0;
+    border-radius: 8px;
+    font-size: 15px;
+  }
+
+  .el-button--default {
+    padding: 10px 26px;
+  }
+
+  .el-button--success {
+    float: left;
+    padding: 10px 15px;
   }
 </style>

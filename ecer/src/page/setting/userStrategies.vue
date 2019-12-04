@@ -7,16 +7,27 @@
              :before-close="closeAllModel">
     <hr class="boundary">
     <div class="body">
-      <el-card class="cardGroups">
-        <div slot="header" class="clearfix">
-          <span>参数预设</span>
-        </div>
-        <div class="strategiesName" v-for="(item,index) in strategiesList" @click="selectStrategy(item.id,item.name)">
-          {{item.name}}
-        </div>
-        <div class="cardFooter"><i class="el-icon-remove" @click="showDelModel"></i><i class="el-icon-circle-plus"
-                                                                                       @click="showAddModel"></i></div>
-      </el-card>
+      <div class="strategiesCards">
+        <el-card class="adminStrategies">
+          <div slot="header" class="clearfix">
+            <span>管理员预设</span>
+          </div>
+          <div class="adminStrategyName" v-for="(item,index) in strategiesList" @click="selectStrategy(item.id,item.name)">
+            {{item.name}}
+          </div>
+        </el-card>
+        <el-card class="usersStrategies">
+          <div slot="header" class="clearfix">
+            <span>自定义预设</span>
+          </div>
+          <div class="strategiesName" v-for="(item,index) in strategiesList" @click="selectStrategy(item.id,item.name)">
+            {{item.name}}
+          </div>
+          <div class="cardFooter"><i class="el-icon-remove" @click="showDelModel"></i><i class="el-icon-circle-plus"
+                                                                                         @click="showAddModel"></i>
+          </div>
+        </el-card>
+      </div>
       <div class="strategyContent">
         <div class="titleBoundary">
           <div class="title">时间管理</div>
@@ -105,7 +116,7 @@
         let hour, min
         this.selectId = id
         this.$nextTick(function () {
-          let strategiesName = document.getElementsByClassName('strategiesName')
+          let strategiesName = document.getElementsByClassName('adminStrategyName')
           for (let i = 0; i < strategiesName.length; i++) {
             let campus = strategiesName[i].innerText.replace(/\s/g, '')// 清除按钮导致的回车
             if (name === campus) {//被选中
@@ -160,5 +171,170 @@
 
 <style scoped>
   @import '../../assets/public/model.css';
-  @import '../../assets/manageStrategy.css';
+
+
+  .el-dialog__wrapper >>> .el-dialog {
+    width: 850px;
+  }
+
+  .body {
+    margin: 20px auto;
+    width: 95%;
+    height: 350px;
+  }
+
+  .strategiesCards {
+    float: left;
+    width: 33%;
+  }
+
+  .adminStrategies {
+    position: relative;
+    margin: 0 0 10px 9px;
+    width: 100%;
+    height: 139px;
+    border: 1px solid #BBBBBB;
+  }
+
+  .usersStrategies {
+    position: relative;
+    margin: 0 0 0 9px;
+    width: 100%;
+    height: 200px;
+    border: 1px solid #BBBBBB;
+  }
+
+  .adminStrategies >>> .el-card__header, .usersStrategies >>> .el-card__header {
+    font-size: 16px;
+    padding: 5px;
+    text-align: center;
+    background: #E8E8E8;
+    border-bottom: 1px solid #BBBBBB;
+  }
+
+  .adminStrategies >>> .el-card__body {
+    height: 100%;
+    overflow-y: auto;
+    padding: 0;
+    text-align: center;
+  }
+
+  .usersStrategies >>> .el-card__body {
+    height:100%;
+    overflow-y: auto;
+    padding: 0;
+    text-align: center;
+  }
+
+  .strategiesName,.adminStrategyName {
+    padding: 5px;
+    border-bottom: 1px solid #BBBBBB;
+  }
+
+  .cardFooter {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 30px;
+    line-height: 30px;
+    border-top: 1px solid #BBBBBB;
+  }
+
+  .el-icon-circle-plus {
+    float: right;
+    margin: 3px 0;
+    font-size: 24px;
+    color: #78AC3C;
+  }
+
+  .el-icon-remove {
+    float: right;
+    margin: 3px 7px 3px 5px;
+    font-size: 24px;
+    color: #AC3C3C;
+  }
+
+  .strategyContent {
+    float: right;
+    margin: 0 9px 0 0;
+    width: 62%;
+    height: 100%;
+    overflow-y: auto;
+    border: 1px solid #BBBBBB;
+    border-radius: 4px;
+  }
+
+  .strategyContent span {
+    color: #A8A8A8;
+    padding: 0 10px;
+  }
+
+  .titleBoundary {
+    position: relative;
+    margin: 17px auto 22px;
+    width: 91%;
+    border: 1px solid #BBBBBB;
+  }
+
+  .title {
+    position: absolute;
+    top: -12px;
+    left: 17px;
+    font-size: 16px;
+    padding: 0 5px;
+    background-color: white;
+  }
+
+  .manageTime, .manageTemp {
+    font-size: 14px;
+    padding: 17px 15px 8px;
+  }
+
+  .manageTime div {
+    margin-bottom: 7px;
+  }
+
+  .showTime {
+    height: 20px;
+  }
+
+  .startTime {
+    float: left
+  }
+
+  .endTime {
+    float: right;
+  }
+
+  .manageTemp {
+    height: 96px;
+    padding: 21px 12px 8px;
+  }
+
+  .manageTemp div {
+    margin-bottom: 13px;
+  }
+
+  .summerTemp {
+    float: left;
+  }
+
+  .winterTemp {
+    float: right;
+  }
+
+  .el-button--primary {
+    float: right;
+    margin: 10px 20px 10px 0;
+    width: 85px;
+    padding: 10px 20px;
+  }
+
+  .el-button--default {
+    margin: 0;
+    border-radius: 8px;
+    font-size: 15px;
+    padding: 10px 26px;
+  }
+
 </style>
