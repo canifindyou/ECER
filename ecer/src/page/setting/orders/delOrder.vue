@@ -24,7 +24,7 @@
 
   export default {
     props: {
-      delId: Number,
+      delId: String,
       delOrder: Boolean
     },
     data () {

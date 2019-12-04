@@ -30,13 +30,14 @@
         label="操作"
         width="180px">
         <template slot-scope="scope">
-          <el-button size="small" @click="modifyBrand=true">修 改</el-button>
+          <el-button size="small" @click="showModifyModel(scope.row.brandId)">修 改</el-button>
           <el-button size="small" type="danger" @click="showDelModel(scope.row.brandId)">删 除</el-button>
         </template>
       </el-table-column>
     </el-table>
     <hr class="boundary">
     <add-brand :addBrand="addBrand" @closeModel="closeModel"></add-brand>
+    <modify-brand :modifyBrand="modifyBrand" :modifyId="modifyId" @closeModel="closeModel"></modify-brand>
     <del-brand :delBrand="delBrand" :delId="delId" @closeModel="closeModel"></del-brand>
     <div slot="footer" class="dialog-footer">
       <el-button @click="closeAllModel">关 闭</el-button>
@@ -47,17 +48,21 @@
 
 <script>
   import addBrand from './brands/addBrand'
+  import modifyBrand from './brands/modifyBrand'
   import delBrand from './brands/delBrand'
 
   export default {
     components: {
       addBrand,
+      modifyBrand,
       delBrand
     },
     data () {
       return {
         manageBrands: true,
         addBrand: false,
+        modifyId: 0,
+        modifyBrand: false,
         delId: 0,
         delBrand: false,
         tableData: [{
@@ -80,6 +85,11 @@
         this.addBrand = true
       },
 
+      showModifyModel (id) {
+        this.modifyId = id
+        this.modifyBrand = true
+      },
+
       showDelModel (id) {
         this.delId = id
         this.delBrand = true
@@ -87,12 +97,15 @@
 
       closeModel () {
         this.addBrand = false
+        this.modifyId = 0
+        this.modifyBrand = false
         this.delId = 0
         this.delBrand = false
       },
 
       closeAllModel () {
         this.manageBrands = false
+        this.$emit('closeModel')
       }
     }
   }

@@ -30,13 +30,14 @@
         label="操作"
         width="180px">
         <template slot-scope="scope">
-          <el-button size="small" @click="modifyUser=true">修 改</el-button>
+          <el-button size="small" @click="showModifyModel(scope.row.id)">修 改</el-button>
           <el-button size="small" type="danger" @click="showDelModel(scope.row.id)">删 除</el-button>
         </template>
       </el-table-column>
     </el-table>
     <hr class="boundary">
     <add-user :addUser="addUser" @closeModel="closeModel"></add-user>
+    <modify-user :modifyUser="modifyUser" :modifyId="modifyId" @closeModel="closeModel"></modify-user>
     <del-user :delUser="delUser" :delId="delId" @closeModel="closeModel"></del-user>
     <div slot="footer" class="dialog-footer">
       <el-button @click="closeAllModel">关 闭</el-button>
@@ -47,17 +48,21 @@
 
 <script>
   import addUser from './users/addUser'
+  import modifyUser from './users/modifyUser'
   import delUser from './users/delUser'
 
   export default {
     components: {
       addUser,
+      modifyUser,
       delUser
     },
     data () {
       return {
         manageUsers: true,
         addUser: false,
+        modifyId:0,
+        modifyUser:false,
         delId: 0,
         delUser: false,
         tableData: [{
@@ -93,6 +98,11 @@
         this.addUser = true
       },
 
+      showModifyModel(id){
+        this.modifyId = id
+        this.modifyUser = true
+      },
+
       showDelModel (id) {
         this.delId = id
         this.delUser = true
@@ -100,14 +110,17 @@
 
       closeModel () {
         this.addUser = false
+        this.modifyId = 0
+        this.modifyUser = false
         this.delId = 0
         this.delUser = false
       },
 
       closeAllModel () {
         this.manageUsers = false
+        this.$emit('closeModel')
       }
-    }
+    },
   }
 </script>
 

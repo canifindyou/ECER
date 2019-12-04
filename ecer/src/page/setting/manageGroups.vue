@@ -364,6 +364,7 @@
 
       closeAllModel () {
         this.manageGroups = false
+        this.$emit('closeModel')
       }
     },
   }

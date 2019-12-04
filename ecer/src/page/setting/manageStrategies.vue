@@ -150,6 +150,7 @@
 
       closeAllModel () {
         this.manageStrategies = false
+        this.$emit('closeModel')
       }
     },
     mounted () {

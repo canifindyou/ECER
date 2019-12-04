@@ -41,7 +41,7 @@ export default new Router({
           aside: leftNav
         },
         childNode: true,
-        needData: true
+        needData: true,
       },
         {
           path: '/admin/waringInfo',
@@ -51,7 +51,7 @@ export default new Router({
             top: titleNav,
             aside: leftNav
           },
-          childNode: false,
+          childNode: true,
           needData: false,
           children: [{
             path: '/admin/waringInfo',
@@ -87,46 +87,47 @@ export default new Router({
         },
         {
           path: '/admin/adminSet',
-          name: '设置',
+          name: '系统管理',
           childNode: true,
           needData: false,
+          needList:true,
           components: {
             default: mySet,
             top: titleNav,
             aside: leftNav
           },
-          children: [
-            {
-              path: '/admin/adminSet/manageUsers',
-              name: '用户管理',
-              component: manageUsers
-            },
-            {
-              path: '/admin/adminSet/manageGroups',
-              name: '分组管理',
-              component: manageGroups
-            },
-            {
-              path: '/admin/adminSet/manageStrategies',
-              name: '策略管理',
-              component: manageStrategies
-            },
-            {
-              path: '/admin/adminSet/manageBrands',
-              name: '设备品牌管理',
-              component: manageBrands
-            },
-            {
-              path: '/admin/adminSet/manageOrders',
-              name: '控制项设置',
-              component: manageOrders
-            },
-            {
-              path: '/admin/adminSet/globalControl',
-              name: '全局配置',
-              component: globalControl
-            },
-          ]
+          // children: [
+          //   {
+          //     path: '/admin/adminSet/manageUsers',
+          //     name: '用户管理',
+          //     component: manageUsers
+          //   },
+          //   {
+          //     path: '/admin/adminSet/manageGroups',
+          //     name: '分组管理',
+          //     component: manageGroups
+          //   },
+          //   {
+          //     path: '/admin/adminSet/manageStrategies',
+          //     name: '策略管理',
+          //     component: manageStrategies
+          //   },
+          //   {
+          //     path: '/admin/adminSet/manageBrands',
+          //     name: '设备品牌管理',
+          //     component: manageBrands
+          //   },
+          //   {
+          //     path: '/admin/adminSet/manageOrders',
+          //     name: '控制项设置',
+          //     component: manageOrders
+          //   },
+          //   {
+          //     path: '/admin/adminSet/globalControl',
+          //     name: '全局配置',
+          //     component: globalControl
+          //   },
+          // ]
         }
       ]
     },
@@ -191,22 +192,15 @@ export default new Router({
             }]
         },
         {
-          path: '/user/userSet',
-          name: '设置',
-          childNode: true,
+          path: '/user/manageStrategies',
+          name: '策略管理',
+          childNode: false,
           needData: false,
           components: {
-            default: mySet,
+            default: userStrategies,
             top: titleNav,
             aside: leftNav
-          },
-          children: [
-            {
-              path: '/user/userSet/manageStrategies',
-              name: '策略管理',
-              component: userStrategies
-            }
-          ]
+          }
         }
       ]
     }]

@@ -36,25 +36,29 @@
     </div>
     <hr class="boundary">
     <del-order :delOrder="delOrder" :delId="delId" @closeModel="closeModel"></del-order>
+    <choose-brand :chooseBrand="chooseBrand" @closeModel="closeModel"></choose-brand>
     <div slot="footer" class="dialog-footer">
       <el-button @click="closeAllModel">关 闭</el-button>
-      <el-button type="success" @click="">导入指令模板</el-button>
+      <el-button type="success" @click="showBrandsList">导入指令模板</el-button>
     </div>
   </el-dialog>
 </template>
 
 <script>
   import delOrder from './orders/delOrder'
+  import chooseBrand from './orders/chooseBrand'
 
   export default {
     components: {
-      delOrder
+      delOrder,
+      chooseBrand
     },
     data () {
       return {
         manageOrders: true,
         delId: 0,
-        delOrder:false,
+        delOrder: false,
+        chooseBrand: false,
         templateData: [{
           'templateId': '1',
           'templateName': '格力空调', 'templateInfo': [{
@@ -80,7 +84,7 @@
             orderName: '恒温制热20度',
           }]
         }],
-        tableData: []
+        tableData: [],
       }
     },
     methods: {
@@ -110,13 +114,19 @@
         this.delOrder = true
       },
 
+      showBrandsList () {
+        this.chooseBrand = true
+      },
+
       // 关闭子级模态框
       closeModel () {
         this.delOrder = false
+        this.chooseBrand = false
       },
 
       closeAllModel () {
         this.manageOrders = false
+        this.$emit('closeModel')
       }
     },
     mounted () {

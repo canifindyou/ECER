@@ -1,8 +1,8 @@
 <template>
   <el-dialog
-    title="添加品牌型号"
+    :title="name"
     top="150px"
-    :visible.sync="addBrand"
+    :visible.sync="modifyBrand"
     :close-on-press-escape="false"
     :close-on-click-modal="false"
     :before-close="closeModel"
@@ -27,10 +27,11 @@
 <script>
   export default {
     props: {
-      addBrand: Boolean
+      modifyBrand: Boolean
     },
     data () {
       return {
+        name:'修改品牌型号',
         labelPosition: 'left',
         deviceData: {
           brandId: '',
@@ -40,7 +41,7 @@
     },
     methods:{
       closeModel(){
-        this.addBrand=false
+        this.modifyBrand=false
         this.$emit('closeModel')
       }
     }
