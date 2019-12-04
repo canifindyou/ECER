@@ -20,12 +20,22 @@ import manageOrders from '@/page/setting/manageOrders'
 import globalControl from '@/page/setting/globalControl'
 import userDeviceList from '@/page/user/userHome'
 import userStrategies from '@/page/setting/userStrategies'
+import login from "@/page/login/login"
 
 Vue.use(Router)
 
 export default new Router({
-  mode: 'history',
+  // mode: 'hash',
   routes: [
+    {
+      path: '/',
+      redirect: '/login',
+    },
+       {
+        path: '/login',
+        component: login,
+       },
+
     {
       path: '/admin',
       type: 'admin',

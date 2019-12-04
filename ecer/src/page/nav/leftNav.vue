@@ -99,9 +99,9 @@ export default {
   },
   mounted() {
    if(this.$route.path.split("/")[1] == "user"){
-     this.id = 1
+     this.id = 3
    }else{
-     this.id = 0
+     this.id = 2
    }
    console.log(this.roles )
    console.log(this.$router.options.routes)
