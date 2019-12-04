@@ -71,7 +71,7 @@ export default new Router({
         },
         {
           path: '/admin/data',
-          name: '数据统计',
+          name: '历史数据',
           components: {
             default: data,
             top: titleNav,
@@ -81,7 +81,7 @@ export default new Router({
           needData: false,
           children: [{
             path: '/admin/dataHistory/dataHistory',
-            name: '历史数据',
+            name: '历史状态',
             component: historyData
           },
             {
@@ -176,7 +176,7 @@ export default new Router({
         },
         {
           path: '/user/data',
-          name: '数据统计',
+          name: '历史数据',
           components: {
             default: data,
             top: titleNav,
@@ -186,7 +186,7 @@ export default new Router({
           needData: false,
           children: [{
             path: '/user/dataHistory/dataHistory',
-            name: '历史数据',
+            name: '历史状态',
             component: historyData
           },
             {
