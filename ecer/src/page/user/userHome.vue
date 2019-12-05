@@ -109,7 +109,48 @@
             </el-switch>
           </template>
         </el-table-column>
-      
+
+         <el-table-column
+          label="继电器控制"
+          prop="selfControl"
+          align="center"
+          width="200"
+        >
+          <template slot-scope="props">
+            <el-popover
+            v-if="props.row.selfControl"
+              placement="top-start"
+              title="提示"
+              width="100"
+              trigger="hover"
+              content="您需要关闭自控状态后操作"
+            >
+              <el-switch
+                slot="reference"
+                disabled="!props.row.selfControl"
+                v-model="props.row.jdControl"
+                active-color="#13ce66"
+                inactive-color="#ff3342"
+                @change="
+                  switchChange2($event, props.$index, props.row.selfControl)
+                "
+              >
+              </el-switch>
+            </el-popover>
+               <el-switch
+               v-if="!props.row.selfControl"
+                slot="reference"
+                v-model="props.row.jdControl"
+                active-color="#13ce66"
+                inactive-color="#ff3342"
+                @change="
+                  switchChange2($event, props.$index, props.row.selfControl)
+                "
+              >
+              </el-switch>
+          </template>
+        </el-table-column>
+        
       </el-table>
     </template>
     <!-- 添加弹窗 -->

@@ -15,6 +15,7 @@
           <el-radio v-model="radio" label="1">控制项</el-radio>
           <el-radio v-model="radio" label="2">定时设置</el-radio>
           <el-radio v-model="radio" label="3">自控设置</el-radio>
+          <el-radio v-model="radio" label="4">继电器设置</el-radio>
         </template>
       </div>
 
@@ -119,6 +120,21 @@
               inactive-color="#ff4949"
             >
             </el-switch>
+          </div>
+        </div>
+        <div class="tabBoxContent " v-show="radio == 4">
+          <div class="selectItemBox">
+            <!-- 继电器控制：<el-switch
+              v-model="switchAll"
+              active-color="#13ce66"
+              inactive-color="#ff4949"
+            >
+            </el-switch> -->
+            继电器控制：  <el-button type="success">闭合</el-button>
+            <el-button type="info">断开</el-button>
+            <p style="color:red;padding:20px 0 10px 0">
+              提示：对多个设备执行该操作时，将关闭所有设备的自控状态
+            </p>
           </div>
         </div>
         <!-- </transition> -->
@@ -263,7 +279,7 @@ export default {
       ],
       controlItem: "",
       selectTime: "",
-      switchAll:false,
+      switchAll: false,
       pickerOptions: {
         disabledDate(time) {
           return time.getTime() < Date.now() - 8.64e7; //如果没有后面的-8.64e6就是不可以选择今天的
