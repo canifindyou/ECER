@@ -117,7 +117,7 @@
             </el-switch>
           </template>
         </el-table-column>
-        <el-table-column
+         <el-table-column
           label="继电器控制"
           prop="selfControl"
           align="center"
@@ -125,7 +125,7 @@
         >
           <template slot-scope="props">
             <el-popover
-              v-if="props.row.selfControl"
+            v-if="props.row.selfControl"
               placement="top-start"
               title="提示"
               width="100"
@@ -144,17 +144,17 @@
               >
               </el-switch>
             </el-popover>
-            <el-switch
-              v-if="!props.row.selfControl"
-              slot="reference"
-              v-model="props.row.jdControl"
-              active-color="#13ce66"
-              inactive-color="#ff3342"
-              @change="
+               <el-switch
+               v-if="!props.row.selfControl"
+                slot="reference"
+                v-model="props.row.jdControl"
+                active-color="#13ce66"
+                inactive-color="#ff3342"
+                @change="
                   switchChange2($event, props.$index, props.row.selfControl)
                 "
-            >
-            </el-switch>
+              >
+              </el-switch>
           </template>
         </el-table-column>
       </el-table>

@@ -130,7 +130,7 @@
         >
           <template slot-scope="props">
             <el-popover
-              v-if="props.row.selfControl"
+            v-if="props.row.selfControl"
               placement="top-start"
               title="提示"
               width="100"
@@ -149,17 +149,17 @@
               >
               </el-switch>
             </el-popover>
-            <el-switch
-              v-if="!props.row.selfControl"
-              slot="reference"
-              v-model="props.row.jdControl"
-              active-color="#13ce66"
-              inactive-color="#ff3342"
-              @change="
+               <el-switch
+               v-if="!props.row.selfControl"
+                slot="reference"
+                v-model="props.row.jdControl"
+                active-color="#13ce66"
+                inactive-color="#ff3342"
+                @change="
                   switchChange2($event, props.$index, props.row.selfControl)
                 "
-            >
-            </el-switch>
+              >
+              </el-switch>
           </template>
         </el-table-column>
         <el-table-column
@@ -437,7 +437,8 @@ export default {
               label: "低风制冷18度"
             }
           ],
-          selfControl: true,
+          selfControl: false,
+          jdControl: true,
           location: "东二209",
           name: "空调一",
           id: "1123",
@@ -471,7 +472,8 @@ export default {
               label: "低风制冷18度"
             }
           ],
-          selfControl: true,
+          selfControl: false,
+          jdControl: true,
           location: "东二209",
           name: "空调一",
           id: "1123",
@@ -505,7 +507,8 @@ export default {
               label: "低风制冷18度"
             }
           ],
-          selfControl: "推拉框",
+          selfControl: false,
+          jdControl: true,
           location: "东二209",
           name: "空调一",
           id: "1123",
@@ -534,6 +537,10 @@ export default {
     switchChange(el, id) {
       //推拉框回调函数
       console.log(el, id);
+    },
+    switchChange2(el, id, selfStatus) {
+      // this.tableData[id].selfControl = !this.tableData[id].selfControl;
+      console.log(id);
     },
     searchClick() {
       //搜索功能
@@ -595,12 +602,12 @@ export default {
         message: "存在设备故障",
         type: "warning",
         duration: 0,
-        onClick:this.checkedInfo
+        onClick: this.checkedInfo
       });
     },
-    checkedInfo(){
-      this.$router.push("/waringInfo")
-      console.log("查看消息")
+    checkedInfo() {
+      this.$router.push("/waringInfo");
+      console.log("查看消息");
     }
   },
   watch: {
