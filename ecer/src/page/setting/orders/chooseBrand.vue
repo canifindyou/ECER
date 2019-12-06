@@ -15,9 +15,23 @@
         :options="options"
         :props="{ expandTrigger: 'hover' }"
       ></el-cascader>
+      <div class="bodyModal">
+        <el-upload
+          class="upload-demo"
+          drag
+          ref="upload"
+          action="http://172.16.211.152/sbkp/census/uploadExcel"
+          :auto-upload="false"
+          :on-success="uploadSucc"
+        >
+          <i class="el-icon-upload"></i>
+          <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+        </el-upload>
+      </div>
     </div>
     <hr class="boundary">
     <div slot="footer" class="dialog-footer">
+      <el-button class="download" type="warning" size="medium" @click="">模板下载</el-button>
       <el-button @click="closeModel">取 消</el-button>
       <el-button type="primary">确 定</el-button>
     </div>
@@ -79,7 +93,7 @@
   @import "../../../assets/public/subModal.css";
 
   .el-dialog__wrapper >>> .el-dialog {
-    width: 395px;
+    width: 520px;
   }
 
  .body{
@@ -100,5 +114,14 @@
     border-radius: 8px;
     font-size: 15px;
     padding: 10px 20px;
+  }
+
+  /*上传*/
+  .el-dialog__wrapper >>> .el-upload {
+    margin: 15px 54px;
+  }
+
+  .download {
+    float: left;
   }
 </style>

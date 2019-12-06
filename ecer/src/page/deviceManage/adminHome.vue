@@ -1,6 +1,7 @@
 <template>
   <div>
     <div class="tableHead">
+      <i class="el-icon-refresh"></i>
       <div class="tableHead-left">
         <el-button
           type="text"
@@ -52,6 +53,8 @@
       <el-table :data="tableData" style="width: 100%">
         <el-table-column
           type="expand"
+          label="查看详情"
+          width="78px"
           align="center"
           style="padding:0;height: 50px;"
         >
@@ -81,11 +84,14 @@
         </el-table-column>
         <el-table-column label="品牌" prop="brandge" align="center">
         </el-table-column>
-        <el-table-column label="环境温度" prop="ter" align="center">
+        <el-table-column label="环境温度" align="center">
+          <template slot-scope="scope">
+            {{scope.row.ter}}℃
+          </template>
         </el-table-column>
         <el-table-column label="当前状态" prop="status" align="center">
         </el-table-column>
-        <el-table-column label="电量" prop="nums" align="center">
+        <el-table-column label="已用电量" prop="nums" align="center">
         </el-table-column>
         <el-table-column label="控制" prop="control" width="200" align="center">
           <template slot-scope="props">
@@ -112,6 +118,46 @@
               active-color="#13ce66"
               inactive-color="#ff3342"
               @change="switchChange($event, props.$index)"
+            >
+            </el-switch>
+          </template>
+        </el-table-column>
+        <el-table-column
+          label="继电器控制"
+          prop="selfControl"
+          align="center"
+          width="200"
+        >
+          <template slot-scope="props">
+            <el-popover
+              v-if="props.row.selfControl"
+              placement="top-start"
+              title="提示"
+              width="100"
+              trigger="hover"
+              content="您需要关闭自控状态后操作"
+            >
+              <el-switch
+                slot="reference"
+                disabled="!props.row.selfControl"
+                v-model="props.row.jdControl"
+                active-color="#13ce66"
+                inactive-color="#ff3342"
+                @change="
+                  switchChange2($event, props.$index, props.row.selfControl)
+                "
+              >
+              </el-switch>
+            </el-popover>
+            <el-switch
+              v-if="!props.row.selfControl"
+              slot="reference"
+              v-model="props.row.jdControl"
+              active-color="#13ce66"
+              inactive-color="#ff3342"
+              @change="
+                  switchChange2($event, props.$index, props.row.selfControl)
+                "
             >
             </el-switch>
           </template>
@@ -364,7 +410,7 @@ export default {
       tableData: [
         //列表数据
         {
-          type: "一匹",
+          type: "1P",
           brandge: "格力",
           ter: "26",
           status: "通电未开机",
@@ -398,7 +444,7 @@ export default {
           ip: "172.16.22.18"
         },
         {
-          type: "一匹",
+          type: "1P",
           brandge: "格力",
           ter: "26",
           status: "断电",
@@ -432,7 +478,7 @@ export default {
           ip: "172.16.22.18"
         },
         {
-          type: "一匹",
+          type: "1P",
           brandge: "格力",
           ter: "26",
           status: "开机",
@@ -582,6 +628,20 @@ export default {
   display: inline-block;
   width: 49%;
 }
+
+.el-icon-refresh{
+  float: left;
+  margin-left:20px;
+  font-size: 34px;
+  font-weight: 900;
+  color: #5daf34;
+  padding-top:7px;
+}
+
+.tableHead-left{
+  float: left;
+}
+
 .tableHead .tableHead-right {
   display: inline-flex;
   flex-direction: row-reverse;

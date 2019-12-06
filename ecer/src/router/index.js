@@ -3,21 +3,14 @@ import Router from 'vue-router'
 import homePage from '@/page/homePage'
 import titleNav from '@/page/nav/header'
 import leftNav from '@/page/nav/leftNav'
-import shouye from '@/page/shouye'
 import waringInfoList from '@/page/waringInfo/waringInfo'
 import mySet from '@/page/mySet'
-import manageUsers from '@/page/setting/manageUsers'
 import deviceList from '@/page/deviceManage/adminHome'
 import data from '@/page/dataHistory/data'
 import historyData from '@/page/dataHistory/historyData'
 import instructHistory from '@/page/dataHistory/instructControllerHistory.vue'
 import selfControlStatus from '@/page/dataHistory/selfControlStatus.vue'
 import userHome from '@/page/userHome'
-import manageGroups from '@/page/setting/manageGroups'
-import manageStrategies from '@/page/setting/manageStrategies'
-import manageBrands from '@/page/setting/manageBrands'
-import manageOrders from '@/page/setting/manageOrders'
-import globalControl from '@/page/setting/globalControl'
 import userDeviceList from '@/page/user/userHome'
 import userStrategies from '@/page/setting/userStrategies'
 import login from "@/page/login/login"
@@ -66,7 +59,7 @@ export default new Router({
           children: [{
             path: '/admin/waringInfo',
             name: '通知详情',
-            component: manageUsers
+            component: waringInfoList
           }]
         },
         {
@@ -106,38 +99,6 @@ export default new Router({
             top: titleNav,
             aside: leftNav
           },
-          // children: [
-          //   {
-          //     path: '/admin/adminSet/manageUsers',
-          //     name: '用户管理',
-          //     component: manageUsers
-          //   },
-          //   {
-          //     path: '/admin/adminSet/manageGroups',
-          //     name: '分组管理',
-          //     component: manageGroups
-          //   },
-          //   {
-          //     path: '/admin/adminSet/manageStrategies',
-          //     name: '策略管理',
-          //     component: manageStrategies
-          //   },
-          //   {
-          //     path: '/admin/adminSet/manageBrands',
-          //     name: '设备品牌管理',
-          //     component: manageBrands
-          //   },
-          //   {
-          //     path: '/admin/adminSet/manageOrders',
-          //     name: '控制项设置',
-          //     component: manageOrders
-          //   },
-          //   {
-          //     path: '/admin/adminSet/globalControl',
-          //     name: '全局配置',
-          //     component: globalControl
-          //   },
-          // ]
         }
       ]
     },
@@ -167,12 +128,12 @@ export default new Router({
             top: titleNav,
             aside: leftNav
           },
-          childNode: false,
+          childNode: true,
           needData: false,
           children: [{
             path: '/user/waringInfo',
             name: '通知详情',
-            component: manageUsers
+            component: waringInfoList
           }]
         },
         {

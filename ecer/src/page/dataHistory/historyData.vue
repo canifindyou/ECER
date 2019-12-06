@@ -9,7 +9,12 @@
           </el-table-column>
           <el-table-column align="center" prop="warningDevice" label="蜂鸣器">
           </el-table-column>
-          <el-table-column align="center" prop="temp" label="温度">
+          <el-table-column align="center" label="温度">
+            <template slot-scope="scope">
+              {{scope.row.temp}}℃
+            </template>
+          </el-table-column>
+          <el-table-column align="center" prop="usedElectric" label="已用电量">
           </el-table-column>
           <el-table-column align="center" prop="powerStatus" label="电源">
           </el-table-column>
@@ -19,9 +24,9 @@
           </el-table-column>
           <el-table-column align="center" prop="selfControllStatus" label="自控状态">
           </el-table-column>
-           <el-table-column align="center" prop="obtainTime" label="采集时间">
+          <el-table-column align="center" prop="obtainTime" label="采集时间">
           </el-table-column>
-        
+
         </el-table>
       </template>
     </div>
@@ -29,98 +34,108 @@
 </template>
 
 <script>
-import searchHead from "../../components/searchHead/searchHead"
-export default {
-  data() {
-    return {
-      tableData: [
-        {
-          name: "空调一",
-          warningDevice: "开启",
-          temp: "22",
-          powerStatus: "电源",
-          voltage: "220V",
-          current: "5A",
-          obtainTime: "2019.12.1 12:22",
-          selfControllStatus:"开启"
-        },
-           {
-          name: "空调一",
-          warningDevice: "开启",
-          temp: "22",
-          powerStatus: "电源",
-          voltage: "220V",
-          current: "5A",
-          obtainTime: "2019.12.1 12:22",
-          selfControllStatus:"开启"
-        },
-           {
-          name: "空调一",
-          warningDevice: "开启",
-          temp: "22",
-          powerStatus: "电源",
-          voltage: "220V",
-          current: "5A",
-          obtainTime: "2019.12.1 12:22",
-          selfControllStatus:"开启"
-        },
-           {
-          name: "空调一",
-          warningDevice: "开启",
-          temp: "22",
-          powerStatus: "电源",
-          voltage: "220V",
-          current: "5A",
-          obtainTime: "2019.12.1 12:22",
-          selfControllStatus:"开启"
-        },
-           {
-          name: "空调一",
-          warningDevice: "开启",
-          temp: "22",
-          powerStatus: "电源",
-          voltage: "220V",
-          current: "5A",
-          obtainTime: "2019.12.1 12:22",
-          selfControllStatus:"开启"
-        },
-           {
-          name: "空调一",
-          warningDevice: "开启",
-          temp: "22",
-          powerStatus: "电源",
-          voltage: "220V",
-          current: "5A",
-          obtainTime: "2019.12.1 12:22",
-          selfControllStatus:"开启"
-        },
-        
-      ]
-    };
-  },
-  components:{
+  import searchHead from '../../components/searchHead/searchHead'
+
+  export default {
+    data () {
+      return {
+        tableData: [
+          {
+            name: '空调一',
+            warningDevice: '开启',
+            temp: '22',
+            usedElectric: '500V',
+            powerStatus: '电源',
+            voltage: '220V',
+            current: '5A',
+            obtainTime: '2019.12.1 12:22',
+            selfControllStatus: '开启'
+          },
+          {
+            name: '空调一',
+            warningDevice: '开启',
+            temp: '22',
+            usedElectric: '500V',
+            powerStatus: '电源',
+            voltage: '220V',
+            current: '5A',
+            obtainTime: '2019.12.1 12:22',
+            selfControllStatus: '开启'
+          },
+          {
+            name: '空调一',
+            warningDevice: '开启',
+            temp: '22',
+            usedElectric: '500V',
+            powerStatus: '电源',
+            voltage: '220V',
+            current: '5A',
+            obtainTime: '2019.12.1 12:22',
+            selfControllStatus: '开启'
+          },
+          {
+            name: '空调一',
+            warningDevice: '开启',
+            temp: '22',
+            usedElectric: '500V',
+            powerStatus: '电源',
+            voltage: '220V',
+            current: '5A',
+            obtainTime: '2019.12.1 12:22',
+            selfControllStatus: '开启'
+          },
+          {
+            name: '空调一',
+            warningDevice: '开启',
+            temp: '22',
+            usedElectric: '500V',
+            powerStatus: '电源',
+            voltage: '220V',
+            current: '5A',
+            obtainTime: '2019.12.1 12:22',
+            selfControllStatus: '开启'
+          },
+          {
+            name: '空调一',
+            warningDevice: '开启',
+            temp: '22',
+            usedElectric: '500V',
+            powerStatus: '电源',
+            voltage: '220V',
+            current: '5A',
+            obtainTime: '2019.12.1 12:22',
+            selfControllStatus: '开启'
+          },
+
+        ]
+      }
+    },
+    components: {
       searchHead
+    }
   }
-};
 </script>
 
 <style scoped>
-.contentbox {
-  display: inline-flex;
-}
-.tableHead {
-  /* height: 50px; */
-  /* border-bottom: 1px solid #000; */
-  /* line-height: 20px; */
-  display: block;
-  /* padding: 0 0 0 5px; */
-}
-.tableHead .selectItem {
-  display: block;
-  padding: 10px 5px 0 10px;
-}
-.select-box {
-  border: 1px #eee solid;
-  padding: 0px 20px 0 0px;
-}
+  .contentbox {
+    display: inline-flex;
+  }
+
+  .tableHead {
+    /* height: 50px; */
+    /* border-bottom: 1px solid #000; */
+    /* line-height: 20px; */
+    display: block;
+    /* padding: 0 0 0 5px; */
+  }
+
+  .tableHead .selectItem {
+    display: block;
+    padding: 10px 5px 0 10px;
+  }
+
+  .select-box {
+    border: 1px #eee solid;
+    padding: 0px 20px 0 0px;
+  }
 </style>

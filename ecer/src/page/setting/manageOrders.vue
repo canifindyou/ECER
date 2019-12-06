@@ -15,7 +15,7 @@
              @click="selectOrder(item.templateId,item.templateName)">
           {{item.templateName}}
         </div>
-        <div class="cardFooter"><i class="el-icon-delete" @click="showDelModel"></i><i class="el-icon-edit"></i></div>
+        <div class="cardFooter"><i class="el-icon-delete" @click="showDelModel"></i><i class="el-icon-edit" @click="modifyTemplate"></i></div>
       </el-card>
       <div class="strategyContent">
         <el-table
@@ -35,7 +35,7 @@
       </div>
     </div>
     <hr class="boundary">
-    <del-order :delOrder="delOrder" :delId="delId" @closeModel="closeModel"></del-order>
+    <del-order :delOrder="delOrder" :delId="selectId" @closeModel="closeModel"></del-order>
     <choose-brand :chooseBrand="chooseBrand" @closeModel="closeModel"></choose-brand>
     <div slot="footer" class="dialog-footer">
       <el-button @click="closeAllModel">关 闭</el-button>
@@ -56,7 +56,8 @@
     data () {
       return {
         manageOrders: true,
-        delId: 0,
+        selectId: 0,
+        selectName:'',
         delOrder: false,
         chooseBrand: false,
         templateData: [{
@@ -90,7 +91,8 @@
     methods: {
       // 选中预设
       selectOrder (id, name) {
-        this.delId = id
+        this.selectId = id
+        this.selectName = name
         this.tableData = []
         this.$nextTick(function () {
           let ordersName = document.getElementsByClassName('ordersName')
@@ -108,6 +110,34 @@
             this.tableData = this.templateData[i].templateInfo
           }
         }
+      },
+
+      modifyTemplate(){
+        let self = this
+        let id = this.selectId
+        // 将需要修改的div被输入框覆盖
+        let div = document.getElementsByClassName('el-card__body')
+        let newDiv = document.createElement('div')
+        newDiv.setAttribute('class', 'ordersName')// 设置class属性
+        newDiv.innerHTML = '<input type="text" value=' + this.selectName + ' style="text-align: center"/>'// 添加input框
+        console.log(div[0])
+        div[0].insertBefore(newDiv, div[0].childNodes[1])// 插入有input框的div
+        div[0].childNodes[2].style.display = 'none'// 隐藏要修改的div
+        newDiv.childNodes[0].addEventListener('blur', function () {// input框失焦后的操作
+        //   let newCampus = newDiv.childNodes[0].value// 取值
+        //   let campusData = newCampus.split('校区')[0]// 取出校区前的文字判断是否填写校区名
+        //   if (campusData) {
+        //     // 调用修改校区接口
+        //     self.allCampuses[index].name = newCampus// 取得返回值并修改数组
+        //     div[0].childNodes[index + 2].style.display = 'block'// 显示修改后的div
+        //     newDiv.remove()// 移除div
+        //   } else {
+        //     console.log('请按照XX校区的格式修改')
+        //     newDiv.childNodes[0].focus()
+        //   }
+        })
+        // let inputSelect = newDiv.childNodes[0]
+        // inputSelect.focus()// input框获取焦点
       },
 
       showDelModel () {
@@ -239,5 +269,22 @@
   .el-button--success {
     float: left;
     padding: 10px 15px;
+  }
+</style>
+
+<style>
+  .ordersName {
+    padding: 5px;
+    border-bottom: 1px solid #BBBBBB;
+  }
+
+  input {
+    width: 50%;
+    padding: 0 0 3px 3px;
+    border-top: 0;
+    border-left: 0;
+    border-right: 0;
+    border-bottom: 1px solid #BBB;
+    outline: none;
   }
 </style>

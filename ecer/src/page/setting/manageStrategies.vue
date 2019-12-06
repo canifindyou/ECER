@@ -47,12 +47,15 @@
             </div>
           </div>
         </div>
-        <el-button type="primary">修 改</el-button>
+        <el-button type="primary" @click="showModifyModel">修 改</el-button>
+        <el-button type="warning" @click="showGroupModel">应 用</el-button>
       </div>
     </div>
     <hr class="boundary">
     <add-strategy :addStrategy="addStrategy" @closeModel="closeModel"></add-strategy>
+    <modify-strategy :modifyStrategy="modifyStrategy" @closeModel="closeModel"></modify-strategy>
     <del-strategy :delStrategy="delStrategy" :delId="selectId" @closeModel="closeModel"></del-strategy>
+    <use-strategy :groupModel="groupModel"></use-strategy>
     <div slot="footer" class="dialog-footer">
       <el-button @click="closeAllModel">关 闭</el-button>
     </div>
@@ -61,19 +64,25 @@
 
 <script>
   import addStrategy from './strategies/addStrategy'
+  import modifyStrategy from './strategies/modifyStrategy'
   import delStrategy from './strategies/delStrategy'
+  import useStrategy from './strategies/useStrategy'
 
   export default {
     components: {
       addStrategy,
-      delStrategy
+      modifyStrategy,
+      delStrategy,
+      useStrategy
     },
     data () {
       return {
         manageStrategies: true,
         addStrategy: false,
         selectId: 0,
+        modifyStrategy: false,
         delStrategy: false,
+        groupModel: false,
         strategiesList: [{
           'id': 1,
           'name': '预设一',
@@ -100,6 +109,10 @@
       }
     },
     methods: {
+      showGroupModel () {
+        this.groupModel = true
+      },
+
       // 选中预设
       selectStrategy (id, name) {
         let hour, min
@@ -136,6 +149,10 @@
       // 添加新策略
       showAddModel () {
         this.addStrategy = true
+      },
+
+      showModifyModel () {
+        this.modifyStrategy = true
       },
 
       showDelModel () {

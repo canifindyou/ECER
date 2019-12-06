@@ -58,7 +58,8 @@
             </div>
           </div>
         </div>
-        <el-button type="primary">修 改</el-button>
+<!--        <el-button type="primary">修 改</el-button>-->
+        <el-button type="warning">应 用</el-button>
       </div>
     </div>
     <hr class="boundary">
@@ -280,6 +281,7 @@
     position: absolute;
     top: -12px;
     left: 17px;
+    margin: 0;
     font-size: 16px;
     padding: 0 5px;
     background-color: white;
@@ -323,7 +325,7 @@
     float: right;
   }
 
-  .el-button--primary {
+  .el-button--primary,.el-button--warning {
     float: right;
     margin: 10px 20px 10px 0;
     width: 85px;

@@ -1,8 +1,8 @@
 <template>
   <el-dialog
-    title="添加策略"
+    title="修改策略"
     top="50px"
-    :visible.sync="addStrategy"
+    :visible.sync="modifyStrategy"
     :close-on-press-escape="false"
     :close-on-click-modal="false"
     :before-close="closeModel"
@@ -118,7 +118,7 @@
 <script>
   export default {
     props: {
-      addStrategy: Boolean
+      modifyStrategy: Boolean
     },
     data () {
       return {
@@ -174,7 +174,7 @@
       },
 
       closeModel () {
-        this.addStrategy = false
+        this.modifyStrategy = false
         this.$emit('closeModel')
       },
     }

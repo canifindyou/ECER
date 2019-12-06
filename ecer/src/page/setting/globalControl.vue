@@ -124,6 +124,7 @@
     position: absolute;
     top: -12px;
     left: 17px;
+    margin: 0;
     font-size: 16px;
     padding: 0 5px;
     background-color: white;

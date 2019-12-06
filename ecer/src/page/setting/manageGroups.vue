@@ -42,7 +42,7 @@
              @click="selectClassroom(item.name,index)">
           {{item.name}}
           <div v-show="showClassroomOperate===index" class="operation">
-            <i class="el-icon-edit"></i>
+            <i class="el-icon-edit" @click="modifyClassroom(index,item.name)"></i>
             <i class="el-icon-delete" @click="delClassroom(item.id)"></i>
           </div>
         </div>
@@ -301,7 +301,7 @@
         // 将需要修改的div被输入框覆盖
         let div = document.getElementsByClassName('el-card__body')
         let newDiv = document.createElement('div')
-        newDiv.setAttribute('class', 'campusesList')// 设置class属性
+        newDiv.setAttribute('class', 'buildingsList')// 设置class属性
         newDiv.innerHTML = '<input type="text" value=' + buildingName + ' style="text-align: center"/>'// 添加input框
         div[1].insertBefore(newDiv, div[1].childNodes[index + 1])// 插入有input框的div
         div[1].childNodes[index + 2].style.display = 'none'// 隐藏要修改的div
@@ -319,6 +319,35 @@
           } else {
             console.log('请按照"楼栋名(层数)"的格式修改')
             newDiv.childNodes[0].focus()
+          }
+        })
+        let inputSelect = newDiv.childNodes[0]
+        inputSelect.focus()// input框获取焦点
+      },
+
+      // 修改教室
+      modifyClassroom (index, name,) {
+        let self = this
+        // 将需要修改的div被输入框覆盖
+        let div = document.getElementsByClassName('el-card__body')
+        let newDiv = document.createElement('div')
+        newDiv.setAttribute('class', 'classroomsList')// 设置class属性
+        newDiv.innerHTML = '<input type="text" value=' + name + ' style="text-align: center"/>'// 添加input框
+        div[2].insertBefore(newDiv, div[2].childNodes[index + 1])// 插入有input框的div
+        div[2].childNodes[index + 2].style.display = 'none'// 隐藏要修改的div
+        newDiv.childNodes[0].addEventListener('blur', function () {// input框失焦后的操作
+          let newClassroom = newDiv.childNodes[0].value// 取值
+          console.log(newClassroom)
+          // let newBuilding = buildingData.split('(')[0]// 取出楼栋名
+          // let newFloor = parseInt(buildingData.substring(buildingData.indexOf('(') + 1, buildingData.indexOf(')')))// 取出层数并转换为数字
+          if (newClassroom) {
+            // 调用修改校区接口
+            self.classroomsData[index].name = newClassroom// 取得返回值并修改数组
+            div[2].childNodes[index + 2].style.display = 'block'// 显示修改后的div
+            div[2].childNodes[index + 2].style.background = '#BBB'// 显示修改后的div
+            newDiv.remove()// 移除div
+          }else{
+            console.log('数据不能为空')
           }
         })
         let inputSelect = newDiv.childNodes[0]
