@@ -1,5 +1,5 @@
 .el-dialog__wrapper >>> .el-dialog {
-  width: 850px;
+  width: 700px;
 }
 
 .body {
@@ -115,7 +115,7 @@
 
 .manageTemp {
   height: 96px;
-  padding: 21px 12px 8px;
+  padding: 22px 26px 8px 22px;
 }
 
 .manageTemp div {

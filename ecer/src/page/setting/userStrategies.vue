@@ -12,7 +12,8 @@
           <div slot="header" class="clearfix">
             <span>管理员预设</span>
           </div>
-          <div class="adminStrategyName" v-for="(item,index) in strategiesList" @click="selectStrategy(item.id,item.name)">
+          <div class="adminStrategyName" v-for="(item,index) in adminList"
+               @click="selectAdminStrategy(item.id,item.name)">
             {{item.name}}
           </div>
         </el-card>
@@ -20,7 +21,8 @@
           <div slot="header" class="clearfix">
             <span>自定义预设</span>
           </div>
-          <div class="strategiesName" v-for="(item,index) in strategiesList" @click="selectStrategy(item.id,item.name)">
+          <div class="userStrategiesName" v-for="(item,index) in userList"
+               @click="selectUserStrategy(item.id,item.name)">
             {{item.name}}
           </div>
           <div class="cardFooter"><i class="el-icon-remove" @click="showDelModel"></i><i class="el-icon-circle-plus"
@@ -47,18 +49,18 @@
           <div class="title">温度参数设置</div>
           <div class="manageTemp">
             <div class="summerTemp">
-              <div>夏季送电最低温: <span>{{strategyInfo.transPowerLowTemp}}</span>度</div>
-              <div>环境温度最低温: <span>{{strategyInfo.TALowTemp}}</span>度</div>
-              <div>空调可用最低温:<span>{{strategyInfo.airLowTemp}}</span></div>
+              <div>夏季送电温度: <span>{{strategyInfo.transPowerSTemp}}</span>度</div>
+              <div>夏季断电温度: <span>{{strategyInfo.failPowerSTemp}}</span>度</div>
+              <div>夏季温度回调: <span>{{strategyInfo.callbackSTemp}}</span>度</div>
             </div>
             <div class="winterTemp">
-              <div>冬季送电最高温: <span>{{strategyInfo.transPowerHighTemp}}</span>度</div>
-              <div>环境温度最高温: <span>{{strategyInfo.TAHighTemp}}</span>度</div>
-              <div>空调可用最高温:<span>{{strategyInfo.airHighTemp}}</span></div>
+              <div>冬季送电温度: <span>{{strategyInfo.transPowerWTemp}}</span>度</div>
+              <div>冬季断电温度: <span>{{strategyInfo.failPowerWTemp}}</span>度</div>
+              <div>冬季温度回调: <span>{{strategyInfo.callbackWTemp}}</span>度</div>
             </div>
           </div>
         </div>
-<!--        <el-button type="primary">修 改</el-button>-->
+        <el-button type="primary" v-show="showModify">修 改</el-button>
         <el-button type="warning">应 用</el-button>
       </div>
     </div>
@@ -83,26 +85,49 @@
     data () {
       return {
         manageStrategies: true,
+        showModify: false,
         addStrategy: false,
         selectId: 0,
         delStrategy: false,
-        strategiesList: [{
+        adminList: [{
           'id': 1,
           'name': '预设一',
           'executionTime': ['星期一', '星期二', '星期一', '星期二', '星期一', '星期二', '星期一'],
           'executionStrategy': '按时段执行',
           'startTime': '08:00',
           'endTime': '17:00',
-          'transPowerLowTemp': '26',
-          'TALowTemp': '26',
-          'airLowTemp': '恒温制冷26度',
-          'transPowerHighTemp': '10',
-          'TAHighTemp': '10',
-          'airHighTemp': '恒温制热20度',
+          'transPowerSTemp': '26',
+          'failPowerSTemp': '26',
+          'callbackSTemp': '26',
+          'transPowerWTemp': '10',
+          'failPowerWTemp': '10',
+          'callbackWTemp': '10',
         },
           {
             'id': 2,
             'name': '预设二',
+            'executionTime': ['星期一', '星期二'],
+            'executionStrategy': '全天执行',
+            'startTime': '00:00',
+            'endTime': '00:00'
+          },],
+        userList: [{
+          'id': 1,
+          'name': '111',
+          'executionTime': ['星期一', '星期二', '星期一', '星期二', '星期一', '星期二', '星期一'],
+          'executionStrategy': '按时段执行',
+          'startTime': '08:00',
+          'endTime': '17:00',
+          'transPowerSTemp': '26',
+          'failPowerSTemp': '26',
+          'callbackSTemp': '26',
+          'transPowerWTemp': '10',
+          'failPowerWTemp': '10',
+          'callbackWTemp': '10',
+        },
+          {
+            'id': 2,
+            'name': '222',
             'executionTime': ['星期一', '星期二'],
             'executionStrategy': '全天执行',
             'startTime': '00:00',
@@ -113,11 +138,16 @@
     },
     methods: {
       // 选中预设
-      selectStrategy (id, name) {
+      selectAdminStrategy (id, name) {
+        this.showModify = false
         let hour, min
         this.selectId = id
         this.$nextTick(function () {
           let strategiesName = document.getElementsByClassName('adminStrategyName')
+          let userStrategiesName = document.getElementsByClassName('userStrategiesName')
+          for (let i = 0; i < userStrategiesName.length; i++) {
+            userStrategiesName[i].style.background = '#FFF'
+          }
           for (let i = 0; i < strategiesName.length; i++) {
             let campus = strategiesName[i].innerText.replace(/\s/g, '')// 清除按钮导致的回车
             if (name === campus) {//被选中
@@ -127,9 +157,46 @@
             }
           }
         })
-        for (let i = 0; i < this.strategiesList.length; i++) {
-          if (id === this.strategiesList[i].id) {
-            this.strategyInfo = this.strategiesList[i]
+        for (let i = 0; i < this.adminList.length; i++) {
+          if (id === this.adminList[i].id) {
+            this.strategyInfo = this.adminList[i]
+            if ((typeof this.strategyInfo.executionTime == 'object') && this.strategyInfo.executionTime.constructor === Array) {
+              this.strategyInfo.executionTime = this.strategyInfo.executionTime.join('、')
+            }
+            hour = this.strategyInfo.startTime.split(':')[0]
+            min = this.strategyInfo.startTime.split(':')[1]
+            this.strategyInfo.startTimeHour = hour
+            this.strategyInfo.startTimeMin = min
+            hour = this.strategyInfo.endTime.split(':')[0]
+            min = this.strategyInfo.endTime.split(':')[1]
+            this.strategyInfo.endTimeHour = hour
+            this.strategyInfo.endTimeMin = min
+          }
+        }
+      },
+
+      selectUserStrategy (id, name) {
+        this.showModify = true
+        let hour, min
+        this.selectId = id
+        this.$nextTick(function () {
+          let strategiesName = document.getElementsByClassName('userStrategiesName')
+          let adminStrategiesName = document.getElementsByClassName('adminStrategyName')
+          for (let i = 0; i < adminStrategiesName.length; i++) {
+            adminStrategiesName[i].style.background = '#FFF'
+          }
+          for (let i = 0; i < strategiesName.length; i++) {
+            let campus = strategiesName[i].innerText.replace(/\s/g, '')// 清除按钮导致的回车
+            if (name === campus) {//被选中
+              strategiesName[i].style.background = '#BBB'
+            } else {
+              strategiesName[i].style.background = '#FFF'
+            }
+          }
+        })
+        for (let i = 0; i < this.userList.length; i++) {
+          if (id === this.userList[i].id) {
+            this.strategyInfo = this.userList[i]
             if ((typeof this.strategyInfo.executionTime == 'object') && this.strategyInfo.executionTime.constructor === Array) {
               this.strategyInfo.executionTime = this.strategyInfo.executionTime.join('、')
             }
@@ -165,7 +232,7 @@
       }
     },
     mounted () {
-      this.selectStrategy(this.strategiesList[0].id, this.strategiesList[0].name)
+      this.selectAdminStrategy(this.adminList[0].id, this.adminList[0].name)
     }
   }
 </script>
@@ -175,7 +242,7 @@
 
 
   .el-dialog__wrapper >>> .el-dialog {
-    width: 850px;
+    width: 700px;
   }
 
   .body {
@@ -221,13 +288,13 @@
   }
 
   .usersStrategies >>> .el-card__body {
-    height:100%;
+    height: 100%;
     overflow-y: auto;
     padding: 0;
     text-align: center;
   }
 
-  .strategiesName,.adminStrategyName {
+  .userStrategiesName, .adminStrategyName {
     padding: 5px;
     border-bottom: 1px solid #BBBBBB;
   }
@@ -310,7 +377,7 @@
 
   .manageTemp {
     height: 96px;
-    padding: 21px 12px 8px;
+    padding: 22px 26px 8px 22px;
   }
 
   .manageTemp div {
@@ -325,7 +392,7 @@
     float: right;
   }
 
-  .el-button--primary,.el-button--warning {
+  .el-button--primary, .el-button--warning {
     float: right;
     margin: 10px 20px 10px 0;
     width: 85px;

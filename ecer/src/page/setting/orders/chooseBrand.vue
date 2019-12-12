@@ -9,12 +9,8 @@
     append-to-body>
     <hr class="boundary">
     <div class="body">
-      <span class="demonstration">请选择需要添加指令模板对应的设备型号</span>
-      <el-cascader
-        v-model="options.value"
-        :options="options"
-        :props="{ expandTrigger: 'hover' }"
-      ></el-cascader>
+      <span class="demonstration">请选择需要添加指令模板的名称</span>
+      <el-input v-model="input" placeholder="请输入内容"></el-input>
       <div class="bodyModal">
         <el-upload
           class="upload-demo"

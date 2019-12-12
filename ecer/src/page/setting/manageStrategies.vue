@@ -36,14 +36,14 @@
           <div class="title">温度参数设置</div>
           <div class="manageTemp">
             <div class="summerTemp">
-              <div>夏季送电最低温: <span>{{strategyInfo.transPowerLowTemp}}</span>度</div>
-              <div>环境温度最低温: <span>{{strategyInfo.TALowTemp}}</span>度</div>
-              <div>空调可用最低温:<span>{{strategyInfo.airLowTemp}}</span></div>
+              <div>夏季送电温度: <span>{{strategyInfo.transPowerSTemp}}</span>度</div>
+              <div>夏季断电温度: <span>{{strategyInfo.failPowerSTemp}}</span>度</div>
+              <div>夏季温度回调: <span>{{strategyInfo.callbackSTemp}}</span>度</div>
             </div>
             <div class="winterTemp">
-              <div>冬季送电最高温: <span>{{strategyInfo.transPowerHighTemp}}</span>度</div>
-              <div>环境温度最高温: <span>{{strategyInfo.TAHighTemp}}</span>度</div>
-              <div>空调可用最高温:<span>{{strategyInfo.airHighTemp}}</span></div>
+              <div>冬季送电温度: <span>{{strategyInfo.transPowerWTemp}}</span>度</div>
+              <div>冬季断电温度: <span>{{strategyInfo.failPowerWTemp}}</span>度</div>
+              <div>冬季温度回调: <span>{{strategyInfo.callbackWTemp}}</span>度</div>
             </div>
           </div>
         </div>
@@ -90,12 +90,12 @@
           'executionStrategy': '按时段执行',
           'startTime': '08:00',
           'endTime': '17:00',
-          'transPowerLowTemp': '26',
-          'TALowTemp': '26',
-          'airLowTemp': '恒温制冷26度',
-          'transPowerHighTemp': '10',
-          'TAHighTemp': '10',
-          'airHighTemp': '恒温制热20度',
+          'transPowerSTemp': '26',
+          'failPowerSTemp': '26',
+          'callbackSTemp': '26',
+          'transPowerWTemp': '10',
+          'failPowerWTemp': '10',
+          'callbackWTemp': '10',
         },
           {
             'id': 2,
@@ -162,6 +162,7 @@
       // 关闭子级模态框
       closeModel () {
         this.addStrategy = false
+        this.modifyStrategy = false
         this.delStrategy = false
       },
 

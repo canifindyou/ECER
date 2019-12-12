@@ -39,6 +39,12 @@
 
 .operation {
   float: right;
+  cursor:pointer
+}
+
+.operation .el-icon-delete{
+  margin-left: 2px;
+  margin-right: 2px;
 }
 
 .cardFooter {
@@ -55,6 +61,7 @@
   margin: 3px 7px;
   font-size: 24px;
   color: #78AC3C;
+  cursor:pointer
 }
 
 /*.text:active{*/

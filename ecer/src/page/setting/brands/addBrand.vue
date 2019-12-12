@@ -10,16 +10,16 @@
     <hr class="boundary">
     <el-form :label-position="labelPosition" label-width="90px">
       <el-form-item label="设备品牌">
-        <el-input v-model="deviceData.brandId"></el-input>
+        <el-input v-model="deviceData.brandName"></el-input>
       </el-form-item>
       <el-form-item label="设备型号">
-        <el-input v-model="deviceData.brandName"></el-input>
+        <el-input v-model="deviceData.brandType"></el-input>
       </el-form-item>
     </el-form>
     <hr class="boundary">
     <div slot="footer" class="dialog-footer">
       <el-button @click="closeModel">取 消</el-button>
-      <el-button type="primary">保 存</el-button>
+      <el-button type="primary" @click="clickAdd">保 存</el-button>
     </div>
   </el-dialog>
 </template>
@@ -33,16 +33,41 @@
       return {
         labelPosition: 'left',
         deviceData: {
-          brandId: '',
           brandName: '',
+          brandType: ''
         },
       }
     },
-    methods:{
-      closeModel(){
-        this.addBrand=false
+    methods: {
+      clickAdd () {
+        let self = this
+        $.ajax({
+          type: 'POST',
+          url: 'http://172.16.211.75:8080/models',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          dataType: 'json',
+          data: JSON.stringify({
+            'brandName': self.deviceData.brandName,
+            'modelName': self.deviceData.brandType
+          }),
+          success (data) {
+            console.log(data)
+            self.closeModel()
+          }
+        })
+      },
+
+      closeModel () {
+        this.addBrand = false
+        this.deviceData.brandName=''
+        this.deviceData.brandType=''
+        this.$emit('showBrandsList')
         this.$emit('closeModel')
       }
+    },
+    mounted () {
     }
   }
 </script>

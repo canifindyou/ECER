@@ -9,7 +9,7 @@
     <div class="body">
       <el-card class="cardGroups">
         <div slot="header" class="clearfix">
-          <span>参数预设</span>
+          <span>指令模板</span>
         </div>
         <div class="ordersName" v-for="(item,index) in templateData"
              @click="selectOrder(item.templateId,item.templateName)">

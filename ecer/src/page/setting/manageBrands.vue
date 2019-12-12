@@ -7,11 +7,12 @@
              :before-close="closeAllModel">
     <hr class="boundary">
     <el-table
-      :data="tableData"
+      :data="brandData"
       height="270px"
       style="width: 90%">
       <el-table-column
-        prop="brandId"
+        type="index"
+        prop="id"
         label="编号"
         width="135px"
         :show-overflow-tooltip="true">
@@ -21,7 +22,7 @@
         label="品牌">
       </el-table-column>
       <el-table-column
-        prop="deviceType"
+        prop="modelName"
         label="型号"
         width="110px"
         :show-overflow-tooltip="true">
@@ -30,15 +31,15 @@
         label="操作"
         width="180px">
         <template slot-scope="scope">
-          <el-button size="small" @click="showModifyModel(scope.row.brandId)">修 改</el-button>
-          <el-button size="small" type="danger" @click="showDelModel(scope.row.brandId)">删 除</el-button>
+          <el-button size="small" @click="showModifyModel(scope.$index,scope.row.id)">修 改</el-button>
+          <el-button size="small" type="danger" @click="showDelModel(scope.row.id)">删 除</el-button>
         </template>
       </el-table-column>
     </el-table>
     <hr class="boundary">
-    <add-brand :addBrand="addBrand" @closeModel="closeModel"></add-brand>
-    <modify-brand :modifyBrand="modifyBrand" :modifyId="modifyId" @closeModel="closeModel"></modify-brand>
-    <del-brand :delBrand="delBrand" :delId="delId" @closeModel="closeModel"></del-brand>
+    <add-brand :addBrand="addBrand" @showBrandsList="showBrandsList" @closeModel="closeModel"></add-brand>
+    <modify-brand :modifyBrand="modifyBrand" :modifyInfo="modifyInfo" @showBrandsList="showBrandsList" @closeModel="closeModel"></modify-brand>
+    <del-brand :delBrand="delBrand" :delId="delId" @showBrandsList="showBrandsList" @closeModel="closeModel"></del-brand>
     <div slot="footer" class="dialog-footer">
       <el-button @click="closeAllModel">关 闭</el-button>
       <el-button type="success" @click="showAddModel">添 加</el-button>
@@ -61,32 +62,37 @@
       return {
         manageBrands: true,
         addBrand: false,
-        modifyId: 0,
+        modifyInfo: {},
         modifyBrand: false,
         delId: 0,
         delBrand: false,
-        tableData: [{
-          brandId: '1',
-          brandName: '美的',
-          deviceType: '1111'
-        }, {
-          brandId: '2',
-          brandName: '美的',
-          deviceType: '2222'
-        }, {
-          brandId: '3',
-          brandName: '格力',
-          deviceType: '1111'
-        }]
+        brandData: []
       }
     },
     methods: {
+      showBrandsList () {
+        let self = this
+        $.ajax({
+          type: 'GET',
+          url: 'http://172.16.211.75:8080/models',
+          async:false,
+          success (data) {
+            self.brandData = data
+          },
+          error () {
+            console.log('error')
+          }
+        })
+      },
+
       showAddModel () {
         this.addBrand = true
       },
 
-      showModifyModel (id) {
-        this.modifyId = id
+      showModifyModel (key, id) {
+        this.modifyInfo = {
+          'id': id, 'brandName': this.brandData[key].brandName, 'modelName': this.brandData[key].modelName
+        }
         this.modifyBrand = true
       },
 
@@ -107,6 +113,9 @@
         this.manageBrands = false
         this.$emit('closeModel')
       }
+    },
+    mounted () {
+      this.showBrandsList()
     }
   }
 </script>

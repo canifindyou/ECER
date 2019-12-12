@@ -14,7 +14,7 @@
       <hr class="boundary">
       <div slot="footer" class="dialog-footer">
         <el-button @click="closeModel">关 闭</el-button>
-        <el-button type="danger" @click="">删 除</el-button>
+        <el-button type="danger" @click="clickDel">删 除</el-button>
       </div>
     </el-dialog>
   </div>
@@ -28,18 +28,28 @@
       delBrand: Boolean
     },
     data () {
-      return {
-
-      }
+      return {}
     },
     methods: {
+      clickDel () {
+        let self = this
+        $.ajax({
+          type: 'DELETE',
+          url: 'http://172.16.211.75:8080/models',
+          data: {
+            'id': self.delId,
+          },
+          success (data) {
+            console.log(data)
+            self.closeModel()
+          }
+        })
+      },
       closeModel () {
         this.delBrand = false
+        this.$emit('showBrandsList')
         this.$emit('closeModel')
       }
-    },
-    watch: {
-
     }
   }
 </script>
