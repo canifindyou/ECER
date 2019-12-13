@@ -14,7 +14,7 @@
                 :class="{ click: code == secondItem.label }"
                 :index="secondItem.index.toString()"
                 @click="
-                  test(secondItem.index,secondItem.floors,sideItem.index,)
+                  clickNode(secondItem.index,secondItem.floors,sideItem.index,)
                 "
                 >{{ secondItem.label }}
               </el-menu-item>
@@ -52,7 +52,7 @@ export default {
   data() {
     return {
       id: "",
-      code: "A18",
+      // code: "A18",
       index:"1",
       clickIndex: "",
       schoolId:[],//校区id数组
@@ -98,14 +98,9 @@ export default {
   },
   methods: {
     open(key) {
-      // if (key === "3" || key === "4") {
-      //   console.log("事件已触发");
-      // }
-      // let dom = document.getElementsByClassName("el-submenu__title")
-      console.log(key);
-      // dom[key].style.color = "red"
+
     },
-    test(buildId, fnum, schoolId) {
+    clickNode(buildId, fnum, schoolId) {
       this.code = buildId;
       console.log(buildId, fnum);
       if (this.$route.path.split("/")[1] == "admin") {
@@ -175,6 +170,7 @@ export default {
     } else {
       this.id = 2;
     }
+     this.count = 0
     this.initLeftNav();
   }
 };
