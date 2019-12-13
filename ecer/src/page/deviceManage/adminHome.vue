@@ -1,8 +1,9 @@
 <template>
   <div>
     <div class="tableHead">
-      <i class="el-icon-refresh"></i>
+      
       <div class="tableHead-left">
+        <i class="el-icon-refresh"></i>
         <el-button
           type="text"
           style="margin-left:20px"
@@ -26,7 +27,7 @@
         <template>
           <el-select
             v-model="selectBuild"
-            placeholder="请选择"
+            placeholder="请选择楼层"
             size="mini"
             style="width:120px;"
           >
@@ -39,13 +40,7 @@
             </el-option>
           </el-select>
         </template>
-        <el-input
-          placeholder="请输入内容"
-          v-model="searchInput"
-          size="mini"
-          style="width:150px;margin-right:50px"
-        >
-        </el-input>
+     
       </div>
     </div>
 
@@ -381,31 +376,13 @@ export default {
       centerDialogVisible: false, //添加设备弹窗控制
       selectBuild: "", //选择楼栋绑定值，头部搜索
       searchInput: "", //头部搜索输入框
-      code: this.$route.query.code, //路由标识符
+      code: this.$route.query.code , //路由标识符
+       buildId:this.$route.query.build ? this.$route.query.build : localStorage.getItem("initBuildId"),//楼栋id
+      floorNum:this.$route.query.fNum ? this.$route.query.fNum : localStorage.getItem("initFloorNum"),//楼层数
+      schoolId:this.$route.query.sch ? this.$route.query.sch : localStorage.getItem("initschoolId"),//校区ID
       controlItem: "", //控制项下拉框绑定值
       selfBtnValue: "",
-      options: [
-        //楼层搜索下拉框
-        {
-          value: "1F",
-          label: "一楼"
-        },
-        {
-          value: "2F",
-          label: "二楼"
-        },
-        {
-          value: "3F",
-          label: "三楼"
-        },
-        {
-          value: "4F",
-          label: "四楼"
-        },
-        {
-          value: "5F",
-          label: "五楼"
-        }
+      options: [//楼层搜索下拉框
       ],
       tableData: [
         //列表数据
@@ -523,9 +500,7 @@ export default {
     batchExport
   },
   methods: {
-    test() {
-      console.log("参数更新");
-    },
+  
     buildControlModel() {
       //构造下拉框绑定值
       let arr = [];
@@ -606,20 +581,33 @@ export default {
       });
     },
     checkedInfo() {
-      this.$router.push("/waringInfo");
+      this.$router.push("/admin/waringInfo");
       console.log("查看消息");
+    },
+    constructSearchInput(){//构造搜索项下拉框数据
+      for (let i = 0; i < this.floorNum; i++) {
+        this.options.push({"value":`${i+1}F`,"label":`${i+1}F`})
+      }
     }
   },
   watch: {
     $route() {
       //监听路由参数变化触发事件，在这里进行页面切换时请求接口
-      this.code = this.$route.query.code;
-      this.test();
+      // this.code = this.$route.query.b;
+      this.buildId = this.$route.query.build;
+      this.floorNum =this.$route.query.fNum;
+      this.schoolId =this.$route.query.sch;
+      this.options = []
+      this.constructSearchInput()
+      
+      
     }
   },
   mounted() {
     this.controlItem = this.buildControlModel(); //初始化下拉框绑定值
-    this.openMessage();
+    // this.openMessage();
+    this.constructSearchInput()
+    console.log(this.$route.query.code)
   }
 };
 </script>

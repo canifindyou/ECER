@@ -1,28 +1,30 @@
 <template>
   <el-aside width="180px">
-    <el-menu :default-active="this.$router.path" router @open="open">
+    <el-menu :default-active="index" router @open="open">
       <!-- <template v-for="all in this.$router.options.routes"> -->
       <template v-for="item in this.$router.options.routes[id].children">
         <el-submenu :index="item.path" v-if="item.childNode">
           <!-- :index="item.path" -->
           <template slot="title">{{ item.name }}</template>
           <template v-if="item.needData" v-for="sideItem in sideData">
-            <el-submenu :index="sideItem.index">
+            <el-submenu :index="sideItem.index.toString()">
               <template slot="title">{{ sideItem.label }}</template>
               <el-menu-item
                 v-for="secondItem in sideItem.building"
                 :class="{ click: code == secondItem.label }"
-                :index="secondItem.index"
-                @click="test(secondItem.label, secondItem.index)"
-              >{{ secondItem.label }}
-              </el-menu-item
-              >
-              <!-- :index="secondItem.index" -->
+                :index="secondItem.index.toString()"
+                @click="
+                  test(secondItem.index,secondItem.floors,sideItem.index,)
+                "
+                >{{ secondItem.label }}
+              </el-menu-item>
             </el-submenu>
           </template>
           <template v-if="!item.needData">
             <template v-for="(kids, i) in item.children">
-              <el-menu-item :index="kids.path" @click="code = ''">{{kids.name }}</el-menu-item>
+              <el-menu-item :index="kids.path" @click="code = ''">{{
+                kids.name
+              }}</el-menu-item>
             </template>
           </template>
           <template v-if="item.needList" v-for="sideItem in setList">
@@ -31,7 +33,9 @@
           </template>
         </el-submenu>
         <template v-if="!item.childNode">
-          <el-menu-item :index="item.path" @click="code = ''">{{item.name }}</el-menu-item>
+          <el-menu-item :index="item.path" @click="code = ''">{{
+            item.name
+          }}</el-menu-item>
         </template>
       </template>
       <!-- </template> -->
@@ -40,121 +44,158 @@
 </template>
 
 <script>
-  export default {
-    data () {
-      return {
-        id: '',
-        code: 'A18',
-        clickIndex: '',
-        sideData: [
-          {
-            label: '新芜校区',
-            building: [
-              {label: 'A18', index: '1'},
-              {label: 'A19', index: '2'}
-            ],
-            index: 1
-          },
-          {
-            label: '文津校区',
-            building: [
-              {label: '东二', index: '3'},
-              {label: '东三', index: '4'}
-            ],
-            index: '2'
-          }
-        ],
-        setList: [{
-          'name': '教职工管理',
-          'controlItem': 'manageTeachingStaffs'
-        },{
-          'name': '分组管理',
-          'controlItem': 'manageGroups'
-        }, {
-          'name': '策略管理',
-          'controlItem': 'manageStrategies'
-        }, {
-          'name': '设备品牌管理',
-          'controlItem': 'manageBrands'
-        }, {
-          'name': '控制项设置',
-          'controlItem': 'manageOrders'
-        }, {
-          'name': '全局配置',
-          'controlItem': 'globalControl'
-        }]
-      }
-    },
-    methods: {
-      open(key) {
-        // if (key === "3" || key === "4") {
-        //   console.log("事件已触发");
-        // }
-        // let dom = document.getElementsByClassName("el-submenu__title")
-        console.log(key);
-        // dom[key].style.color = "red"
-      },
-      test(flag, index) {
-        this.code = flag;
-        console.log(flag, index);
-        if (this.$route.path.split("/")[1] == "admin") {
-          this.$router.push({
-            path: "/admin/adminHome",
-            query: {
-              code: this.code
-            }
-          });
-        }else{
-          this.$router.push({
-            path: "/user/userHome",
-            query: {
-              code: this.code
-            }
-          });
+import axios from "axios";
+import qs from "qs";
+export default {
+  data() {
+    return {
+      id: "",
+      code: "A18",
+      index:"1",
+      clickIndex: "",
+      schoolId:[],//校区id数组
+      count:0,
+      sideData: [
+        // {
+        //   label: 'xiaoqu',
+        //   building: [
+        //     {label: 'A18', index: '1'},
+        //     {label: 'A19', index: '2'}
+        //   ],
+        //   index: "",
+        //   flag:true
+        // },
+      ],
+      setList: [
+        {
+          name: "教职工管理",
+          controlItem: "manageTeachingStaffs"
+        },
+        {
+          name: "分组管理",
+          controlItem: "manageGroups"
+        },
+        {
+          name: "策略管理",
+          controlItem: "manageStrategies"
+        },
+        {
+          name: "设备品牌管理",
+          controlItem: "manageBrands"
+        },
+        {
+          name: "控制项设置",
+          controlItem: "manageOrders"
+        },
+        {
+          name: "全局配置",
+          controlItem: "globalControl"
         }
-      },
-
-      chooseSettings (controlItem) {
-        this.$emit('chooseModel', controlItem)
-      },
-
-      handleSelect (key, keyPath) {
-        // console.log(key);
-      }
+      ]
+    };
+  },
+  methods: {
+    open(key) {
+      // if (key === "3" || key === "4") {
+      //   console.log("事件已触发");
+      // }
+      // let dom = document.getElementsByClassName("el-submenu__title")
+      console.log(key);
+      // dom[key].style.color = "red"
     },
-    watch: {
-
-    },
-    mounted () {
-      if (this.$route.path.split('/')[1] == 'user') {
-        this.id = 3
+    test(buildId, fnum, schoolId) {
+      this.code = buildId;
+      console.log(buildId, fnum);
+      if (this.$route.path.split("/")[1] == "admin") {
+        this.$router.replace({
+          path: "/admin/adminHome",
+          query: {
+            build: this.code,
+            fNum:fnum,
+            sch:schoolId
+          }
+        });
       } else {
-        this.id = 2
+        this.$router.replace({
+          path: "/user/userHome",
+          query: {
+            build: this.code,
+            fNum:fnum,
+            sch:schoolId
+          }
+        });
       }
-      console.log(this.roles)
-      console.log(this.$router.options.routes)
+    },
+
+    chooseSettings(controlItem) {
+      this.$emit("chooseModel", controlItem);
+    },
+
+    handleSelect(key, keyPath) {
+      // console.log(key);
+    },
+    initLeftNav() {
+      //获取校区侧边栏数据
+      axios.get(this.api + "schoolZones").then(this.initLeftNavCallBack);
+    },
+    initLeftNavCallBack(res) {
+      res.data.forEach(item => {
+        this.sideData.push({ label: item.name, index: item.id,building:[]});
+        this.schoolId.push(item.id)
+        axios.get(this.api + "buildings", {
+          params: {
+            zoneId: item.id
+          }
+        }).then(this.inintBuilding);
+      });
+
+    },
+    inintBuilding(res){
+    console.log(this.sideData)
+    let len = this.sideData.length
+    let data = res.data
+    let lenB =data.length
+      for (let j = 0; j < lenB; j++) {
+        this.sideData[this.count].building.push({"label":data[j].name,"index":data[j].id,floors:data[j].floors})
+      }
+
+      this.count += 1
+     console.log(this.sideData)
+     localStorage.setItem("initFloorNum",this.sideData[0].building[0].floors)
+     localStorage.setItem("initBuildId",this.sideData[0].building[0].index)
+     localStorage.setItem("initschoolId",this.sideData[0].index)
     }
+  },
+  watch: {},
+  mounted() {
+    if (this.$route.path.split("/")[1] == "user") {
+      this.id = 3;
+    } else {
+      this.id = 2;
+    }
+    this.initLeftNav();
   }
+};
 </script>
 <style>
-  /*el-container*/
-  .el-aside {
-    line-height: 100px;
-    background: #eee;
-    overflow: hidden;
-  }
+/*el-container*/
+.el-aside {
+  line-height: 100px;
+  background: #eee;
+  overflow: hidden;
+}
 
-  .el-tree {
-    padding-left: 25px;
-    font-size: 15px;
-    font-weight: 500;
-  }
+.el-tree {
+  padding-left: 25px;
+  font-size: 15px;
+  font-weight: 500;
+}
 
-  .click {
-    color: #409eff;
-  }
+.click {
+  color: #409eff;
+}
 
-  .testClass {
-    color: red;
-  }
+.testClass {
+  color: red;
+}
 </style>
