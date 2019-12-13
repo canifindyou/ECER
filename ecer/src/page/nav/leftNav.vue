@@ -20,14 +20,14 @@
               <!-- :index="secondItem.index" -->
             </el-submenu>
           </template>
-          <template v-if="item.needList" v-for="sideItem in setList">
-            <el-menu-item @click="chooseSettings(sideItem.controlItem)">{{sideItem.name}}</el-menu-item>
-            <!-- :index="secondItem.index" -->
-          </template>
           <template v-if="!item.needData">
             <template v-for="(kids, i) in item.children">
               <el-menu-item :index="kids.path" @click="code = ''">{{kids.name }}</el-menu-item>
             </template>
+          </template>
+          <template v-if="item.needList" v-for="sideItem in setList">
+            <el-menu-item @click="chooseSettings(sideItem.controlItem)">{{sideItem.name}}</el-menu-item>
+            <!-- :index="secondItem.index" -->
           </template>
         </el-submenu>
         <template v-if="!item.childNode">
@@ -65,9 +65,9 @@
           }
         ],
         setList: [{
-          'name': '用户管理',
-          'controlItem': 'manageUsers'
-        }, {
+          'name': '教职工管理',
+          'controlItem': 'manageTeachingStaffs'
+        },{
           'name': '分组管理',
           'controlItem': 'manageGroups'
         }, {

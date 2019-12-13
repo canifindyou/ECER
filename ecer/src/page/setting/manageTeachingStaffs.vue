@@ -1,5 +1,5 @@
 <template>
-  <el-dialog title="用户管理"
+  <el-dialog title="教职工管理"
              top="125px"
              :visible.sync="manageUsers"
              :close-on-press-escape="false"

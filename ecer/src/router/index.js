@@ -5,6 +5,7 @@ import titleNav from '@/page/nav/header'
 import leftNav from '@/page/nav/leftNav'
 import waringInfoList from '@/page/waringInfo/waringInfo'
 import mySet from '@/page/mySet'
+import managePropertyPersonnel from '../page/setting/managePropertyPersonnel'
 import deviceList from '@/page/deviceManage/adminHome'
 import data from '@/page/dataHistory/data'
 import historyData from '@/page/dataHistory/historyData'
@@ -13,7 +14,7 @@ import selfControlStatus from '@/page/dataHistory/selfControlStatus.vue'
 import userHome from '@/page/userHome'
 import userDeviceList from '@/page/user/userHome'
 import userStrategies from '@/page/setting/userStrategies'
-import login from "@/page/login/login"
+import login from '@/page/login/login'
 
 Vue.use(Router)
 
@@ -24,10 +25,10 @@ export default new Router({
       path: '/',
       redirect: '/login',
     },
-       {
-        path: '/login',
-        component: login,
-       },
+    {
+      path: '/login',
+      component: login,
+    },
 
     {
       path: '/admin',
@@ -93,12 +94,17 @@ export default new Router({
           name: '系统管理',
           childNode: true,
           needData: false,
-          needList:true,
+          needList: true,
           components: {
             default: mySet,
             top: titleNav,
             aside: leftNav
           },
+          children: [{
+            path: '/admin/adminSet/managePropertyPersonnel',
+            name: '物业人员管理',
+            component: managePropertyPersonnel
+          }]
         }
       ]
     },
