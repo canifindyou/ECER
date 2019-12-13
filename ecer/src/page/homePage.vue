@@ -7,7 +7,7 @@
       <el-main style="padding:0">
         <!--        <router-view/>-->
         <router-view></router-view>
-        <manage-users v-if="showUsersModel" @closeModel="closeModel"></manage-users>
+        <manage-teaching-staffs v-if="showStaffsModel" @closeModel="closeModel"></manage-teaching-staffs>
         <manage-groups v-if="showGroupsModel" @closeModel="closeModel"></manage-groups>
         <manage-strategies v-if="showStrategiesModel" @closeModel="closeModel"></manage-strategies>
         <manage-brands v-if="showBrandsModel" @closeModel="closeModel"></manage-brands>
@@ -20,7 +20,7 @@
 </template>
 
 <script>
-  import manageUsers from './setting/manageUsers'
+  import manageTeachingStaffs from './setting/manageTeachingStaffs'
   import manageGroups from './setting/manageGroups'
   import manageStrategies from './setting/manageStrategies'
   import manageBrands from './setting/manageBrands'
@@ -30,7 +30,7 @@
   export default {
     name: 'homePage',
     components: {
-      manageUsers,
+      manageTeachingStaffs,
       manageGroups,
       manageStrategies,
       manageBrands,
@@ -40,7 +40,7 @@
     data () {
       return {
         controlName: '',
-        showUsersModel: false,
+        showStaffsModel: false,
         showGroupsModel: false,
         showStrategiesModel: false,
         showBrandsModel: false,
@@ -50,8 +50,8 @@
     },
     methods: {
       chooseModel (controlName) {
-        if (controlName === 'manageUsers') {
-          this.showUsersModel = true
+        if (controlName === 'manageTeachingStaffs') {
+          this.showStaffsModel = true
         } else if (controlName === 'manageGroups') {
           this.showGroupsModel = true
         } else if (controlName === 'manageStrategies') {
@@ -66,13 +66,12 @@
       },
 
       closeModel () {
-        this.showUsersModel = false
+        this.showStaffsModel = false
         this.showGroupsModel = false
         this.showStrategiesModel = false
         this.showBrandsModel = false
         this.showOrdersModel = false
         this.showGlobalControl = false
-        // this.showUsersModel = false
       }
     }
   }
