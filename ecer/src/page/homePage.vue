@@ -4,7 +4,7 @@
     <router-view name="top"></router-view>
     <el-container>
       <router-view name="aside" @chooseModel="chooseModel"></router-view>
-      <el-main style="padding:0">
+      <el-main style="padding:0;margin-left:180px">
         <!--        <router-view/>-->
         <router-view></router-view>
         <manage-teaching-staffs v-if="showStaffsModel" @closeModel="closeModel"></manage-teaching-staffs>
