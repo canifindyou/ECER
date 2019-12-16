@@ -13,31 +13,24 @@
                 v-for="secondItem in sideItem.building"
                 :class="{ click: code == secondItem.label }"
                 :index="secondItem.index.toString()"
-                @click="
-                  test(secondItem.index,secondItem.floors,sideItem.index,)
-                "
-              >{{ secondItem.label }}
+                @click="test(secondItem.index,secondItem.floors,sideItem.index,)">
+                {{ secondItem.label }}
               </el-menu-item>
             </el-submenu>
           </template>
           <template v-if="!item.needData">
             <template v-for="(kids, i) in item.children">
-              <el-menu-item :index="kids.path" @click="code = ''">{{
-                kids.name
-                }}
-              </el-menu-item>
+              <el-menu-item :index="kids.path" @click="code = ''">{{kids.name}}</el-menu-item>
             </template>
           </template>
-          <template v-if="item.needList" v-for="sideItem in setList">
-            <el-menu-item @click="chooseSettings(sideItem.controlItem)">{{sideItem.name}}</el-menu-item>
+          <template v-if="item.needList" v-for="(sideItem,index) in setList">
+            <el-menu-item class="settingName" @click="chooseSettings(index,sideItem.controlItem)">{{sideItem.name}}
+            </el-menu-item>
             <!-- :index="secondItem.index" -->
           </template>
         </el-submenu>
         <template v-if="!item.childNode">
-          <el-menu-item :index="item.path" @click="code = ''">{{
-            item.name
-            }}
-          </el-menu-item>
+          <el-menu-item :index="item.path" @click="code = ''">{{item.name}}</el-menu-item>
         </template>
       </template>
       <!-- </template> -->
@@ -94,7 +87,8 @@
             name: '全局配置',
             controlItem: 'globalControl'
           }
-        ]
+        ],
+        listId: 0
       }
     },
     methods: {
@@ -130,7 +124,10 @@
         }
       },
 
-      chooseSettings (controlItem) {
+      chooseSettings (index, controlItem) {
+        this.listId = index
+        let list = document.getElementsByClassName('settingName')
+        list[index].classList.add('is-active')
         this.$emit('chooseModel', controlItem)
       },
 
@@ -167,6 +164,11 @@
         localStorage.setItem('initFloorNum', this.sideData[0].building[0].floors)
         localStorage.setItem('initBuildId', this.sideData[0].building[0].index)
         localStorage.setItem('initschoolId', this.sideData[0].index)
+      },
+
+      changeCss () {
+        let list = document.getElementsByClassName('settingName')
+        list[ this.listId].classList.remove('is-active')
       }
     },
     watch: {},
@@ -180,6 +182,7 @@
     }
   }
 </script>
+
 <style>
   /*el-container*/
   .el-aside {
@@ -191,30 +194,36 @@
     overflow-y: auto;
   }
 
-  .el-menu{
+  .el-menu {
+    border: 0;
     background: #001529;
   }
 
-  .el-submenu__title{
-    color: #fff;
-  }
-
-  .el-submenu__title:hover{
-    color: #fff;
-    background: #001529;
-  }
-
-  .el-menu-item{
+  .el-submenu__title, .el-menu-item {
     color: hsla(0, 0%, 100%, .65);
   }
 
-  .el-menu-item.is-active{
+  .el-submenu.is-active .el-submenu__title {
+    color: #fff;
+  }
+
+  .el-submenu__title:hover {
+    color: #fff;
+    background: #001529;
+  }
+
+  .el-menu-item.is-active, .el-menu-item.is-active:hover {
     color: #fff;
     background-color: #1890ff;
   }
 
-  .el-menu-item:hover{
+  .el-menu-item:hover {
     color: #fff;
     background: #001529;
+  }
+
+  .settingName.is-active {
+    color: #fff;
+    background-color: #1890ff;
   }
 </style>
