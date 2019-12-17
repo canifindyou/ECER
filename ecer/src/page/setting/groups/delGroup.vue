@@ -10,7 +10,7 @@
       <hr class="boundary">
       <div class="body">
         <div class="tip">是否删除所选{{delGroupType}}</div>
-<!--        <div class="specialTip" v-show="specialTip">删除所选{{delGroupType}}将会删除该{{delGroupType}}下所有{{typeTip}}</div>-->
+        <!--        <div class="specialTip" v-show="specialTip">删除所选{{delGroupType}}将会删除该{{delGroupType}}下所有{{typeTip}}</div>-->
       </div>
       <hr class="boundary">
       <div slot="footer" class="dialog-footer">
@@ -19,21 +19,21 @@
       </div>
     </el-dialog>
 
-<!--    <el-dialog title="错误提示"-->
-<!--               top="150px"-->
-<!--               :visible.sync="showDelTip"-->
-<!--               :close-on-press-escape="false"-->
-<!--               :close-on-click-modal="false"-->
-<!--               :before-close="closeModel"-->
-<!--               append-to-body>-->
-<!--      <hr class="boundary">-->
-<!--      <div class="cannotDel">该分组下还存在子分组或设备，请将分组置为空再进行删除</div>-->
-<!--&lt;!&ndash;      <div class="cannotDel">该分组下还存在设备，请将设备删除或更换分组后再进行删除</div>&ndash;&gt;-->
-<!--      <hr class="boundary">-->
-<!--      <div slot="footer" class="dialog-footer">-->
-<!--        <el-button @click="closeModel">关 闭</el-button>-->
-<!--      </div>-->
-<!--    </el-dialog>-->
+    <!--    <el-dialog title="错误提示"-->
+    <!--               top="150px"-->
+    <!--               :visible.sync="showDelTip"-->
+    <!--               :close-on-press-escape="false"-->
+    <!--               :close-on-click-modal="false"-->
+    <!--               :before-close="closeModel"-->
+    <!--               append-to-body>-->
+    <!--      <hr class="boundary">-->
+    <!--      <div class="cannotDel">该分组下还存在子分组或设备，请将分组置为空再进行删除</div>-->
+    <!--&lt;!&ndash;      <div class="cannotDel">该分组下还存在设备，请将设备删除或更换分组后再进行删除</div>&ndash;&gt;-->
+    <!--      <hr class="boundary">-->
+    <!--      <div slot="footer" class="dialog-footer">-->
+    <!--        <el-button @click="closeModel">关 闭</el-button>-->
+    <!--      </div>-->
+    <!--    </el-dialog>-->
   </div>
 </template>
 
@@ -43,10 +43,11 @@
     props: {
       // 判断修改内容
       delGroupType: String,
+      campusId: Number,
+      buildingId: Number,
       // 打开弹窗
       delGroup: Boolean,
       delId: Number,
-      deviceNum: Number
     },
     data () {
       return {
@@ -58,9 +59,10 @@
       }
     },
     methods: {
+      // 确认删除
       delClick () {
         let self = this
-        if (this.delGroupType === '校区') {
+        if (this.delGroupType === '校区') {// 删除校区
           $.ajax({
             type: 'DELETE',
             url: 'http://172.16.211.75:8080/schoolZones',
@@ -68,19 +70,20 @@
               'id': this.delId
             },
             success (data) {
-              let abc = {"code":1, "reason":"Internal Exception"}
-              console.log(data)
-              console.log(data.code)
-              console.log(abc.code)
-              if (data.code===1){
-                self.$message.error('请将该校区下所有分组删除后再进行该操作！');
-              }else {
+              let jsonData = JSON.parse(data)
+              if (jsonData.status === 1) {// 删除失败，存在分组
+                self.$message.error('请将该校区下所有分组删除后再进行该操作！')
+              } else {// 删除成功
                 self.$emit('getCampusesList')
+                self.$message({
+                  message: '删除成功',
+                  type: 'success'
+                })
                 self.closeModel()
               }
             }
           })
-        } else if (this.delGroupType === '楼栋') {
+        } else if (this.delGroupType === '楼栋') {// 删除校区
           $.ajax({
             type: 'DELETE',
             url: 'http://172.16.211.75:8080/buildings',
@@ -88,11 +91,20 @@
               'id': this.delId
             },
             success (data) {
-              self.$emit('selectBuilding')
-              self.closeModel()
+              let jsonData = JSON.parse(data)
+              if (jsonData.status === 1) {// 删除失败，存在分组
+                self.$message.error('请将该楼栋下所有分组删除后再进行该操作！')
+              } else {// 删除成功
+                self.$emit('getBuildingsList', self.campusId)
+                self.$message({
+                  message: '删除成功',
+                  type: 'success'
+                })
+                self.closeModel()
+              }
             }
           })
-        } else {
+        } else if (this.delGroupType === '教室') {
           $.ajax({
             type: 'DELETE',
             url: 'http://172.16.211.75:8080/rooms',
@@ -100,13 +112,23 @@
               'id': this.delId
             },
             success (data) {
-              self.$emit('getCampusesList')
-              self.closeModel()
+              let jsonData = JSON.parse(data)
+              if (jsonData.status === 1) {// 删除失败，存在分组
+                self.$message.error('请将该教室下的设备删除或更换分组后再进行该操作！')
+              } else {// 删除成功
+                self.$emit('getClassroomsList', self.buildingId)
+                self.$message({
+                  message: '删除成功',
+                  type: 'success'
+                })
+                self.closeModel()
+              }
             }
           })
         }
       },
 
+      // 关闭窗口
       closeModel () {
         this.showDelTip = false
         this.showDelGroup = false
@@ -132,7 +154,7 @@
 
       delGroup: function (newVal) {
         // if (this.deviceCount === 0) {// 无设备情况下
-          this.showDelGroup = newVal
+        this.showDelGroup = newVal
         // } else {
         //   this.showDelTip = newVal
         // }

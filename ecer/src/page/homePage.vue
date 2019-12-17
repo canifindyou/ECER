@@ -2,13 +2,13 @@
   <div>
     <!--  <el-container style="height: 100%">-->
     <router-view name="top"></router-view>
-    <el-container>
-      <router-view name="aside" @chooseModel="chooseModel"></router-view>
-      <el-main style="padding:0">
+    <el-container style="">
+      <router-view name="aside" @chooseModel="chooseModel" ref="changeCSS"></router-view>
+      <el-main>
         <!--        <router-view/>-->
         <router-view></router-view>
         <manage-teaching-staffs v-if="showStaffsModel" @closeModel="closeModel"></manage-teaching-staffs>
-        <manage-groups v-if="showGroupsModel" @closeModel="closeModel"></manage-groups>
+        <manage-groups v-if="showGroupsModel" @closeModel="closeModel" @updateNav="updateNav"></manage-groups>
         <manage-strategies v-if="showStrategiesModel" @closeModel="closeModel"></manage-strategies>
         <manage-brands v-if="showBrandsModel" @closeModel="closeModel"></manage-brands>
         <manage-orders v-if="showOrdersModel" @closeModel="closeModel"></manage-orders>
@@ -39,7 +39,6 @@
     },
     data () {
       return {
-        controlName: '',
         showStaffsModel: false,
         showGroupsModel: false,
         showStrategiesModel: false,
@@ -65,6 +64,10 @@
         }
       },
 
+      updateNav(){
+        this.$refs.changeCSS.initLeftNav()
+      },
+
       closeModel () {
         this.showStaffsModel = false
         this.showGroupsModel = false
@@ -72,7 +75,23 @@
         this.showBrandsModel = false
         this.showOrdersModel = false
         this.showGlobalControl = false
+        // this.$emit('chooseModel')
+        this.$refs.changeCSS.changeCss()
       }
     }
   }
 </script>
+
+<style scoped>
+  .el-main {
+    padding: 0;
+    left: 180px;
+    background: #eee;
+    position: absolute;
+    top: 80px;
+    bottom: 0;
+    right: 0;
+    min-width: 844px;
+    overflow: hidden;
+  }
+</style>
