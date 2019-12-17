@@ -50,8 +50,10 @@
       </el-card>
     </div>
     <hr class="boundary">
-    <del-group :delGroup="delGroup" :delGroupType="delGroupType" :delId="delId" :deviceNum="deviceNum"
-               @closeModel="closeModel" @getCampusesList="getCampusesList" :selectBuilding="selectBuilding"></del-group>
+    <del-group :delGroupType="delGroupType" :delGroup="delGroup" :delId="delId"
+               :campusId="campusId" :buildingId="buildingId" @closeModel="closeModel"
+               @getCampusesList="getCampusesList" @getBuildingsList="getBuildingsList"
+               @getClassroomsList="getClassroomsList"></del-group>
     <batch-addition :batchAddition="batchAddition" @closeModel="closeModel"></batch-addition>
     <div slot="footer" class="dialog-footer">
       <el-button type="success" @click="showBatchAddition">批量添加</el-button>
@@ -88,106 +90,87 @@
       }
     },
     methods: {
-      // 更新校区列表
-      getCampusesList () {
-        let self = this
-        $.ajax({
-          type: 'GET',
-          async: false,
-          url: 'http://172.16.211.75:8080/schoolZones',
-          success (data) {
-            self.allCampuses = data
-          },
-          error () {
-            console.log('获取失败')
-          }
-        })
-      },
-
       // 选择校区
       selectCampus (id, name, index) {
-        let self = this
-        self.campusId = id// 保存校区id
-        self.buildingId = -1// 清除楼栋id
+        let type = 1
+        this.campusId = id// 保存校区id
+        this.buildingId = -1// 清除楼栋id
         // 清空楼栋/教室列表
-        self.buildingsData = []
-        self.classroomsData = []
-        self.showBuildingOperate = -1// 清除楼栋显示的修改删除按钮
-        // 楼栋列表背景CSS全部更改为白色
-        let buildingsList = document.getElementsByClassName('buildingsList')
-        for (let i = 0; i < buildingsList.length; i++) {
-          buildingsList[i].style.background = '#FFF'
-        }
-        self.showCampusOperate = index// 选中的div显示修改删除按钮
-        // this.showOperate = this.showOperate === index ? -1 : index
-        // 被选中的校区背景CSS更改为灰色，其余为白色
-        let campusesList = document.getElementsByClassName('campusesList')
-        for (let i = 0; i < campusesList.length; i++) {
-          let campus = campusesList[i].innerText.replace(/\s/g, '')// 清除按钮导致的回车
-          if (name === campus) {//被选中
-            campusesList[i].style.background = '#BBB'
-          } else {
-            campusesList[i].style.background = '#FFF'
-          }
-        }
+        this.buildingsData = []
+        this.classroomsData = []
+        this.showBuildingOperate = -1// 清除楼栋显示的修改删除按钮
         // 根据选中的校区id获取楼栋列表
-        $.ajax({
-          type: 'GET',
-          url: 'http://172.16.211.75:8080/buildings',
-          data: {'zoneId': id},
-          success (data) {
-            self.buildingsData = data
-          }
-        })
+        this.selectList(type, name, index)
+        this.getBuildingsList(id)
       },
 
       // 选择楼栋
       selectBuilding (id, name, index) {
-        let self = this
+        let type = 2
         this.buildingId = id// 保存楼栋id
         this.classroomsData = []// 清空教室列表
         this.showClassroomOperate = -1// 清除教室显示的修改删除按钮
-        // 教室CSS全部更改为白色
-        let div = document.getElementsByClassName('classroomsList')
-        for (let i = 0; i < div.length; i++) {
-          div[i].style.background = '#FFF'
-        }
-        this.showBuildingOperate = index// 选中的div显示修改删除按钮
-        // 被选中的楼栋CSS更改为灰色，其余为白色
-        let buildingsList = document.getElementsByClassName('buildingsList')
-        for (let i = 0; i < buildingsList.length; i++) {
-          let building = buildingsList[i].innerText.split(' ')[0]//取空格(楼层数)前面的数据
-          if (name === building) {//被选中
-            buildingsList[i].style.background = '#BBB'
-          } else {
-            buildingsList[i].style.background = '#FFF'
-          }
-        }
-        // 根据选中的楼栋id获取教室列表
-        $.ajax({
-          type: 'GET',
-          url: 'http://172.16.211.75:8080/rooms/'+id,
-          // data: {'buildingId': id},
-          success (data) {
-            console.log(data)
-            self.classroomsData = data
-          }
-        })
+        this.selectList(type, name, index)
+        this.getClassroomsList(id)
       },
 
       // 选择教室
       selectClassroom (name, index) {
-        this.showClassroomOperate = index// 选中的div显示修改删除按钮
-        // 被选中的教室CSS更改为灰色，其余为白色
-        let div = document.getElementsByClassName('classroomsList')
-        for (let i = 0; i < div.length; i++) {
-          let classroom = div[i].innerText.replace(/\s/g, '')// 清除多余空格
-          if (name === classroom) {// 被选中
-            div[i].style.background = '#BBB'
-          } else {
-            div[i].style.background = '#FFF'
+        let type = 3
+        this.selectList(type, name, index)
+      },
+
+      // 选择列表项
+      selectList (type, name, index) {
+        let campusesList = document.getElementsByClassName('campusesList')
+        let buildingsList = document.getElementsByClassName('buildingsList')
+        let classroomsList = document.getElementsByClassName('classroomsList')
+        if (type === 1) {// 选择校区
+          // 楼栋样式置为初始
+          for (let i = 0; i < buildingsList.length; i++) {
+            buildingsList[i].style.background = '#FFF'
+          }
+          this.showCampusOperate = index// 选中的div显示修改删除按钮
+          // this.showOperate = this.showOperate === index ? -1 : index
+          // 被选中的校区背景CSS更改为灰色，其余为白色
+          for (let i = 0; i < campusesList.length; i++) {
+            let campus = campusesList[i].innerText.replace(/\s/g, '')// 清除按钮导致的回车
+            if (name === campus) {//被选中
+              campusesList[i].style.background = '#BBB'
+            } else {
+              campusesList[i].style.background = '#FFF'
+            }
+          }
+        } else if (type === 2) {// 选择楼栋
+          // 教室CSS全部更改为白色
+          for (let i = 0; i < classroomsList.length; i++) {
+            classroomsList[i].style.background = '#FFF'
+          }
+          this.showBuildingOperate = index// 选中的div显示修改删除按钮
+          // 被选中的楼栋CSS更改为灰色，其余为白色
+          for (let i = 0; i < buildingsList.length; i++) {
+            let building = buildingsList[i].innerText.split(' ')[0]//取空格(楼层数)前面的数据
+            if (name === building) {//被选中
+              buildingsList[i].style.background = '#BBB'
+            } else {
+              buildingsList[i].style.background = '#FFF'
+            }
+          }
+        } else if (type === 3) {// 选择教室
+          this.showClassroomOperate = index// 选中的div显示修改删除按钮
+          for (let i = 0; i < classroomsList.length; i++) {
+            let classroom = classroomsList[i].innerText.replace(/\s/g, '')// 清除多余空格
+            if (name === classroom) {// 被选中
+              classroomsList[i].style.background = '#BBB'
+            } else {
+              classroomsList[i].style.background = '#FFF'
+            }
           }
         }
+      },
+
+      changeCSS () {
+
       },
 
       // 增加校区
@@ -209,19 +192,19 @@
               url: 'http://172.16.211.75:8080/schoolZones',
               data: {'name': newCampus},
               success (data) {
-                // 刷新列表
-                $.ajax({
-                  type: 'GET',
-                  url: 'http://172.16.211.75:8080/schoolZones',
-                  success (data) {
-                    newDiv.remove()// 移除div
-                    self.allCampuses = data
-                  }
-                })
+                let jsonData = JSON.parse(data)
+                if (jsonData.status === 1) {// 删除失败，存在分组
+                  self.$message.error('校区名不能重复！')
+                } else {// 刷新列表
+                  self.getCampusesList()
+                  newDiv.remove()// 移除div
+                }
+              },
+              error (data) {
+                console.log(data)
               }
             })
           } else {
-            // alert('请在括号前填写楼栋名')
             newDiv.remove()// 移除div
           }
         })
@@ -259,15 +242,9 @@
                   'floors': newFloor
                 }),
                 success (data) {// 刷新列表
-                  $.ajax({
-                    type: 'GET',
-                    url: 'http://172.16.211.75:8080/buildings',
-                    data: {'zoneId': self.campusId},
-                    success (data) {
-                      newDiv.remove()// 移除div
-                      self.buildingsData = data
-                    }
-                  })
+                  console.log(data)
+                  self.getBuildingsList(self.campusId)
+                  newDiv.remove()// 移除div
                 }
               })
             } else if (!newBuilding && newFloor) {// 楼栋未填写，楼层填写
@@ -293,8 +270,8 @@
           div[2].appendChild(newDiv)//插入创建的div
           newDiv.childNodes[0].addEventListener('blur', function () {//  input框失焦后的操作
             let newClassroom = newDiv.childNodes[0].value// 取值
-            if (newClassroom) {
-              let roomFloor = parseInt(newClassroom.replace(/[^0-9]/ig, '').substr(0, 1))// 获取楼层
+            let roomFloor = parseInt(newClassroom.replace(/[^0-9]/ig, '').substr(0, 1))// 获取楼层
+            if (newClassroom && roomFloor) {
               // 调用添加教室接口
               $.ajax({
                 type: 'POST',
@@ -309,16 +286,14 @@
                   'floor': roomFloor
                 }),
                 success (data) {// 刷新列表
-                  $.ajax({
-                    type: 'GET',
-                    url: 'http://172.16.211.75:8080/rooms',
-                    data: {'buildingId': self.buildingId},
-                    success (data) {
-                      newDiv.remove()// 移除div
-                      self.classroomsData = data
-                    }
-                  })
+                  newDiv.remove()// 移除div
+                  self.getClassroomsList(self.buildingId)
                 }
+              })
+            } else if (newClassroom && !roomFloor) {
+              self.$message({
+                message: '请填写正确的教室格式',
+                type: 'warning'
               })
             } else {
               newDiv.remove()// 移除div
@@ -485,36 +460,74 @@
       // 删除校区
       delCampus (id) {
         this.delGroupType = '校区'
-        // 根据id查找设备
-        // 返回deviceNum
         this.delId = id
-        // this.deviceNum = 3
         this.delGroup = true
       },
 
       // 删除楼栋
       delBuilding (id) {
         this.delGroupType = '楼栋'
-        // 根据id查找设备
-        // 返回deviceNum
         this.delId = id
-        // this.deviceNum = 1
         this.delGroup = true
       },
 
       // 删除教室
       delClassroom (id) {
         this.delGroupType = '教室'
-        // 根据id查找设备
-        // 返回deviceNum
         this.delId = id
-        // this.deviceNum = 0
         this.delGroup = true
       },
 
       // 批量添加分组
       showBatchAddition () {
         this.batchAddition = true
+      },
+
+      // 调用校区列表接口
+      getCampusesList () {
+        let self = this
+        $.ajax({
+          type: 'GET',
+          async: false,
+          url: 'http://172.16.211.75:8080/schoolZones',
+          success (data) {
+            self.allCampuses = data
+          },
+          error () {
+            console.log('获取数据失败')
+          }
+        })
+      },
+
+      // 调用楼栋列表接口
+      getBuildingsList (id) {
+        let self = this
+        $.ajax({
+          type: 'GET',
+          url: this.api + 'buildings',
+          data: {'zoneId': id},
+          success (data) {
+            self.buildingsData = data
+            self.$emit('updateNav')
+          },
+          error () {
+            console.log('获取数据失败')
+          }
+        })
+      },
+
+      // 调用教室列表接口
+      getClassroomsList (id) {
+        let self = this
+        // 根据选中的楼栋id获取教室列表
+        $.ajax({
+          type: 'GET',
+          url: 'http://172.16.211.75:8080/rooms/' + id,
+          success (data) {
+            console.log(data)
+            self.classroomsData = data
+          }
+        })
       },
 
       // 关闭子级模态框
@@ -528,6 +541,7 @@
       closeAllModel () {
         this.manageGroups = false
         this.$emit('closeModel')
+
       }
     },
     mounted () {

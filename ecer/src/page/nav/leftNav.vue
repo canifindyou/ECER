@@ -135,6 +135,8 @@
         // console.log(key);
       },
       initLeftNav () {
+        this.count = 0
+        this.sideData = []
         //获取校区侧边栏数据
         axios.get(this.api + 'schoolZones').then(this.initLeftNavCallBack)
       },
@@ -168,7 +170,7 @@
 
       changeCss () {
         let list = document.getElementsByClassName('settingName')
-        list[ this.listId].classList.remove('is-active')
+        list[this.listId].classList.remove('is-active')
       }
     },
     watch: {},

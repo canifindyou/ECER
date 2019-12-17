@@ -8,7 +8,7 @@
         <!--        <router-view/>-->
         <router-view></router-view>
         <manage-teaching-staffs v-if="showStaffsModel" @closeModel="closeModel"></manage-teaching-staffs>
-        <manage-groups v-if="showGroupsModel" @closeModel="closeModel"></manage-groups>
+        <manage-groups v-if="showGroupsModel" @closeModel="closeModel" @updateNav="updateNav"></manage-groups>
         <manage-strategies v-if="showStrategiesModel" @closeModel="closeModel"></manage-strategies>
         <manage-brands v-if="showBrandsModel" @closeModel="closeModel"></manage-brands>
         <manage-orders v-if="showOrdersModel" @closeModel="closeModel"></manage-orders>
@@ -39,7 +39,6 @@
     },
     data () {
       return {
-        controlName: '',
         showStaffsModel: false,
         showGroupsModel: false,
         showStrategiesModel: false,
@@ -63,6 +62,10 @@
         } else if (controlName === 'globalControl') {
           this.showGlobalControl = true
         }
+      },
+
+      updateNav(){
+        this.$refs.changeCSS.initLeftNav()
       },
 
       closeModel () {
