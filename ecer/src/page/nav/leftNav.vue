@@ -1,20 +1,20 @@
 <template>
-  <el-aside width="180px">
+  <el-aside width="180px" v-if="sideData.length !== 0">
     <el-menu :default-active="index" router @open="open">
       <!-- <template v-for="all in this.$router.options.routes"> -->
       <template v-for="item in this.$router.options.routes[id].children">
         <el-submenu :index="item.path" v-if="item.childNode">
           <!-- :index="item.path" -->
           <template slot="title">{{ item.name }}</template>
-          <template v-if="item.needData" v-for="sideItem in sideData">
+          <template v-if="item.needData" v-for="(sideItem, num) in sideData">
             <el-submenu :index="sideItem.index.toString()">
               <template slot="title">{{ sideItem.label }}</template>
+              <!--  :class="{ click: code == secondItem.label }" -->
               <el-menu-item
-                v-for="secondItem in sideItem.building"
-                :class="{ click: code == secondItem.label }"
-                :index="secondItem.index.toString()"
+                v-for="(secondItem, num2) in sideItem.building"
+                :index="secondItem.myindex.toString()"
                 @click="
-                  clickNode(secondItem.index,secondItem.floors,sideItem.index,)
+                  clickNode(secondItem.index, secondItem.floors, sideItem.index)
                 "
                 >{{ secondItem.label }}
               </el-menu-item>
@@ -22,20 +22,18 @@
           </template>
           <template v-if="!item.needData">
             <template v-for="(kids, i) in item.children">
-              <el-menu-item :index="kids.path" @click="code = ''">{{
-                kids.name
-              }}</el-menu-item>
+              <el-menu-item :index="kids.path">{{ kids.name }}</el-menu-item>
             </template>
           </template>
           <template v-if="item.needList" v-for="sideItem in setList">
-            <el-menu-item @click="chooseSettings(sideItem.controlItem)">{{sideItem.name}}</el-menu-item>
+            <el-menu-item @click="chooseSettings(sideItem.controlItem)">{{
+              sideItem.name
+            }}</el-menu-item>
             <!-- :index="secondItem.index" -->
           </template>
         </el-submenu>
         <template v-if="!item.childNode">
-          <el-menu-item :index="item.path" @click="code = ''">{{
-            item.name
-          }}</el-menu-item>
+          <el-menu-item :index="item.path">{{ item.name }}</el-menu-item>
         </template>
       </template>
       <!-- </template> -->
@@ -50,11 +48,12 @@ export default {
   data() {
     return {
       id: "",
+      myindex: 0,
       // code: "A18",
-      index:"1",
+      index: "0",
       clickIndex: "",
-      schoolId:[],//校区id数组
-      count:0,
+      schoolIds: [], //校区id数组
+      count: 0,
       sideData: [
         // {
         //   label: 'xiaoqu',
@@ -96,27 +95,27 @@ export default {
   },
   methods: {
     open(key) {
-
+      //  console.log(typeof key)
     },
     clickNode(buildId, fnum, schoolId) {
-      this.code = buildId;
+      // this.code = buildId;
       console.log(buildId, fnum);
       if (this.$route.path.split("/")[1] == "admin") {
         this.$router.replace({
           path: "/admin/adminHome",
           query: {
-            build: this.code,
-            fNum:fnum,
-            sch:schoolId
+            build: buildId,
+            fNum: fnum,
+            sch: schoolId
           }
         });
       } else {
         this.$router.replace({
           path: "/user/userHome",
           query: {
-            build: this.code,
-            fNum:fnum,
-            sch:schoolId
+            build: buildId,
+            fNum: fnum,
+            sch: schoolId
           }
         });
       }
@@ -135,30 +134,50 @@ export default {
     },
     initLeftNavCallBack(res) {
       res.data.forEach(item => {
-        this.sideData.push({ label: item.name, index: item.id,building:[]});
-        this.schoolId.push(item.id)
-        axios.get(this.api + "buildings", {
-          params: {
-            zoneId: item.id
-          }
-        }).then(this.inintBuilding);
+        this.sideData.push({ label: item.name, index: item.id, building: [] });
+        this.schoolIds.push(item.id);
       });
-
+      this.getData();
     },
-    inintBuilding(res){
-    console.log(this.sideData)
-    let len = this.sideData.length
-    let data = res.data
-    let lenB =data.length
-      for (let j = 0; j < lenB; j++) {
-        this.sideData[this.count].building.push({"label":data[j].name,"index":data[j].id,floors:data[j].floors})
+    getData() {//构造侧边栏数据结构
+      // for (let i = 0; i < this.schoolIds.length; i++) {
+      if (this.count >= this.schoolIds.length) {//递归结束条件
+        return;
       }
-
-      this.count += 1
-     console.log(this.sideData)
-     localStorage.setItem("initFloorNum",this.sideData[0].building[0].floors)
-     localStorage.setItem("initBuildId",this.sideData[0].building[0].index)
-     localStorage.setItem("initschoolId",this.sideData[0].index)
+      axios
+        .get(this.api + "buildings", {
+          params: {
+            zoneId: this.schoolIds[this.count]
+          }
+        })
+        .then(res => {
+          console.log(this.count);
+          this.inintBuilding(res);
+          this.getData();
+        });
+      // }
+    },
+    inintBuilding(res) {
+      let len = this.sideData.length;
+      let data = res.data;
+      let lenB = data.length;
+      // console.log(this.count)
+      if (this.count < this.schoolIds.length) {
+        for (let j = 0; j < lenB; j++) {
+          let arr = this.sideData[this.count].building.push({
+            label: data[j].name,
+            index: data[j].id,
+            floors: data[j].floors,
+            myindex: this.myindex++
+          });
+        }
+      }
+      this.count += 1;
+      //  console.log(this.sideData)
+      localStorage.setItem("initFloorNum", this.sideData[0].building[0].floors);
+      localStorage.setItem("initBuildId", this.sideData[0].building[0].index);
+      localStorage.setItem("initschoolId", this.sideData[0].index);
+      // this.index =  this.sideData[0].building[0].index
     }
   },
   watch: {},
@@ -168,7 +187,8 @@ export default {
     } else {
       this.id = 2;
     }
-     this.count = 0
+    this.count = 0;
+    this.sideData = [];
     this.initLeftNav();
   }
 };

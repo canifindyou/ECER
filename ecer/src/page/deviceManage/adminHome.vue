@@ -1,7 +1,6 @@
 <template>
   <div>
     <div class="tableHead">
-      
       <div class="tableHead-left">
         <i class="el-icon-refresh"></i>
         <el-button
@@ -40,7 +39,6 @@
             </el-option>
           </el-select>
         </template>
-     
       </div>
     </div>
 
@@ -80,9 +78,7 @@
         <el-table-column label="品牌" prop="brandge" align="center">
         </el-table-column>
         <el-table-column label="环境温度" align="center">
-          <template slot-scope="scope">
-            {{scope.row.ter}}℃
-          </template>
+          <template slot-scope="scope"> {{ scope.row.ter }}℃ </template>
         </el-table-column>
         <el-table-column label="当前状态" prop="status" align="center">
         </el-table-column>
@@ -125,7 +121,7 @@
         >
           <template slot-scope="props">
             <el-popover
-            v-if="props.row.selfControl"
+              v-if="props.row.selfControl"
               placement="top-start"
               title="提示"
               width="100"
@@ -144,17 +140,17 @@
               >
               </el-switch>
             </el-popover>
-               <el-switch
-               v-if="!props.row.selfControl"
-                slot="reference"
-                v-model="props.row.jdControl"
-                active-color="#13ce66"
-                inactive-color="#ff3342"
-                @change="
-                  switchChange2($event, props.$index, props.row.selfControl)
-                "
-              >
-              </el-switch>
+            <el-switch
+              v-if="!props.row.selfControl"
+              slot="reference"
+              v-model="props.row.jdControl"
+              active-color="#13ce66"
+              inactive-color="#ff3342"
+              @change="
+                switchChange2($event, props.$index, props.row.selfControl)
+              "
+            >
+            </el-switch>
           </template>
         </el-table-column>
         <el-table-column
@@ -193,8 +189,10 @@
           <template>
             <el-select
               v-model="addSchoolAera"
-              placeholder="请选择"
+              placeholder="请选择校区"
               size="small"
+              :loading="addSchoolAeraOptions.length == 0"
+              @focus="selectSchool"
             >
               <el-option
                 v-for="item in addSchoolAeraOptions"
@@ -209,7 +207,14 @@
         <li class="dialogContentItem">
           <span class="dItemText">楼栋:</span>
           <template>
-            <el-select v-model="addBuilding" placeholder="请选择" size="small">
+            <el-select
+              v-model="addBuilding"
+              :disabled="addSchoolAera == ''"
+              placeholder="请选择楼栋"
+              size="small"
+              :loading="addBuildingOptions.length == 0"
+              @focus="selectbuilding"
+            >
               <el-option
                 v-for="item in addBuildingOptions"
                 :key="item.value"
@@ -223,7 +228,14 @@
         <li class="dialogContentItem">
           <span class="dItemText">楼层:</span>
           <template>
-            <el-select v-model="addFloor" placeholder="请选择" size="small">
+            <el-select
+              v-model="addFloor"
+              :disabled="addBuilding == ''"
+              placeholder="请选择楼层"
+              size="small"
+              :loading="addFloorOptions.length == 0"
+              @focus="selectFloor"
+            >
               <el-option
                 v-for="item in addFloorOptions"
                 :key="item.value"
@@ -237,7 +249,14 @@
         <li class="dialogContentItem">
           <span class="dItemText">教室:</span>
           <template>
-            <el-select v-model="addRoom" placeholder="请选择" size="small">
+            <el-select
+              v-model="addRoom"
+              :disabled="addFloor == ''"
+              placeholder="请选择"
+              size="small"
+              @focus="selectRoom"
+            >
+              <!-- :loading="addRoomOptions.length == 0" -->
               <el-option
                 v-for="item in addRoomOptions"
                 :key="item.value"
@@ -251,7 +270,12 @@
         <li class="dialogContentItem">
           <span class="dItemText">品牌:</span>
           <template>
-            <el-select v-model="addBrand" placeholder="请选择" size="small">
+            <el-select
+              v-model="addBrand"
+              @focus="selectBrand"
+              placeholder="请选择品牌"
+              size="small"
+            >
               <el-option
                 v-for="item in addBrandOptions"
                 :key="item.value"
@@ -265,7 +289,13 @@
         <li class="dialogContentItem">
           <span class="dItemText">型号:</span>
           <template>
-            <el-select v-model="addType" placeholder="请选择" size="small">
+            <el-select
+              v-model="addType"
+              :disabled="addBrand == ''"
+              placeholder="请选择型号"
+              size="small"
+              @focus="selectType"
+            >
               <el-option
                 v-for="item in addTypeOptions"
                 :key="item.value"
@@ -281,7 +311,7 @@
           <span class="dItemText numStyle">空调编号:</span>
           <el-input
             v-model="addId"
-            placeholder="请输入内容"
+            placeholder="建议使用数字编号"
             size="small"
             style="width:215px"
           ></el-input>
@@ -290,7 +320,16 @@
           <span class="dItemText ipStyle">空调IP:</span>
           <el-input
             v-model="addIp"
-            placeholder="请输入内容"
+            placeholder="ip地址:xxx.xx.xx.xx"
+            size="small"
+            style="width:215px"
+          ></el-input>
+        </li>
+        <li class="dialogContentItem">
+          <span class="dItemText ipStyle">端口号:</span>
+          <el-input
+            v-model="addPort"
+            placeholder="例:8081"
             size="small"
             style="width:215px"
           ></el-input>
@@ -299,7 +338,7 @@
           <span class="dItemText nameStyle">空调名称:</span>
           <el-input
             v-model="addName"
-            placeholder="请输入内容"
+            placeholder="例:东二209-1"
             size="small"
             style="width:215px"
           ></el-input>
@@ -307,7 +346,12 @@
       </ul>
       <span slot="footer" class="dialog-footer" center>
         <el-button @click="centerDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="centerDialogVisible = false"
+        <el-button
+          type="primary"
+          @click.prevent="addDevice"
+          :disabled="
+            !(addRoom && addType && addId && addName && addPort && addIp)
+          "
           >确 定</el-button
         >
       </span>
@@ -331,30 +375,36 @@
 import editDevice from "./editDevice";
 import batchDialog from "./batchOperat";
 import batchExport from "./upLoad";
+import axios from "axios";
+import qs from "qs";
+
 export default {
   data() {
     return {
       /* 此处为添加功能弹窗值绑定值*/
 
-      addName: "", //空调名称
-      addIp: "", //空调ip
-      addId: "", //空调编号
+      schoolLoaded: true, //添加弹窗加载动画
+
+      addName: "东二209", //空调名称
+      addIp: "172.16.22.209", //空调ip
+      addId: "01", //空调编号
       addType: "", //空调型号
       addBrand: "", //空调品牌
       addRoom: "", //教室名称
       addFloor: "", //楼层
       addBuilding: "", //楼栋
       addSchoolAera: "", //校区
+      addPort: "8001", //端口号
 
-      addNameOptions: "", //空调名称
-      addIpOptions: "", //空调ip
-      addIdOptions: "", //空调编号
-      addTypeOptions: "", //空调型号
-      addBrandOptions: "", //空调品牌
-      addRoomOptions: "", //教室名称
-      addFloorOptions: "", //楼层
-      addBuildingOptions: "", //楼栋
-      addSchoolAeraOptions: "", //校区
+      addNameOptions: [], //空调名称
+      addIpOptions: [], //空调ip
+      addIdOptions: [], //空调编号
+      addTypeOptions: [], //空调型号
+      addBrandOptions: [], //空调品牌
+      addRoomOptions: [], //教室名称
+      addFloorOptions: [], //楼层
+      addBuildingOptions: [], //楼栋
+      addSchoolAeraOptions: [], //校区
 
       /* 修改设备信息值 */
       showDialog: false,
@@ -376,13 +426,20 @@ export default {
       centerDialogVisible: false, //添加设备弹窗控制
       selectBuild: "", //选择楼栋绑定值，头部搜索
       searchInput: "", //头部搜索输入框
-      code: this.$route.query.code , //路由标识符
-       buildId:this.$route.query.build ? this.$route.query.build : localStorage.getItem("initBuildId"),//楼栋id
-      floorNum:this.$route.query.fNum ? this.$route.query.fNum : localStorage.getItem("initFloorNum"),//楼层数
-      schoolId:this.$route.query.sch ? this.$route.query.sch : localStorage.getItem("initschoolId"),//校区ID
+      code: this.$route.query.code, //路由标识符
+      buildId: this.$route.query.build
+        ? this.$route.query.build
+        : localStorage.getItem("initBuildId"), //楼栋id
+      floorNum: this.$route.query.fNum
+        ? this.$route.query.fNum
+        : localStorage.getItem("initFloorNum"), //楼层数
+      schoolId: this.$route.query.sch
+        ? this.$route.query.sch
+        : localStorage.getItem("initschoolId"), //校区ID
       controlItem: "", //控制项下拉框绑定值
       selfBtnValue: "",
-      options: [//楼层搜索下拉框
+      options: [
+        //楼层搜索下拉框
       ],
       tableData: [
         //列表数据
@@ -500,7 +557,144 @@ export default {
     batchExport
   },
   methods: {
-  
+    addDevice() {
+      //添加设备
+      let params = {
+        name: this.addName,
+        ipAddress: this.addIp,
+        port: this.addPort,
+        addressCode: this.addId,
+        roomId: this.addRoom,
+        modelId: this.addBuilding
+      };
+      $.ajax({
+        type: "POST",
+        url: this.api + "devices",
+        data: params,
+        success:(data) =>{
+          // 刷新列表
+          this.messageSuccess();
+          this.centerDialogVisible = false;
+        },
+        error:()=>{
+          this.messageErr()
+        }
+        
+      });
+     
+    },
+    selectSchool(e) {
+      //校区下拉框数据加载
+      this.addSchoolAeraOptions = [];
+      this.addBuildingOptions = [];
+      this.addFloorOptions = [];
+      this.addFloor = "";
+      this.addBuilding = "";
+      this.addRoomOptions = [];
+      this.addRoom = "";
+      this.constructData("schoolZones", this.addSchoolAeraOptions);
+    },
+    selectbuilding() {
+      //楼栋下拉框数据加载
+      this.addFloorOptions = [];
+      (this.addFloor = ""), //楼层
+        (this.addBuildingOptions = []);
+      this.addRoomOptions = [];
+      this.addRoom = "";
+      this.constructData("buildings", this.addBuildingOptions, {
+        zoneId: this.addSchoolAera
+      });
+    },
+    selectFloor(params) {
+      //楼层下拉数据加载
+      this.addFloorOptions = [];
+      this.addRoomOptions = [];
+      this.addRoom = "";
+      this.pubilcFnAxios(`buildings/floors/${this.addBuilding}`, {})
+        .then(data => {
+          console.log(data);
+          for (let i = 1; i < data + 1; i++) {
+            this.addFloorOptions.push({ label: i + "F", value: i });
+          }
+        })
+        .catch(() => {
+          console.log("请求失败");
+        });
+    },
+    selectRoom() {
+      //加载教室下拉框数据
+      this.addRoomOptions = [];
+      this.constructData(
+        `rooms/${this.addBuilding}/${this.addFloor}`,
+        this.addRoomOptions,
+        {}
+      );
+    },
+    selectBrand() {
+      //加载品牌列表
+      this.addBrandOptions = [];
+      this.addTypeOptions = [];
+      this.addType = "";
+      this.pubilcFnAxios("models/brands", {})
+        .then(data => {
+          for (let i = 0; i < data.length; i++) {
+            this.addBrandOptions.push({ label: data[i], value: data[i] });
+          }
+        })
+        .catch(() => {
+          console.log("请求失败");
+        });
+    },
+    selectType() {
+      //加载型号
+      this.addTypeOptions = [];
+      this.constructData(`/models/${this.addBrand}`, this.addTypeOptions, {});
+    },
+    constructData(urlString, obj, params) {
+      //构造下拉菜单数据结构
+      this.pubilcFnAxios(urlString, params)
+        .then(data => {
+          console.log(data);
+          data.forEach(item => {
+            obj.push({
+              value: item.id,
+              label: item.name || item.modelName
+            });
+          });
+          this.schoolLoaded = false;
+        })
+        .catch(() => {
+          console.log("请求失败");
+        });
+    },
+
+    pubilcFnAxios(urlString, params, method) {
+      //公用axios数据请求
+      return new Promise((resolve, reject) => {
+        if (method == "post") {
+          axios
+            .post(this.api + urlString, qs.stringify(params), {
+              headers: { contentType: "application/json; charset=utf-8" }
+            })
+            .then(res => {
+              resolve(res.data);
+            })
+            .catch(err => {
+              reject("post请求出现错误");
+            });
+        } else {
+          axios
+            .get(this.api + urlString, { params: params })
+            .then(res => {
+              resolve(res.data);
+            })
+            .catch(err => {
+              reject("get请求错误");
+            });
+        }
+      });
+    },
+
     buildControlModel() {
       //构造下拉框绑定值
       let arr = [];
@@ -555,6 +749,20 @@ export default {
           });
         });
     },
+    messageSuccess() {
+      this.$message({
+        showClose: true,
+        message: "操作成功",
+        type: "success"
+      });
+    },
+    messageErr() {
+      this.$message({
+        showClose: true,
+        message: "操作失败，请检查网络",
+        type: "error"
+      });
+    },
     handleDelete(name, id) {
       //按钮点击事件
       this.open(name);
@@ -584,9 +792,10 @@ export default {
       this.$router.push("/admin/waringInfo");
       console.log("查看消息");
     },
-    constructSearchInput(){//构造搜索项下拉框数据
+    constructSearchInput() {
+      //构造搜索项下拉框数据
       for (let i = 0; i < this.floorNum; i++) {
-        this.options.push({"value":`${i+1}F`,"label":`${i+1}F`})
+        this.options.push({ value: `${i + 1}F`, label: `${i + 1}F` });
       }
     }
   },
@@ -595,19 +804,17 @@ export default {
       //监听路由参数变化触发事件，在这里进行页面切换时请求接口
       // this.code = this.$route.query.b;
       this.buildId = this.$route.query.build;
-      this.floorNum =this.$route.query.fNum;
-      this.schoolId =this.$route.query.sch;
-      this.options = []
-      this.constructSearchInput()
-      
-      
+      this.floorNum = this.$route.query.fNum;
+      this.schoolId = this.$route.query.sch;
+      this.options = [];
+      this.constructSearchInput();
     }
   },
   mounted() {
     this.controlItem = this.buildControlModel(); //初始化下拉框绑定值
     // this.openMessage();
-    this.constructSearchInput()
-    console.log(this.$route.query.code)
+    this.constructSearchInput();
+    console.log(this.$route.query.code);
   }
 };
 </script>
@@ -624,16 +831,16 @@ export default {
   width: 49%;
 }
 
-.el-icon-refresh{
+.el-icon-refresh {
   float: left;
-  margin-left:20px;
+  margin-left: 20px;
   font-size: 34px;
   font-weight: 900;
   color: #5daf34;
-  padding-top:7px;
+  padding-top: 7px;
 }
 
-.tableHead-left{
+.tableHead-left {
   float: left;
 }
 

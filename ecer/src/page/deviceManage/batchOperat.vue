@@ -130,7 +130,7 @@
               inactive-color="#ff4949"
             >
             </el-switch> -->
-            继电器控制：  <el-button type="success">闭合</el-button>
+            继电器控制： <el-button type="success">闭合</el-button>
             <el-button type="info">断开</el-button>
             <p style="color:red;padding:20px 0 10px 0">
               提示：对多个设备执行该操作时，将关闭所有设备的自控状态
@@ -466,6 +466,7 @@ export default {
           let index = this.checkedItem.indexOf(item);
           if (index >= 0) {
             this.checkedItem.splice(index, 1);
+
           }
         });
       }
@@ -563,7 +564,7 @@ export default {
   /* -webkit-box-shadow:inset006pxrgba(0,0,0,0); */
 }
 ::-webkit-scrollbar-thumb:window-inactive {
-  background: rgba(255, 0, 0, 0);
+  background: rgba(255, 0, 0, 0);    
 }
 .selectBatchBox .boxLeft {
 }

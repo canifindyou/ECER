@@ -6,6 +6,7 @@ import 'element-ui/lib/theme-chalk/index.css';
 import App from './App'
 import router from './router'
 import G from "./page/publicValue"
+
 Vue.use(G)
 Vue.use(ElementUI);
 
