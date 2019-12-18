@@ -27,7 +27,7 @@
     </div>
     <hr class="boundary">
     <div slot="footer" class="dialog-footer">
-      <el-button class="download" type="warning" size="medium" @click="">模板下载</el-button>
+      <el-button class="download" type="warning" size="medium" @click="download">模板下载</el-button>
       <el-button @click="closeModel">取 消</el-button>
       <el-button type="primary">确 定</el-button>
     </div>
@@ -41,42 +41,21 @@
     },
     data () {
       return {
-        options: [{
-          value: '1',
-          label: '美的',
-          children: [{
-            value: '1',
-            label: '一匹',
-          }, {
-            value: '2',
-            label: '二匹'
-          }, {
-            value: '3',
-            label: '二匹'
-          }, {
-            value: '4',
-            label: '三匹'
-          }, {
-            value: '5',
-            label: '二匹'
-          }, {
-            value: '6',
-            label: '二匹'
-          }]
-        },{
-          value: '2',
-          label: '格力',
-          children: [{
-            value: '1',
-            label: '一匹',
-          }, {
-            value: '2',
-            label: '二匹'
-          }]
-        }]
+        input: ''
       }
     },
     methods: {
+      download () {
+        window.location.href = this.api + '/template.csv'
+        // $.ajax({
+        //   type:'GET',
+        //   url:this.api+'/template.csv',
+        //   success(res){
+        //     console.log(res)
+        //   }
+        // })
+      },
+
       closeModel () {
         this.chooseBrand = false
         this.$emit('closeModel')
@@ -92,12 +71,12 @@
     width: 520px;
   }
 
- .body{
-   margin: 30px auto 15px;
-   width: 95%;
-   text-align: center;
-   font-size: 18px;
- }
+  .body {
+    margin: 30px auto 15px;
+    width: 95%;
+    text-align: center;
+    font-size: 18px;
+  }
 
   .el-dialog__wrapper >>> .el-input__inner {
     margin: 20px 0 15px;
