@@ -671,18 +671,6 @@ export default {
     pubilcFnAxios(urlString, params, method) {
       //公用axios数据请求
       return new Promise((resolve, reject) => {
-        if (method == "post") {
-          axios
-            .post(this.api + urlString, qs.stringify(params), {
-              headers: { contentType: "application/json; charset=utf-8" }
-            })
-            .then(res => {
-              resolve(res.data);
-            })
-            .catch(err => {
-              reject("post请求出现错误");
-            });
-        } else {
           axios
             .get(this.api + urlString, { params: params })
             .then(res => {
@@ -691,7 +679,7 @@ export default {
             .catch(err => {
               reject("get请求错误");
             });
-        }
+        
       });
     },
 

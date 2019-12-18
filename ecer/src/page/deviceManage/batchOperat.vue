@@ -160,7 +160,7 @@
             :highlight-current="true"
             :accordion="true"
           >
-            <!-- @node-collapse="cleanSelectdate" -->
+            <!-- @node-collapse="cleanSelectdate"    lazy -->
             <!-- @check-change="handleCheckChange" -->
           </el-tree>
         </div>
@@ -228,6 +228,8 @@
 </template>
 
 <script>
+import axios from "axios";
+import qs from "qs";
 export default {
   props: {
     showBatch: {
@@ -237,6 +239,7 @@ export default {
   },
   data() {
     return {
+      buildFlag:"",//动态标记楼栋id
       startTime: "",
       endTime: "",
       inner: false, //内层弹窗控制
@@ -331,100 +334,100 @@ export default {
       }
       this.checkAll = this.findItem(this.selectData, this.checkedItem);
     },
+    pubilcFnAxios(urlString, params) {
+      //公用数据请求
+      //公用axios数据请求
+      return new Promise((resolve, reject) => {
+        axios
+          .get(this.api + urlString, { params: params })
+          .then(res => {
+            resolve(res.data);
+          })
+          .catch(err => {
+            reject("get请求错误");
+          });
+      });
+    },
     loadNode(node, resolve) {
       //点击层级加载子层级的数据
+      let schoolId = [];
       if (node.level === 0) {
-        return resolve([{ name: "文津校区" }, { name: "新芜校区" }]);
+        this.pubilcFnAxios("schoolZones", {})
+          .then(data => {
+            console.log(data);
+            let arr = [];
+            data.forEach(item => {
+              arr.push({ name: item.name, label: item.id });
+            });
+
+            return resolve(arr, arr);
+          })
+          .catch();
       }
       if (node.level > 4) return resolve([]);
-
       setTimeout(() => {
-        //调用加载函数
-        var data;
-        if (node.data.name === "文津校区" || node.data.name == "新芜校区") {
-          //点击校区调用（懒加载，全局执行一次）
-          data = [
-            {
-              name: "楼栋1"
-            },
-            {
-              name: "楼栋2"
-            }
-          ];
-        } else if (node.data.name.substring(0, 2) == "楼栋") {
-          //点击楼栋调用
-          data = [
-            {
-              name: "楼层1"
-            },
-            {
-              name: "楼层1"
-            }
-          ];
-        } else if (node.data.name.substring(0, 2) == "楼层") {
-          //点击楼层调用函数
-          data = [
-            {
-              name: "教室1",
-              leaf: true
-            },
-            {
-              name: "教室2",
-              leaf: true
-            }
-          ];
+        if (node.level == 1) {
+          this.pubilcFnAxios("buildings", { zoneId: node.data.label })
+            .then(data => {
+              let arr = [];
+              data.forEach(item => {
+                arr.push({ name: item.name, label: item.id });
+              });
+            
+              return resolve(arr);
+            })
+            .catch();
         }
-        // this.selectItemLoadData(data, node.data.name.substring(0, 2));
-        resolve(data);
+        if (node.level == 2) {
+          console.log(node);
+          this.flag = node.data.label
+          this.pubilcFnAxios(`buildings/floors/${node.data.label}`)
+            .then(data => {
+              let arr = [];
+              for (let i = 1; i < data + 1; i++) {
+                arr.push({ name: i + "层", label: i });
+              }
+              return resolve(arr);
+            })
+            .catch();
+        }
+        if (node.level == 3) {
+          this.pubilcFnAxios(`rooms/${this.flag }/${node.data.label}`)
+            .then(data => {
+              console.log(data)
+              let arr = [];
+              data.forEach(item => {
+                arr.push({ name: item.name, label: item.id,leaf: true });
+              });
+              
+              return resolve(arr);
+            })
+            .catch();
+        }
       }, 500);
     },
 
     selectItemLoadData(node, date) {
-      //展开层级，加载
-      //选择层级，展示可选择的数据，填充数据功能
-
-      console.log(date.id);
+      // 展开层级，加载
+      // 选择层级，展示可选择的数据，填充数据功能
+      
+      if (date.level == 2) {
+        //楼栋层级展开时，需要将楼栋id值保存
+        this.flag = node.data.label
+      }
+     
       this.id = node.id;
       let data;
       this.selectData = [];
       this.allOptions = [];
-      if (node.name === "文津校区" || node.name == "新芜校区") {
-        data = [
-          {
-            name: "楼栋1"
-          },
-          {
-            name: "楼栋2"
-          }
-        ];
-      } else if (node.name.substring(0, 2) == "楼栋") {
-        data = [
-          {
-            name: "楼层1"
-          },
-          {
-            name: "楼层2"
-          }
-        ];
-      } else if (node.name.substring(0, 2) == "楼层") {
-        data = [
-          {
-            name: "教室1",
-            leaf: true
-          },
-          {
-            name: "教室2",
-            leaf: true
-          }
-        ];
-      }
-      this.buildSelectDate(data);
 
-      console.log(this.selectData);
-      console.log(this.checkedItem);
+      // this.buildSelectDate(data);
 
-      this.checkAll = this.findItem(this.selectData, this.checkedItem);
-      console.log(this.checkAll);
+      // console.log(this.selectData);
+      // console.log(this.checkedItem);
+
+      // this.checkAll = this.findItem(this.selectData, this.checkedItem);
+      // console.log(this.checkAll);
     },
     buildSelectDate(data) {
       //测试函数，动态改变选择框中的数据
@@ -466,7 +469,6 @@ export default {
           let index = this.checkedItem.indexOf(item);
           if (index >= 0) {
             this.checkedItem.splice(index, 1);
-
           }
         });
       }
@@ -530,7 +532,8 @@ export default {
         this.construtDeviceList(this.selectDeviceList);
       }
     }
-  }
+  },
+  mounted() {}
 };
 </script>
 
@@ -564,7 +567,7 @@ export default {
   /* -webkit-box-shadow:inset006pxrgba(0,0,0,0); */
 }
 ::-webkit-scrollbar-thumb:window-inactive {
-  background: rgba(255, 0, 0, 0);    
+  background: rgba(255, 0, 0, 0);
 }
 .selectBatchBox .boxLeft {
 }
