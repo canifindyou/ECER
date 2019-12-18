@@ -371,7 +371,7 @@ export default {
             .then(data => {
               let arr = [];
               data.forEach(item => {
-                arr.push({ name: item.name, label: item.id });
+                arr.push({ "name": item.name, "label": item.id });
               });
             
               return resolve(arr);
@@ -379,13 +379,13 @@ export default {
             .catch();
         }
         if (node.level == 2) {
-          console.log(node);
+          console.log("楼栋id    " + node.data.label);
           this.flag = node.data.label
           this.pubilcFnAxios(`buildings/floors/${node.data.label}`)
             .then(data => {
               let arr = [];
               for (let i = 1; i < data + 1; i++) {
-                arr.push({ name: i + "层", label: i });
+                arr.push({ "name": i + "层", "label": i });
               }
               return resolve(arr);
             })
@@ -397,7 +397,7 @@ export default {
               console.log(data)
               let arr = [];
               data.forEach(item => {
-                arr.push({ name: item.name, label: item.id,leaf: true });
+                arr.push({ "name": item.name, "label": item.id,leaf: true });
               });
               
               return resolve(arr);
@@ -410,10 +410,10 @@ export default {
     selectItemLoadData(node, date) {
       // 展开层级，加载
       // 选择层级，展示可选择的数据，填充数据功能
-      
+      // console.log("改变id    " + date.data.label);
       if (date.level == 2) {
         //楼栋层级展开时，需要将楼栋id值保存
-        this.flag = node.data.label
+        this.flag = date.data.label
       }
      
       this.id = node.id;
