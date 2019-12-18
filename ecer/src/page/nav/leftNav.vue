@@ -16,7 +16,7 @@
                 @click="
                   clickNode(secondItem.index, secondItem.floors, sideItem.index)
                 "
-                >{{ secondItem.label }}
+              >{{ secondItem.label }}
               </el-menu-item>
             </el-submenu>
           </template>
@@ -25,11 +25,10 @@
               <el-menu-item :index="kids.path">{{ kids.name }}</el-menu-item>
             </template>
           </template>
-          <template v-if="item.needList" v-for="sideItem in setList">
-            <el-menu-item @click="chooseSettings(sideItem.controlItem)">{{
-              sideItem.name
-            }}</el-menu-item>
-            <!-- :index="secondItem.index" -->
+          <template v-if="item.needList" v-for="(sideItem,index) in setList">
+            <el-menu-item class="settingName" @click="chooseSettings(index,sideItem.controlItem)">
+              {{ sideItem.name }}
+            </el-menu-item>
           </template>
         </el-submenu>
         <template v-if="!item.childNode">
@@ -42,176 +41,210 @@
 </template>
 
 <script>
-import axios from "axios";
-import qs from "qs";
-export default {
-  data() {
-    return {
-      id: "",
-      myindex: 0,
-      // code: "A18",
-      index: "0",
-      clickIndex: "",
-      schoolIds: [], //校区id数组
-      count: 0,
-      sideData: [
-        // {
-        //   label: 'xiaoqu',
-        //   building: [
-        //     {label: 'A18', index: '1'},
-        //     {label: 'A19', index: '2'}
-        //   ],
-        //   index: "",
-        //   flag:true
-        // },
-      ],
-      setList: [
-        {
-          name: "教职工管理",
-          controlItem: "manageTeachingStaffs"
-        },
-        {
-          name: "分组管理",
-          controlItem: "manageGroups"
-        },
-        {
-          name: "策略管理",
-          controlItem: "manageStrategies"
-        },
-        {
-          name: "设备品牌管理",
-          controlItem: "manageBrands"
-        },
-        {
-          name: "控制项设置",
-          controlItem: "manageOrders"
-        },
-        {
-          name: "全局配置",
-          controlItem: "globalControl"
+  import axios from 'axios'
+  import qs from 'qs'
+
+  export default {
+    data () {
+      return {
+        id: '',
+        myindex: 0,
+        // code: "A18",
+        index: '0',
+        clickIndex: '',
+        schoolIds: [], //校区id数组
+        count: 0,
+        sideData: [
+          // {
+          //   label: 'xiaoqu',
+          //   building: [
+          //     {label: 'A18', index: '1'},
+          //     {label: 'A19', index: '2'}
+          //   ],
+          //   index: "",
+          //   flag:true
+          // },
+        ],
+        listId:0,
+        setList: [
+          {
+            name: '教职工管理',
+            controlItem: 'manageTeachingStaffs'
+          },
+          {
+            name: '分组管理',
+            controlItem: 'manageGroups'
+          },
+          {
+            name: '策略管理',
+            controlItem: 'manageStrategies'
+          },
+          {
+            name: '设备品牌管理',
+            controlItem: 'manageBrands'
+          },
+          {
+            name: '控制项设置',
+            controlItem: 'manageOrders'
+          },
+          {
+            name: '全局配置',
+            controlItem: 'globalControl'
+          }
+        ]
+      }
+    },
+    methods: {
+      open (key) {
+        //  console.log(typeof key)
+      },
+      clickNode (buildId, fnum, schoolId) {
+        // this.code = buildId;
+        console.log(buildId, fnum)
+        if (this.$route.path.split('/')[1] == 'admin') {
+          this.$router.replace({
+            path: '/admin/adminHome',
+            query: {
+              build: buildId,
+              fNum: fnum,
+              sch: schoolId
+            }
+          })
+        } else {
+          this.$router.replace({
+            path: '/user/userHome',
+            query: {
+              build: buildId,
+              fNum: fnum,
+              sch: schoolId
+            }
+          })
         }
-      ]
-    };
-  },
-  methods: {
-    open(key) {
-      //  console.log(typeof key)
-    },
-    clickNode(buildId, fnum, schoolId) {
-      // this.code = buildId;
-      console.log(buildId, fnum);
-      if (this.$route.path.split("/")[1] == "admin") {
-        this.$router.replace({
-          path: "/admin/adminHome",
-          query: {
-            build: buildId,
-            fNum: fnum,
-            sch: schoolId
-          }
-        });
-      } else {
-        this.$router.replace({
-          path: "/user/userHome",
-          query: {
-            build: buildId,
-            fNum: fnum,
-            sch: schoolId
-          }
-        });
-      }
-    },
+      },
 
-    chooseSettings(controlItem) {
-      this.$emit("chooseModel", controlItem);
-    },
+      chooseSettings (index, controlItem) {
+        console.log(index)
+        this.listId = index
+        let list = document.getElementsByClassName('settingName')
+        console.log(list[index])
+        list[index].classList.add('is-active')
+        this.$emit('chooseModel', controlItem)
+      },
 
-    handleSelect(key, keyPath) {
-      // console.log(key);
-    },
-    initLeftNav() {
-      //获取校区侧边栏数据
-      axios.get(this.api + "schoolZones").then(this.initLeftNavCallBack);
-    },
-    initLeftNavCallBack(res) {
-      res.data.forEach(item => {
-        this.sideData.push({ label: item.name, index: item.id, building: [] });
-        this.schoolIds.push(item.id);
-      });
-      this.getData();
-    },
-    getData() {//构造侧边栏数据结构
-      // for (let i = 0; i < this.schoolIds.length; i++) {
-      if (this.count >= this.schoolIds.length) {//递归结束条件
-        return;
-      }
-      axios
-        .get(this.api + "buildings", {
-          params: {
-            zoneId: this.schoolIds[this.count]
-          }
+      handleSelect (key, keyPath) {
+        // console.log(key);
+      },
+      initLeftNav () {
+        //获取校区侧边栏数据
+        axios.get(this.api + 'schoolZones').then(this.initLeftNavCallBack)
+      },
+      initLeftNavCallBack (res) {
+        res.data.forEach(item => {
+          this.sideData.push({label: item.name, index: item.id, building: []})
+          this.schoolIds.push(item.id)
         })
-        .then(res => {
-          console.log(this.count);
-          this.inintBuilding(res);
-          this.getData();
-        });
-      // }
-    },
-    inintBuilding(res) {
-      let len = this.sideData.length;
-      let data = res.data;
-      let lenB = data.length;
-      // console.log(this.count)
-      if (this.count < this.schoolIds.length) {
-        for (let j = 0; j < lenB; j++) {
-          let arr = this.sideData[this.count].building.push({
-            label: data[j].name,
-            index: data[j].id,
-            floors: data[j].floors,
-            myindex: this.myindex++
-          });
+        this.getData()
+      },
+      getData () {//构造侧边栏数据结构
+        // for (let i = 0; i < this.schoolIds.length; i++) {
+        if (this.count >= this.schoolIds.length) {//递归结束条件
+          return
         }
+        axios
+          .get(this.api + 'buildings', {
+            params: {
+              zoneId: this.schoolIds[this.count]
+            }
+          })
+          .then(res => {
+            console.log(this.count)
+            this.inintBuilding(res)
+            this.getData()
+          })
+        // }
+      },
+      inintBuilding (res) {
+        let len = this.sideData.length
+        let data = res.data
+        let lenB = data.length
+        // console.log(this.count)
+        if (this.count < this.schoolIds.length) {
+          for (let j = 0; j < lenB; j++) {
+            let arr = this.sideData[this.count].building.push({
+              label: data[j].name,
+              index: data[j].id,
+              floors: data[j].floors,
+              myindex: this.myindex++
+            })
+          }
+        }
+        this.count += 1
+        //  console.log(this.sideData)
+        localStorage.setItem('initFloorNum', this.sideData[0].building[0].floors)
+        localStorage.setItem('initBuildId', this.sideData[0].building[0].index)
+        localStorage.setItem('initschoolId', this.sideData[0].index)
+        // this.index =  this.sideData[0].building[0].index
+      },
+
+      changeCss () {
+        let list = document.getElementsByClassName('settingName')
+        list[this.listId].classList.remove('is-active')
       }
-      this.count += 1;
-      //  console.log(this.sideData)
-      localStorage.setItem("initFloorNum", this.sideData[0].building[0].floors);
-      localStorage.setItem("initBuildId", this.sideData[0].building[0].index);
-      localStorage.setItem("initschoolId", this.sideData[0].index);
-      // this.index =  this.sideData[0].building[0].index
+    },
+    watch: {},
+    mounted () {
+      if (this.$route.path.split('/')[1] == 'user') {
+        this.id = 3
+      } else {
+        this.id = 2
+      }
+      this.count = 0
+      this.sideData = []
+      this.initLeftNav()
     }
-  },
-  watch: {},
-  mounted() {
-    if (this.$route.path.split("/")[1] == "user") {
-      this.id = 3;
-    } else {
-      this.id = 2;
-    }
-    this.count = 0;
-    this.sideData = [];
-    this.initLeftNav();
   }
-};
 </script>
 <style>
-/*el-container*/
-.el-aside {
-  line-height: 100px;
-  background: #eee;
-  overflow: hidden;
-}
+  /*el-container*/
+  .el-aside {
+    position: absolute;
+    top: 80px;
+    bottom: 0;
+    background: #001529;
+    overflow: hidden;
+    overflow-y: auto;
+  }
 
-.el-tree {
-  padding-left: 25px;
-  font-size: 15px;
-  font-weight: 500;
-}
+  .el-menu {
+    border: 0;
+    background: #001529;
+  }
 
-.click {
-  color: #409eff;
-}
+  .el-submenu__title, .el-menu-item {
+    color: hsla(0, 0%, 100%, .65);
+  }
 
-.testClass {
-  color: red;
-}
+  .el-submenu.is-active .el-submenu__title {
+    color: #fff;
+  }
+
+  .el-submenu__title:hover {
+    color: #fff;
+    background: #001529;
+  }
+
+  .el-menu-item.is-active, .el-menu-item.is-active:hover {
+    color: #fff;
+    background-color: #1890ff;
+  }
+
+  .el-menu-item:hover {
+    color: #fff;
+    background: #001529;
+  }
+
+  .settingName.is-active {
+    color: #fff;
+    background-color: #1890ff;
+  }
 </style>

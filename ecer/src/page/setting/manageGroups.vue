@@ -132,15 +132,7 @@
           }
           this.showCampusOperate = index// 选中的div显示修改删除按钮
           // this.showOperate = this.showOperate === index ? -1 : index
-          // 被选中的校区背景CSS更改为灰色，其余为白色
-          for (let i = 0; i < campusesList.length; i++) {
-            let campus = campusesList[i].innerText.replace(/\s/g, '')// 清除按钮导致的回车
-            if (name === campus) {//被选中
-              campusesList[i].style.background = '#BBB'
-            } else {
-              campusesList[i].style.background = '#FFF'
-            }
-          }
+          this.changeCSS(campusesList,name)// 被选中的校区背景CSS更改为灰色，其余为白色
         } else if (type === 2) {// 选择楼栋
           // 教室CSS全部更改为白色
           for (let i = 0; i < classroomsList.length; i++) {
@@ -158,19 +150,19 @@
           }
         } else if (type === 3) {// 选择教室
           this.showClassroomOperate = index// 选中的div显示修改删除按钮
-          for (let i = 0; i < classroomsList.length; i++) {
-            let classroom = classroomsList[i].innerText.replace(/\s/g, '')// 清除多余空格
-            if (name === classroom) {// 被选中
-              classroomsList[i].style.background = '#BBB'
-            } else {
-              classroomsList[i].style.background = '#FFF'
-            }
-          }
+          this.changeCSS(classroomsList,name)// 被选中的校区背景CSS更改为灰色，其余为白色
         }
       },
 
-      changeCSS () {
-
+      changeCSS (list,name) {
+        for (let i = 0; i < list.length; i++) {
+          let dataName = list[i].innerText.replace(/\s/g, '')// 清除按钮导致的回车
+          if (name === dataName) {//被选中
+            list[i].style.background = '#BBB'
+          } else {
+            list[i].style.background = '#FFF'
+          }
+        }
       },
 
       // 增加校区
@@ -384,7 +376,7 @@
               success (data) {// 更新楼栋列表
                 $.ajax({
                   type: 'GET',
-                  url: 'http://172.16.211.75:8080/buildings',
+                  url:  this.api + 'buildings',
                   data: {'zoneId': self.campusId},
                   success (data) {
                     div[1].childNodes[index + 2].style.display = 'block'// 显示修改后的div
@@ -489,7 +481,7 @@
         $.ajax({
           type: 'GET',
           async: false,
-          url: 'http://172.16.211.75:8080/schoolZones',
+          url: this.api + 'schoolZones',
           success (data) {
             self.allCampuses = data
           },
@@ -522,7 +514,7 @@
         // 根据选中的楼栋id获取教室列表
         $.ajax({
           type: 'GET',
-          url: 'http://172.16.211.75:8080/rooms/' + id,
+          url:  this.api + 'rooms/' + id,
           success (data) {
             console.log(data)
             self.classroomsData = data
