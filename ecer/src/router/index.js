@@ -50,7 +50,6 @@ export default new Router({
         {
           path: '/admin/waringInfo',
           name: '报警通知',
-          num:101,
           components: {
             default: waringInfoList,
             top: titleNav,
@@ -60,7 +59,6 @@ export default new Router({
           needData: false,
           children: [{
             path: '/admin/waringInfo',
-            num:102,
             name: '通知详情',
             component: waringInfoList
           }]
@@ -68,7 +66,7 @@ export default new Router({
         {
           path: '/admin/data',
           name: '历史数据',
-          num:103,
+      
           components: {
             default: data,
             top: titleNav,
@@ -77,19 +75,19 @@ export default new Router({
           childNode: true,
           needData: false,
           children: [{
-            num:104,
+       
             path: '/admin/dataHistory/dataHistory',
             name: '历史状态',
             component: historyData
           },
             {
-              num:105,
+          
               path: '/admin/dataHistory/instructHistory',
               name: '历史指令',
               component: instructHistory
             },
             {
-              num:106,
+        
               path: '/admin/dataHistory/selfControlStatus',
               name: '自控状态',
               component: selfControlStatus
@@ -98,7 +96,7 @@ export default new Router({
         {
           path: '/admin/adminSet',
           name: '系统管理',
-          num:107,
+      
           childNode: true,
           needData: false,
           needList: true,
@@ -108,7 +106,7 @@ export default new Router({
             aside: leftNav
           },
           children: [{
-            num:108,
+         
             path: '/admin/adminSet/managePropertyPersonnel',
             name: '物业人员管理',
             component: managePropertyPersonnel
