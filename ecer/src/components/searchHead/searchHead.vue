@@ -11,6 +11,8 @@
           placeholder="选择校区"
           size="mini"
           style="width:120px;margin:0 10px 0 30px"
+          :loading="selectSchoolOptions.length == 0"
+          @focus="selectSchools"
         >
           <el-option
             v-for="item in selectSchoolOptions"
@@ -23,8 +25,11 @@
         <el-select
           v-model="selectBuild"
           placeholder="选择楼栋"
+          :disabled="selectSchool == ''"
           size="mini"
           style="width:120px;margin:0 10px 0 30px"
+          :loading="selectBuildOptions.length == 0"
+          @focus="selectbuildings"
         >
           <el-option
             v-for="item in selectBuildOptions"
@@ -36,9 +41,12 @@
         </el-select>
         <el-select
           v-model="selectFloor"
+          :disabled="selectBuild == ''"
           placeholder="选择楼层"
           size="mini"
           style="width:120px;margin:0 10px 0 30px"
+          :loading="selectFloorOptions.length == 0"
+          @focus="selectFloors"
         >
           <el-option
             v-for="item in selectFloorOptions"
@@ -49,10 +57,12 @@
           </el-option>
         </el-select>
         <el-select
-          v-model="selectRoom"
+          v-model="selectRooms"
+          :disabled="selectFloor == ''"
           placeholder="选择教室"
           size="mini"
           style="width:120px;margin:0 10px 0 30px"
+          @focus="selectRoom"
         >
           <el-option
             v-for="item in selectRoomOptions"
@@ -107,6 +117,8 @@
 </template>
 
 <script>
+import axios from "axios"
+import qs from "qs"
 export default {
   props: {
     flag: {
@@ -117,20 +129,101 @@ export default {
   data() {
     return {
       selectSchool: "",
-      selectSchoolOptions: [{ value: "文津校区", label: "新芜校区" }],
+      selectSchoolOptions: [],
       selectBuild: "",
-      selectBuildOptions: [{ value: "东二", label: "东二" }],
+      selectBuildOptions: [],
       selectFloor: "",
-      selectFloorOptions: [{ value: "一楼", label: "一楼" }],
-      selectRoom: "",
-      selectRoomOptions: [{ value: "109", label: "109" }],
+      selectFloorOptions: [],
+      selectRooms: "",
+      selectRoomOptions: [],
       selectDevice: "",
-      selectDeviceOptions: [{ value: "设备一", label: "设备一" }],
+      selectDeviceOptions: [],
       time: ""
     };
   },
   methods: {
-    searchClick() {}
+    searchClick() {
+      
+    },
+    selectSchools(e) {
+      //校区下拉框数据加载
+      this.selectSchoolOptions = [];
+      this.selectBuildOptions = [];
+      this.selectFloorOptions = [];
+      this.selectFloor = "";
+      this.selectBuild = "";
+      this.selectRoomOptions = [];
+      this.selectRooms = "";
+      this.constructData("schoolZones", this.selectSchoolOptions);
+    },
+    selectbuildings() {
+      //楼栋下拉框数据加载
+      this.addFloorOptions = [];
+      (this.addFloor = ""), //楼层
+        (this.addBuildingOptions = []);
+      this.addRoomOptions = [];
+      this.addRoom = "";
+      this.constructData("buildings", this.selectBuildOptions, {
+        zoneId: this.selectSchool
+      });
+    },
+    selectFloors(params) {
+      //楼层下拉数据加载
+      this.addFloorOptions = [];
+      this.addRoomOptions = [];
+      this.addRoom = "";
+      this.pubilcFnAxios(`buildings/floors/${this.selectBuild}`, {})
+        .then(data => {
+          console.log(data);
+          for (let i = 1; i < data + 1; i++) {
+            this.selectFloorOptions.push({ label: i + "F", value: i });
+          }
+        })
+        .catch(() => {
+          console.log("请求失败");
+        });
+    },
+    selectRoom() {
+      //加载教室下拉框数据
+      this.addRoomOptions = [];
+      this.constructData(
+        `rooms/${this.selectBuild}/${this.selectFloor}`,
+        this.selectRoomOptions,
+        {}
+      );
+    },
+    
+    constructData(urlString, obj, params) {
+      //构造下拉菜单数据结构
+      this.pubilcFnAxios(urlString, params)
+        .then(data => {
+          console.log(data);
+          data.forEach(item => {
+            obj.push({
+              value: item.id,
+              label: item.name || item.modelName
+            });
+          });
+        })
+        .catch(() => {
+          console.log("请求失败");
+        });
+    },
+
+    pubilcFnAxios(urlString, params, method) {
+      //公用axios数据请求
+      return new Promise((resolve, reject) => {
+          axios
+            .get(this.api + urlString, { params: params })
+            .then(res => {
+              resolve(res.data);
+            })
+            .catch(err => {
+              reject("get请求错误");
+            });
+        
+      });
+    },
   }
 };
 </script>

@@ -70,8 +70,11 @@
               <el-date-picker
                 v-model="startTime"
                 type="datetime"
+                format="yyyy-MM-dd HH:mm"
                 placeholder="开始时间"
                 size="mini"
+                :picker-options="pickerOptions"
+                @change="initOptions2"
               >
               </el-date-picker>
             </div>
@@ -82,6 +85,8 @@
                 type="datetime"
                 placeholder="结束时间"
                 size="mini"
+                format="yyyy-MM-dd HH:mm"
+                :picker-options="pickerOptions2"
               >
               </el-date-picker>
             </div>
@@ -183,13 +188,15 @@
               v-model="checkedItem"
               @change="handleCheckedCitiesChange($event)"
             >
-              <el-checkbox
-                style="display:block;padding:10px 0 0 0;text-align:center;margin:0"
-                v-for="item in selectData"
-                :label="item"
-                :key="item"
-                >{{ item }}</el-checkbox
-              >
+              <p>
+                <el-checkbox
+                  style="display:block;padding:10px 0 0 20px;text-align:left;margin:0"
+                  v-for="item in selectData"
+                  :label="item.label"
+                  :key="item.key"
+                  >{{ item.name }}</el-checkbox
+                >
+              </p>
               <!-- @change="singleCheckBoxChange($event, item)" -->
             </el-checkbox-group>
           </template>
@@ -239,7 +246,13 @@ export default {
   },
   data() {
     return {
-      buildFlag:"",//动态标记楼栋id
+      pickerOptions1: {
+          			disabledDate(time) {
+          	 			return time.getTime() < Date.now() - 8.64e7;
+          			}
+            },
+            pickerOptions2:{},
+      buildFlag: "", //动态标记楼栋id
       startTime: "",
       endTime: "",
       inner: false, //内层弹窗控制
@@ -291,6 +304,16 @@ export default {
     };
   },
   methods: {
+    initOptions2($event){
+      //设置结束时间时间范围
+      console.log($event.getTime())
+      console.log(Date.now())
+      this.pickerOptions2 =  {
+          			disabledDate(time) {
+          	 			return time.getTime() < $event.getTime() - 8.64e7 + 1 ;
+          			}
+        		}
+    },
     handleClose(done) {
       this.$confirm("确认关闭？")
         .then(_ => {
@@ -351,7 +374,7 @@ export default {
     loadNode(node, resolve) {
       //点击层级加载子层级的数据
       let schoolId = [];
-      if (node.level === 0) {
+      if (node.level == 0) {
         this.pubilcFnAxios("schoolZones", {})
           .then(data => {
             console.log(data);
@@ -367,42 +390,51 @@ export default {
       if (node.level > 4) return resolve([]);
       setTimeout(() => {
         if (node.level == 1) {
+          //文津校区子菜单加载数据
           this.pubilcFnAxios("buildings", { zoneId: node.data.label })
             .then(data => {
               let arr = [];
               data.forEach(item => {
-                arr.push({ "name": item.name, "label": item.id });
+                arr.push({ name: item.name, label: item.id });
               });
-            
-              return resolve(arr);
+
+              return resolve(arr); //返回数组作为数据填充
             })
-            .catch();
+            .catch(() => {
+              console.log("初始化树形结构请求出错");
+            });
         }
         if (node.level == 2) {
-          console.log("楼栋id    " + node.data.label);
-          this.flag = node.data.label
+          //楼栋子菜单加载数据
+          this.flag = node.data.label;
           this.pubilcFnAxios(`buildings/floors/${node.data.label}`)
             .then(data => {
               let arr = [];
               for (let i = 1; i < data + 1; i++) {
-                arr.push({ "name": i + "层", "label": i });
+                //根据返回楼层数，创建楼层
+                arr.push({ name: i + "层", label: i });
               }
               return resolve(arr);
             })
-            .catch();
+            .catch(() => {
+              console.log("初始化树形结构请求出错");
+            });
         }
         if (node.level == 3) {
-          this.pubilcFnAxios(`rooms/${this.flag }/${node.data.label}`)
+          //楼层子菜单加载数据
+          this.pubilcFnAxios(`rooms/${this.flag}/${node.data.label}`)
             .then(data => {
-              console.log(data)
+              console.log(data);
               let arr = [];
               data.forEach(item => {
-                arr.push({ "name": item.name, "label": item.id,leaf: true });
+                arr.push({ name: item.name, label: item.id, leaf: true });
               });
-              
+
               return resolve(arr);
             })
-            .catch();
+            .catch(() => {
+              console.log("初始化树形结构请求出错");
+            });
         }
       }, 500);
     },
@@ -410,36 +442,87 @@ export default {
     selectItemLoadData(node, date) {
       // 展开层级，加载
       // 选择层级，展示可选择的数据，填充数据功能
-      // console.log("改变id    " + date.data.label);
+      console.log("点击改变 ");
       if (date.level == 2) {
         //楼栋层级展开时，需要将楼栋id值保存
-        this.flag = date.data.label
+        this.flag = date.data.label;
       }
-     
+      if (date.level == 1) {
+        //文津校区子菜单加载数据
+        this.pubilcFnAxios("buildings", { zoneId: date.data.label })
+          .then(data => {
+            let arr = [];
+            data.forEach(item => {
+              arr.push({ "name": item.name, "label": item.id });
+            });
+            console.log(arr)
+            this.selectData = [];
+            this.allOptions = [];
+
+            this.buildSelectDate(arr);
+          })
+          .catch(() => {
+            console.log("初始化树形结构请求出错");
+          });
+      }
+      if (date.level == 2) {
+        //楼栋子菜单加载数据
+        this.flag = date.data.label;
+        this.pubilcFnAxios(`buildings/floors/${date.data.label}`)
+          .then(data => {
+            let arr = [];
+            for (let i = 1; i < data + 1; i++) {
+              //根据返回楼层数，创建楼层
+              arr.push({ "name": i + "层", "label": i + "l" + date.data.label,"id":i });
+            }
+              console.log(arr)
+            this.selectData = [];
+            this.allOptions = [];
+
+            this.buildSelectDate(arr);
+          })
+          .catch(() => {
+            console.log("初始化树形结构请求出错");
+          });
+      }
+      if (date.level == 3) {
+        //楼层子菜单加载数据
+        this.pubilcFnAxios(`rooms/${this.flag}/${date.data.label}`)
+          .then(data => {
+            console.log(data);
+            let arr = [];
+            data.forEach(item => {
+              arr.push({ "name": item.name, "label": item.id});
+            });
+              console.log(arr)
+            this.selectData = [];
+            this.allOptions = [];
+
+            this.buildSelectDate(arr);
+          })
+          .catch(() => {
+            console.log("初始化树形结构请求出错");
+          });
+      }
       this.id = node.id;
-      let data;
-      this.selectData = [];
-      this.allOptions = [];
 
-      // this.buildSelectDate(data);
 
-      // console.log(this.selectData);
-      // console.log(this.checkedItem);
 
-      // this.checkAll = this.findItem(this.selectData, this.checkedItem);
-      // console.log(this.checkAll);
+
+      console.log(this.checkAll);
     },
     buildSelectDate(data) {
-      //测试函数，动态改变选择框中的数据
-      if (name !== "教室") {
-        let len = data.length;
-        for (let i = 0; i < len; i++) {
-          this.selectData.push(data[i].name);
-          this.allOptions.push(data[i].name);
-        }
-      } else {
-        return "";
+      // 测试函数，动态改变选择框中的数据
+
+      let len = data.length;
+      for (let i = 0; i < len; i++) {
+        this.selectData.push(data[i]);
+        this.allOptions.push(data[i].label);
       }
+      this.checkAll = this.findItem(this.selectData, this.checkedItem);
+       console.log(this.selectData);
+       console.log("----------------------------")
+      console.log(this.checkedItem);
     },
     cleanSelectdate() {
       //弹窗关闭，清空选择框中数据
@@ -449,7 +532,7 @@ export default {
     findItem(selectData, updateDate) {
       //判断已经选中的数组中是否包含更新的所有数据，判断全选按钮是否勾选
       let flag = selectData.every(item => {
-        return updateDate.indexOf(item) >= 0;
+        return updateDate.indexOf(item.label) >= 0;
       });
       return flag;
     },
@@ -494,7 +577,6 @@ export default {
     },
     construtDeviceList(secondArr) {
       //构造已选择设备列表
-
       if (secondArr.length === 0) {
         this.selectDeviceList = [];
       } else {

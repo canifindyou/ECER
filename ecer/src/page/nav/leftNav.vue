@@ -1,5 +1,5 @@
 <template>
-  <el-aside width="180px" v-if="sideData.length !== 0">
+  <el-aside width="180px" v-if="sideData.length !== 0" >
     <el-menu :default-active="index" router @open="open">
       <!-- <template v-for="all in this.$router.options.routes"> -->
       <template v-for="item in this.$router.options.routes[id].children">
@@ -7,14 +7,14 @@
           <!-- :index="item.path" -->
           <template slot="title">{{ item.name }}</template>
           <template v-if="item.needData" v-for="(sideItem, num) in sideData">
-            <el-submenu :index="sideItem.index.toString()">
+            <el-submenu :index="sideItem.label">
               <template slot="title">{{ sideItem.label }}</template>
               <!--  :class="{ click: code == secondItem.label }" -->
               <el-menu-item
                 v-for="(secondItem, num2) in sideItem.building"
                 :index="secondItem.myindex.toString()"
                 @click="
-                  clickNode(secondItem.index, secondItem.floors, sideItem.index)
+                  clickNode(secondItem.index, secondItem.floors, sideItem.index,secondItem.myindex)
                 "
               >{{ secondItem.label }}
               </el-menu-item>
@@ -22,7 +22,7 @@
           </template>
           <template v-if="!item.needData">
             <template v-for="(kids, i) in item.children">
-              <el-menu-item :index="kids.path">{{ kids.name }}</el-menu-item>
+              <el-menu-item :index="kids.path" @click="clickNode1(kids.path)">{{ kids.name }}</el-menu-item>
             </template>
           </template>
           <template v-if="item.needList" v-for="(sideItem,index) in setList">
@@ -50,7 +50,7 @@
         id: '',
         myindex: 0,
         // code: "A18",
-        index: '0',
+        index: localStorage.getItem("index") || 0,
         clickIndex: '',
         schoolIds: [], //校区id数组
         count: 0,
@@ -96,11 +96,12 @@
     },
     methods: {
       open (key) {
-        //  console.log(typeof key)
+        console.log(key)
       },
-      clickNode (buildId, fnum, schoolId) {
+      clickNode (buildId, fnum, schoolId,index) {
         // this.code = buildId;
-        console.log(buildId, fnum)
+        localStorage.setItem("index",index.toString())
+        console.log(index)
         if (this.$route.path.split('/')[1] == 'admin') {
           this.$router.replace({
             path: '/admin/adminHome',
@@ -121,7 +122,10 @@
           })
         }
       },
-
+      clickNode1(path){
+        
+        localStorage.setItem("index",path)
+      },
       chooseSettings (index, controlItem) {
         console.log(index)
         this.listId = index
