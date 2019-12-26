@@ -22,23 +22,23 @@
           <template>
             <el-input-number v-model="strategyTime.startTimeHour" :precision="0" :disabled="timeSlot"
                              controls-position="right" @change="handleChange" size="mini" :min="0"
-                             :max="24"></el-input-number>
+                             :max="23"></el-input-number>
             <span class="word">时</span>
             <el-input-number v-model="strategyTime.startTimeMin" :precision="0" :disabled="timeSlot"
                              controls-position="right" @change="handleChange" size="mini" :min="0"
-                             :max="60"></el-input-number>
+                             :max="59"></el-input-number>
             <span class="word">分</span>
           </template>
         </el-form-item>
         <el-form-item label="结束时间">
           <template>
             <el-input-number v-model="strategyTime.endTimeHour" :precision="0" :disabled="timeSlot"
-                             controls-position="right"
-                             @change="handleChange" size="mini" :min="0" :max="24"></el-input-number>
+                             controls-position="right" @change="handleChange" size="mini" :min="0"
+                             :max="23"></el-input-number>
             <span class="word">时</span>
             <el-input-number v-model="strategyTime.endTimeMin" :precision="0" :disabled="timeSlot"
-                             controls-position="right"
-                             @change="handleChange" size="mini" :min="0" :max="60"></el-input-number>
+                             controls-position="right" @change="handleChange" size="mini" :min="0"
+                             :max="59"></el-input-number>
             <span class="word">分</span>
           </template>
         </el-form-item>
