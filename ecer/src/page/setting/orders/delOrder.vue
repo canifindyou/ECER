@@ -14,7 +14,7 @@
       <hr class="boundary">
       <div slot="footer" class="dialog-footer">
         <el-button @click="closeModel">关 闭</el-button>
-        <el-button type="danger" @click="">删 除</el-button>
+        <el-button type="danger" @click="delTemp">删 除</el-button>
       </div>
     </el-dialog>
   </div>
@@ -24,22 +24,34 @@
 
   export default {
     props: {
-      delId: String,
+      delId: Number,
       delOrder: Boolean
     },
     data () {
       return {
-
+        showDel: false
       }
     },
     methods: {
+      delTemp () {
+        $.ajax({
+          type: 'DELETE',
+          url: this.api + 'templates/' + this.delId,
+          success (data){
+            console.log(data)
+          },
+        })
+      },
+
       closeModel () {
-        this.delOrder = false
+        this.showDel = false
         this.$emit('closeModel')
       }
     },
     watch: {
-
+      delOrder (newVal) {
+        this.showDel = newVal
+      }
     }
   }
 </script>

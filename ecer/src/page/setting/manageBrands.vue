@@ -38,8 +38,10 @@
     </el-table>
     <hr class="boundary">
     <add-brand :addBrand="addBrand" @showBrandsList="showBrandsList" @closeModel="closeModel"></add-brand>
-    <modify-brand :modifyBrand="modifyBrand" :modifyInfo="modifyInfo" @showBrandsList="showBrandsList" @closeModel="closeModel"></modify-brand>
-    <del-brand :delBrand="delBrand" :delId="delId" @showBrandsList="showBrandsList" @closeModel="closeModel"></del-brand>
+    <modify-brand :modifyBrand="modifyBrand" :modifyInfo="modifyInfo" @showBrandsList="showBrandsList"
+                  @closeModel="closeModel"></modify-brand>
+    <del-brand :delBrand="delBrand" :delId="delId" @showBrandsList="showBrandsList"
+               @closeModel="closeModel"></del-brand>
     <div slot="footer" class="dialog-footer">
       <el-button @click="closeAllModel">关 闭</el-button>
       <el-button type="success" @click="showAddModel">添 加</el-button>
@@ -74,8 +76,8 @@
         let self = this
         $.ajax({
           type: 'GET',
-          url: 'http://172.16.211.75:8080/models',
-          async:false,
+          url: this.api + 'models',
+          async: false,
           success (data) {
             self.brandData = data
           },

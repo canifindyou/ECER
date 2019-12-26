@@ -11,42 +11,43 @@
         <div slot="header" class="clearfix">
           <span>校区</span>
         </div>
-        <div v-for="(item,index) in allCampuses" class="campusesList" @click="selectCampus(item.id,item.name,index)">
+        <div v-for="(item,index) in allCampuses" class="campusesList"
+             @click="selectCampus(campusType,item.id,item.name,index)">
           {{item.name}}
           <div v-show="showCampusOperate===index" class="operation">
-            <i class="el-icon-edit" @click="modifyCampus(index,item.name)"></i>
-            <i class="el-icon-delete" @click="delCampus(item.id)"></i>
+            <i class="el-icon-edit" @click="modifyNewDiv(campusType,index,item.name)"></i>
+            <i class="el-icon-delete" @click="deleteGroup(campusType,item.id)"></i>
           </div>
         </div>
-        <div class="cardFooter"><i class="el-icon-circle-plus" @click="addCampus()"></i></div>
+        <div class="cardFooter"><i class="el-icon-circle-plus" @click="addNewDiv(campusType)"></i></div>
       </el-card>
       <el-card class="cardGroups">
         <div slot="header" class="clearfix">
           <span>楼栋(层数)</span>
         </div>
         <div v-for="(item,index) in buildingsData" class="buildingsList"
-             @click="selectBuilding(item.id,item.name,index)">
+             @click="selectBuilding(buildingType,item.id,item.name,index)">
           {{item.name}} ({{item.floors}})
           <div v-show="showBuildingOperate===index" class="operation">
-            <i class="el-icon-edit" @click="modifyBuilding(index,item.name,item.floors)"></i>
-            <i class="el-icon-delete" @click="delBuilding(item.id)"></i>
+            <i class="el-icon-edit" @click="modifyNewDiv(buildingType,index,item.name,item.floors)"></i>
+            <i class="el-icon-delete" @click="deleteGroup(buildingType,item.id)"></i>
           </div>
         </div>
-        <div class="cardFooter"><i class="el-icon-circle-plus" @click="addBuilding()"></i></div>
+        <div class="cardFooter"><i class="el-icon-circle-plus" @click="addNewDiv(buildingType)"></i></div>
       </el-card>
       <el-card class="cardGroups">
         <div slot="header" class="clearfix">
           <span id="className">教室</span>
         </div>
         <div v-for="(item,index) in classroomsData" class="classroomsList"
-             @click="selectClassroom(item.name,index)">
+             @click="selectClassroom(classroomType,item.id,item.name,index)">
           {{item.name}}
           <div v-show="showClassroomOperate===index" class="operation">
-            <i class="el-icon-edit" @click="modifyClassroom(index,item.id,item.name)"></i>
-            <i class="el-icon-delete" @click="delClassroom(item.id)"></i>
+            <i class="el-icon-edit" @click="modifyNewDiv(classroomType,index,item.name)"></i>
+            <i class="el-icon-delete" @click="deleteGroup(classroomType,item.id)"></i>
           </div>
         </div>
-        <div class="cardFooter"><i class="el-icon-circle-plus" @click="addClassroom()"></i></div>
+        <div class="cardFooter"><i class="el-icon-circle-plus" @click="addNewDiv(classroomType)"></i></div>
       </el-card>
     </div>
     <hr class="boundary">
@@ -54,7 +55,7 @@
                :campusId="campusId" :buildingId="buildingId" @closeModel="closeModel"
                @getCampusesList="getCampusesList" @getBuildingsList="getBuildingsList"
                @getClassroomsList="getClassroomsList"></del-group>
-    <batch-addition :batchAddition="batchAddition" @closeModel="closeModel"></batch-addition>
+    <batch-addition :batchAddition="batchAddition" @closeModel="closeModel" @clearCSS="clearCSS"></batch-addition>
     <div slot="footer" class="dialog-footer">
       <el-button type="success" @click="showBatchAddition">批量添加</el-button>
       <el-button @click="closeAllModel">关 闭</el-button>
@@ -74,50 +75,66 @@
     data () {
       return {
         manageGroups: true,
-        delGroup: false,
-        batchAddition: false,
-        allCampuses: [],
-        buildingsData: [],
-        classroomsData: [],
+        clickList: true,
         campusId: -1,
-        buildingId: -1,
+        campusType: 0,
+        allCampuses: [],
         showCampusOperate: -1,
+        buildingId: -1,
+        buildingType: 1,
+        buildingsData: [],
         showBuildingOperate: -1,
+        classroomId: -1,
+        classroomType: 2,
+        classroomsData: [],
         showClassroomOperate: -1,
-        delGroupType: '',
+        delGroup: false,
         delId: 0,
-        deviceNum: 0
+        delGroupType: '',
+        batchAddition: false,
       }
     },
     methods: {
       // 选择校区
-      selectCampus (id, name, index) {
-        let type = 1
-        this.campusId = id// 保存校区id
-        this.buildingId = -1// 清除楼栋id
-        // 清空楼栋/教室列表
-        this.buildingsData = []
-        this.classroomsData = []
-        this.showBuildingOperate = -1// 清除楼栋显示的修改删除按钮
-        // 根据选中的校区id获取楼栋列表
-        this.selectList(type, name, index)
-        this.getBuildingsList(id)
+      selectCampus (type, id, name, index) {
+        // 判断是否可点
+        if (this.clickList === true) {
+          this.campusId = id// 保存校区id
+          // 清除视图数据
+          this.buildingId = -1// 清除楼栋id
+          this.buildingsData = []
+          this.classroomsData = []
+          this.showBuildingOperate = -1// 清除楼栋显示的修改删除按钮
+          // 更改试图样式
+          this.selectList(type, name, index)
+          // 获取列表
+          this.getBuildingsList(id)
+        } else {
+          return false
+        }
       },
 
       // 选择楼栋
-      selectBuilding (id, name, index) {
-        let type = 2
-        this.buildingId = id// 保存楼栋id
-        this.classroomsData = []// 清空教室列表
-        this.showClassroomOperate = -1// 清除教室显示的修改删除按钮
-        this.selectList(type, name, index)
-        this.getClassroomsList(id)
+      selectBuilding (type, id, name, index) {
+        if (this.clickList === true) {
+          this.buildingId = id// 保存楼栋id
+          this.classroomsData = []
+          this.showClassroomOperate = -1
+          this.selectList(type, name, index)
+          this.getClassroomsList(id)
+        } else {
+          return false
+        }
       },
 
       // 选择教室
-      selectClassroom (name, index) {
-        let type = 3
-        this.selectList(type, name, index)
+      selectClassroom (type, id, name, index) {
+        if (this.clickList === true) {
+          this.classroomId = id// 保存教室id
+          this.selectList(type, name, index)
+        } else {
+          return false
+        }
       },
 
       // 选择列表项
@@ -125,38 +142,28 @@
         let campusesList = document.getElementsByClassName('campusesList')
         let buildingsList = document.getElementsByClassName('buildingsList')
         let classroomsList = document.getElementsByClassName('classroomsList')
-        if (type === 1) {// 选择校区
-          // 楼栋样式置为初始
-          for (let i = 0; i < buildingsList.length; i++) {
-            buildingsList[i].style.background = '#FFF'
-          }
-          this.showCampusOperate = index// 选中的div显示修改删除按钮
+        if (type === 0) {// 选择校区
+          // 修改背景色
+          this.changeCSS(campusesList, name)
+          // 选中的div显示修改删除按钮
+          this.showCampusOperate = index
           // this.showOperate = this.showOperate === index ? -1 : index
-          this.changeCSS(campusesList,name)// 被选中的校区背景CSS更改为灰色，其余为白色
-        } else if (type === 2) {// 选择楼栋
-          // 教室CSS全部更改为白色
-          for (let i = 0; i < classroomsList.length; i++) {
-            classroomsList[i].style.background = '#FFF'
-          }
-          this.showBuildingOperate = index// 选中的div显示修改删除按钮
-          // 被选中的楼栋CSS更改为灰色，其余为白色
-          for (let i = 0; i < buildingsList.length; i++) {
-            let building = buildingsList[i].innerText.split(' ')[0]//取空格(楼层数)前面的数据
-            if (name === building) {//被选中
-              buildingsList[i].style.background = '#BBB'
-            } else {
-              buildingsList[i].style.background = '#FFF'
-            }
-          }
-        } else if (type === 3) {// 选择教室
-          this.showClassroomOperate = index// 选中的div显示修改删除按钮
-          this.changeCSS(classroomsList,name)// 被选中的校区背景CSS更改为灰色，其余为白色
+        } else if (type === 1) {// 选择楼栋
+          this.changeCSS(buildingsList, name)
+          this.showBuildingOperate = index
+        } else if (type === 2) {// 选择教室
+          this.changeCSS(classroomsList, name)
+          this.showClassroomOperate = index
         }
       },
 
-      changeCSS (list,name) {
+      // 被选中更改样式
+      changeCSS (list, name) {
         for (let i = 0; i < list.length; i++) {
-          let dataName = list[i].innerText.replace(/\s/g, '')// 清除按钮导致的回车
+          //取空格前的数据--针对楼栋
+          let dataName = list[i].innerText.split(' ')[0]
+          // 清除按钮导致的回车
+          dataName = dataName.replace(/\s/g, '')
           if (name === dataName) {//被选中
             list[i].style.background = '#BBB'
           } else {
@@ -165,65 +172,73 @@
         }
       },
 
-      // 增加校区
-      addCampus () {
-        let self = this
-        // 在列表最后一项插入新div
+      // 添加操作
+      addNewDiv (type) {
+        // 生成输入div
         let div = document.getElementsByClassName('el-card__body')
         let newDiv = document.createElement('div')
-        newDiv.setAttribute('class', 'campusesList')// 设置class属性
+        newDiv.setAttribute('class', 'groupList')// 设置class属性
         newDiv.innerHTML = '<input type="text" style="text-align: center"/>'// 添加input框
-        div[0].appendChild(newDiv)// 将生成的新div插入列表
-        newDiv.childNodes[0].focus()// input框获取焦点
+        if (type === 0) {// 添加校区
+          this.addCampus(newDiv)
+        } else if (type === 1) {// 添加楼栋
+          newDiv.innerHTML = '<input type="text" value="( )" style="text-align: center"/>'
+          this.addBuilding(newDiv)
+        } else if (type === 2) {// 添加教室
+          this.addClassroom(newDiv)
+        }
+        div[type].appendChild(newDiv)// 插入div
+        newDiv.childNodes[0].focus()
+      },
+
+      // 增加校区
+      addCampus (newDiv) {
+        let self = this
         newDiv.childNodes[0].addEventListener('blur', function () {// input框失焦后的操作
           let newCampus = newDiv.childNodes[0].value// 取值
-          if (newCampus) {
-            // 调用添加校区接口
+          if (newCampus) {// 存在校区名
             $.ajax({
               type: 'POST',
-              url: 'http://172.16.211.75:8080/schoolZones',
+              url: self.api + 'schoolZones',
               data: {'name': newCampus},
               success (data) {
                 let jsonData = JSON.parse(data)
-                if (jsonData.status === 1) {// 删除失败，存在分组
+                if (jsonData.status === 1) {// 校区名重复
+                  self.clickList = false// 不能切换分组
+                  newDiv.childNodes[0].focus()// input框获取焦点
                   self.$message.error('校区名不能重复！')
-                } else {// 刷新列表
+                } else {// 更新数据并移除输入框
                   self.getCampusesList()
-                  newDiv.remove()// 移除div
+                  newDiv.remove()
+                  self.$message({
+                    message: '校区添加成功',
+                    type: 'success'
+                  })
                 }
-              },
-              error (data) {
-                console.log(data)
               }
             })
-          } else {
-            newDiv.remove()// 移除div
+          } else {// 无校区名
+            self.clickList = true
+            newDiv.remove()
           }
         })
       },
 
       // 增加楼栋
-      addBuilding () {
+      addBuilding (newDiv) {
         if (this.campusId === -1) {// 未选择校区的情况下
+          newDiv.remove()
           alert('请选择校区后再添加新楼栋')
-        } else {
+        } else {// 选择校区的情况下
           let self = this
-          // 在列表最后一项插入新div
-          let div = document.getElementsByClassName('el-card__body')
-          let newDiv = document.createElement('div')
-          newDiv.setAttribute('class', 'buildingsList')
-          newDiv.innerHTML = '<input type="text" value="( )" style="text-align: center"/>'
-          div[1].appendChild(newDiv)//插入创建的div
-          newDiv.childNodes[0].focus()// input框获取焦点
           newDiv.childNodes[0].addEventListener('blur', function () {// input框失焦后的操作
             let buildingData = newDiv.childNodes[0].value// 取值
             let newBuilding = buildingData.split('(')[0]// 取出楼栋名
             let newFloor = parseInt(buildingData.substring(buildingData.indexOf('(') + 1, buildingData.indexOf(')')))// 取出层数并转换为数字
             if (newBuilding && newFloor) {// 楼栋名&层数均存在
-              // 调用添加楼栋接口
               $.ajax({
                 type: 'POST',
-                url: 'http://172.16.211.75:8080/buildings',
+                url: self.api + 'buildings',
                 headers: {
                   'Content-Type': 'application/json',
                 },
@@ -233,17 +248,31 @@
                   'name': newBuilding,
                   'floors': newFloor
                 }),
-                success (data) {// 刷新列表
-                  console.log(data)
-                  self.getBuildingsList(self.campusId)
-                  newDiv.remove()// 移除div
+                success (data) {
+                  if (data.status === 1) {// 存在子分组，删除失败
+                    self.$message.error('楼栋名不能重复！')
+                    newDiv.childNodes[0].focus()// input框获取焦点
+                    self.clickList = false// 不能切换分组
+                  } else {// 更新数据
+                    self.getBuildingsList(self.campusId)
+                    newDiv.remove()
+                    self.$message({
+                      message: '楼栋添加成功',
+                      type: 'success'
+                    })
+                  }
                 }
               })
             } else if (!newBuilding && newFloor) {// 楼栋未填写，楼层填写
-              alert('请在括号前填写楼栋名')
+              self.clickList = false
+              self.$message.error('请在括号前填写楼栋名！')
+              newDiv.childNodes[0].focus()
             } else if (newBuilding && !newFloor) {// 楼栋填写，楼层未填写
-              alert('请检查括号内是否正确填写该楼栋的楼层数')
+              self.clickList = false
+              self.$message.error('请检查括号内是否正确填写该楼栋的楼层数')
+              newDiv.childNodes[0].focus()
             } else {
+              self.clickList = true
               newDiv.remove()// 移除div
             }
           })
@@ -251,23 +280,17 @@
       },
 
       // 增加教室
-      addClassroom () {
+      addClassroom (newDiv) {
         if (this.campusId !== -1 && this.buildingId !== -1) {// 选中校区及楼层
           let self = this
           // 在列表最后一项插入新div
-          let div = document.getElementsByClassName('el-card__body')
-          let newDiv = document.createElement('div')
-          newDiv.setAttribute('class', 'classroomsList')// 设置class属性
-          newDiv.innerHTML = '<input type="text" style="text-align: center"/>'// 添加input框
-          div[2].appendChild(newDiv)//插入创建的div
           newDiv.childNodes[0].addEventListener('blur', function () {//  input框失焦后的操作
             let newClassroom = newDiv.childNodes[0].value// 取值
             let roomFloor = parseInt(newClassroom.replace(/[^0-9]/ig, '').substr(0, 1))// 获取楼层
-            if (newClassroom && roomFloor) {
-              // 调用添加教室接口
+            if (newClassroom && roomFloor) {// 教室名&楼层均存在
               $.ajax({
                 type: 'POST',
-                url: 'http://172.16.211.75:8080/rooms',
+                url: self.api + 'rooms',
                 headers: {
                   'Content-Type': 'application/json',
                 },
@@ -277,92 +300,107 @@
                   'name': newClassroom,
                   'floor': roomFloor
                 }),
-                success (data) {// 刷新列表
-                  newDiv.remove()// 移除div
-                  self.getClassroomsList(self.buildingId)
+                success (data) {
+                  if (data.status === 1) {
+                    self.clickList = false// 不能切换分组
+                    newDiv.childNodes[0].focus()// input框获取焦点
+                    self.$message.error('教室名不能重复！')
+                  } else {// 更新数据并移除输入框
+                    newDiv.remove()
+                    self.getClassroomsList(self.buildingId)
+                    self.$message({
+                      message: '教室添加成功',
+                      type: 'success'
+                    })
+                  }
                 }
               })
             } else if (newClassroom && !roomFloor) {
-              self.$message({
-                message: '请填写正确的教室格式',
-                type: 'warning'
-              })
+              self.clickList = false// 不能切换分组
+              newDiv.childNodes[0].focus()// input框获取焦点
+              self.$message.error('请填写正确的教室格式')
             } else {
+              self.clickList = true
               newDiv.remove()// 移除div
             }
           })
-          let inputSelect = newDiv.childNodes[0]
-          inputSelect.focus()// input框获取焦点
         } else if (this.campusId === -1) {
-          alert('请选择校区及楼栋后再添加新教室')
+          this.$message({
+            message: '请选择校区及楼栋后再添加新教室',
+            type: 'warning'
+          })
+          newDiv.remove()// 移除div
         } else if (this.buildingId === -1) {
-          alert('请选择楼栋后再添加新教室')
+          this.$message({
+            message: '请选择楼栋后再添加新教室',
+            type: 'warning'
+          })
+          newDiv.remove()// 移除div
+        }
+      },
+
+      // 修改操作
+      modifyNewDiv (type, index, name, floor) {
+        let div = document.getElementsByClassName('el-card__body')
+        let newDiv = document.createElement('div')
+        newDiv.setAttribute('class', 'groupList')// 设置class属性
+        newDiv.innerHTML = '<input type="text" style="text-align: center"/>'// 添加input框
+        div[type].insertBefore(newDiv, div[type].childNodes[index + 1])// 插入有input框的div
+        div[type].childNodes[index + 2].style.display = 'none'// 隐藏要修改的div
+        newDiv.childNodes[0].focus()// input框获取焦点
+        newDiv.childNodes[0].value = name// 确保焦点在文字后方
+        if (type === 0) {// 添加校区
+          this.modifyCampus(div[type], newDiv, index)
+        } else if (type === 1) {// 添加楼栋
+          newDiv.childNodes[0].value = name + '(' + floor + ')'
+          this.modifyBuilding(div[type], newDiv, index)
+        } else if (type === 2) {// 添加教室
+          this.modifyClassroom(div[type], newDiv, index)
         }
       },
 
       // 修改校区
-      modifyCampus (index, name) {
+      modifyCampus (div, newDiv, index) {
         let self = this
-        // 将需要修改的div被输入框覆盖
-        let div = document.getElementsByClassName('el-card__body')
-        let newDiv = document.createElement('div')
-        newDiv.setAttribute('class', 'campusesList')// 设置class属性
-        newDiv.innerHTML = '<input type="text" style="text-align: center"/>'// 添加input框
-        div[0].insertBefore(newDiv, div[0].childNodes[index + 1])// 插入有input框的div
-        div[0].childNodes[index + 2].style.display = 'none'// 隐藏要修改的div
-        newDiv.childNodes[0].focus()// input框获取焦点
-        newDiv.childNodes[0].value = name
         newDiv.childNodes[0].addEventListener('blur', function () {// input框失焦后的操作
           let newCampus = newDiv.childNodes[0].value// 取值
-          if (newCampus) {
-            // 调用修改校区接口
+          if (newCampus) {// 校区名存在数据
             $.ajax({
               type: 'PUT',
-              url: 'http://172.16.211.75:8080/schoolZones',
-              headers: {
-                'Content-Type': 'application/json',
-              },
+              url: self.api + 'schoolZones',
+              headers: {'Content-Type': 'application/json',},
               dataType: 'json',
               data: JSON.stringify({
                 'id': self.campusId,
                 'name': newCampus
               }),
               success (data) {
-                div[0].childNodes[index + 2].style.display = 'block'// 显示修改后的div
                 self.getCampusesList()
-                newDiv.remove()// 移除div
-              },
-              error () {
-                console.log('error')
+                newDiv.remove()
+                // 显示修改后的div
+                div.childNodes[index + 1].style.display = 'block'
+                div.childNodes[index + 1].style.background = '#BBB'
               }
             })
-          } else {
-            alert('校区名不能为空')
+          } else {// 校区名无数据
+            self.$message.error('校区名不能为空')
+            self.clickList = false
+            newDiv.childNodes[0].focus()// input框获取焦点
           }
         })
       },
 
       // 修改楼栋
-      modifyBuilding (index, name, floor) {
+      modifyBuilding (div, newDiv, index) {
         let self = this
-        // 将需要修改的div被输入框覆盖
-        let div = document.getElementsByClassName('el-card__body')
-        let newDiv = document.createElement('div')
-        newDiv.setAttribute('class', 'buildingsList')// 设置class属性
-        newDiv.innerHTML = '<input type="text" style="text-align: center"/>'// 添加input框
-        div[1].insertBefore(newDiv, div[1].childNodes[index + 1])// 插入有input框的div
-        div[1].childNodes[index + 2].style.display = 'none'// 隐藏要修改的div
-        newDiv.childNodes[0].focus()// input框获取焦点
-        newDiv.childNodes[0].value = name + '(' + floor + ')'
         newDiv.childNodes[0].addEventListener('blur', function () {// input框失焦后的操作
           let buildingData = newDiv.childNodes[0].value// 取值
           let newBuilding = buildingData.split('(')[0]// 取出楼栋名
           let newFloor = parseInt(buildingData.substring(buildingData.indexOf('(') + 1, buildingData.indexOf(')')))// 取出层数并转换为数字
-          if (newBuilding && newFloor) {
-            // 调用修改楼栋接口
+          if (newBuilding && newFloor) {// 调用修改楼栋接口
             $.ajax({
               type: 'PUT',
-              url: 'http://172.16.211.75:8080/buildings',
+              url: self.api + 'buildings',
               headers: {
                 'Content-Type': 'application/json',
               },
@@ -374,110 +412,95 @@
                 'zoneId': self.campusId
               }),
               success (data) {// 更新楼栋列表
-                $.ajax({
-                  type: 'GET',
-                  url:  this.api + 'buildings',
-                  data: {'zoneId': self.campusId},
-                  success (data) {
-                    div[1].childNodes[index + 2].style.display = 'block'// 显示修改后的div
-                    div[1].childNodes[index + 2].style.background = '#BBB'// 显示修改后的div
-                    self.buildingsData = data
-                    newDiv.remove()// 移除div
-                  }
-                })
+                self.getBuildingsList(self.campusId)
+                newDiv.remove()// 移除div
+                div.childNodes[index + 1].style.display = 'block'// 显示修改后的div
+                div.childNodes[index + 1].style.background = '#BBB'// 显示修改后的div
               },
               error () {
                 console.log('error')
               }
             })
           } else {
-            alert('请按照"楼栋名(层数)"的格式修改')
+            self.$message.error('请按照"楼栋名(层数)"的格式修改')
+            self.clickList = false
+            newDiv.childNodes[0].focus()// input框获取焦点
           }
         })
       },
 
       // 修改教室
-      modifyClassroom (index, id, name) {
+      modifyClassroom (div, newDiv, index) {
         let self = this
-        // 将需要修改的div被输入框覆盖
-        let div = document.getElementsByClassName('el-card__body')
-        let newDiv = document.createElement('div')
-        newDiv.setAttribute('class', 'classroomsList')// 设置class属性
-        newDiv.innerHTML = '<input type="text" style="text-align: center"/>'// 添加input框
-        div[2].insertBefore(newDiv, div[2].childNodes[index + 1])// 插入有input框的div
-        div[2].childNodes[index + 2].style.display = 'none'// 隐藏要修改的div
-        newDiv.childNodes[0].focus()// input框获取焦点
-        newDiv.childNodes[0].value = name// 确保焦点在文字后方
         newDiv.childNodes[0].addEventListener('blur', function () {// input框失焦后的操作
           let newClassroom = newDiv.childNodes[0].value// 取值
           let roomFloor = parseInt(newClassroom.replace(/[^0-9]/ig, '').substr(0, 1))// 取楼层
-          if (newClassroom) {
-            // 调用修改教室接口
+          if (newClassroom) {// 教室名存在数据
             $.ajax({
               type: 'PUT',
-              url: 'http://172.16.211.75:8080/rooms',
+              url: self.api + 'rooms',
               headers: {
                 'Content-Type': 'application/json',
               },
               dataType: 'json',
-              data: JSON.stringify({// 更新教室列表
-                'id': id,
+              data: JSON.stringify({
+                'id': self.classroomId,
                 'name': newClassroom,
                 'floors': roomFloor,
                 'buildingId': self.buildingId
               }),
               success (data) {
-                $.ajax({
-                  type: 'GET',
-                  url: 'http://172.16.211.75:8080/rooms',
-                  data: {'buildingId': self.buildingId},
-                  success (data) {
-                    div[2].childNodes[index + 2].style.display = 'block'// 显示修改后的div
-                    div[2].childNodes[index + 2].style.background = '#BBB'// 显示修改后的div
-                    self.classroomsData = data
-                    newDiv.remove()// 移除div
-                  }
-                })
-              },
-              error () {
-                console.log('error')
+                self.getClassroomsList(self.buildingId)
+                newDiv.remove()// 移除div
+                div.childNodes[index + 1].style.display = 'block'
+                div.childNodes[index + 1].style.background = '#BBB'
               }
             })
-          } else {
-            alert('教室名不能为空')
+          } else {// 教室名无数据
+            self.$message.error('教室名不能为空')
+            self.clickList = false
+            newDiv.childNodes[0].focus()
           }
         })
       },
 
-      // 删除校区
-      delCampus (id) {
-        this.delGroupType = '校区'
+      // 删除操作
+      deleteGroup (type, id) {
+        if (type === 0) {
+          this.delGroupType = '校区'
+        } else if (type === 1) {
+          this.delGroupType = '楼栋'
+        } else if (type === 2) {
+          this.delGroupType = '教室'
+        }
         this.delId = id
         this.delGroup = true
       },
 
-      // 删除楼栋
-      delBuilding (id) {
-        this.delGroupType = '楼栋'
-        this.delId = id
-        this.delGroup = true
-      },
-
-      // 删除教室
-      delClassroom (id) {
-        this.delGroupType = '教室'
-        this.delId = id
-        this.delGroup = true
-      },
-
-      // 批量添加分组
-      showBatchAddition () {
-        this.batchAddition = true
+      clearCSS (type) {
+        console.log(type)
+        let campusesList = document.getElementsByClassName('campusesList')
+        let buildingsList = document.getElementsByClassName('buildingsList')
+        let classroomsList = document.getElementsByClassName('classroomsList')
+        if (type === 0) {// 选择校区
+          for (let i = 0; i < campusesList.length; i++) {
+            campusesList[i].style.background = '#FFF'
+          }
+        } else if (type === 1) {// 选择楼栋
+          for (let i = 0; i < buildingsList.length; i++) {
+            buildingsList[i].style.background = '#FFF'
+          }
+        } else if (type === 2) {// 选择教室
+          for (let i = 0; i < classroomsList.length; i++) {
+            classroomsList[i].style.background = '#FFF'
+          }
+        }
       },
 
       // 调用校区列表接口
       getCampusesList () {
         let self = this
+        this.clickList = true
         $.ajax({
           type: 'GET',
           async: false,
@@ -494,13 +517,14 @@
       // 调用楼栋列表接口
       getBuildingsList (id) {
         let self = this
+        this.clickList = true
         $.ajax({
           type: 'GET',
           url: this.api + 'buildings',
           data: {'zoneId': id},
           success (data) {
             self.buildingsData = data
-            self.$emit('updateNav')
+            // self.$emit('updateNav')
           },
           error () {
             console.log('获取数据失败')
@@ -511,15 +535,20 @@
       // 调用教室列表接口
       getClassroomsList (id) {
         let self = this
+        this.clickList = true
         // 根据选中的楼栋id获取教室列表
         $.ajax({
           type: 'GET',
-          url:  this.api + 'rooms/' + id,
+          url: this.api + 'rooms/' + id,
           success (data) {
-            console.log(data)
             self.classroomsData = data
           }
         })
+      },
+
+      // 批量添加分组
+      showBatchAddition () {
+        this.batchAddition = true
       },
 
       // 关闭子级模态框
@@ -529,11 +558,10 @@
         this.batchAddition = false
       },
 
-      // 关闭子模态框
+      // 关闭模态框
       closeAllModel () {
         this.manageGroups = false
         this.$emit('closeModel')
-
       }
     },
     mounted () {
@@ -548,7 +576,7 @@
 </style>
 
 <style>
-  .campusesList, .buildingsList, .classroomsList {
+  .groupList {
     padding: 2px 5px 5px 5px;
     border-bottom: 1px solid #BBBBBB;
   }

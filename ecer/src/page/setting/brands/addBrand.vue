@@ -31,6 +31,7 @@
     },
     data () {
       return {
+        showAdd: false,
         labelPosition: 'left',
         deviceData: {
           brandName: '',
@@ -43,7 +44,7 @@
         let self = this
         $.ajax({
           type: 'POST',
-          url: 'http://172.16.211.75:8080/models',
+          url: this.api + 'models',
           headers: {
             'Content-Type': 'application/json',
           },
@@ -53,21 +54,23 @@
             'modelName': self.deviceData.brandType
           }),
           success (data) {
-            console.log(data)
             self.closeModel()
           }
         })
       },
 
       closeModel () {
-        this.addBrand = false
-        this.deviceData.brandName=''
-        this.deviceData.brandType=''
+        this.showAdd = false
+        this.deviceData.brandName = ''
+        this.deviceData.brandType = ''
         this.$emit('showBrandsList')
         this.$emit('closeModel')
       }
     },
-    mounted () {
+    watch: {
+      addBrand (newVal) {
+        this.showAdd = newVal
+      }
     }
   }
 </script>

@@ -1,6 +1,6 @@
 <template>
   <el-dialog title="指令模板管理"
-             top="110px"
+             top="160px"
              :visible.sync="manageOrders"
              :close-on-press-escape="false"
              :close-on-click-modal="false"
@@ -12,23 +12,26 @@
           <span>指令模板</span>
         </div>
         <div class="ordersName" v-for="(item,index) in templateData"
-             @click="selectOrder(item.templateId,item.templateName)">
-          {{item.templateName}}
+             @click="selectOrder(item.id,item.name,index)">
+          {{item.name}}
         </div>
-        <div class="cardFooter"><i class="el-icon-delete" @click="showDelModel"></i><i class="el-icon-edit" @click="modifyTemplate"></i></div>
+        <div class="cardFooter"><i class="el-icon-delete" @click="showDelModel"></i><i class="el-icon-edit"
+                                                                                       @click="modifyTemplate"></i>
+        </div>
       </el-card>
       <div class="strategyContent">
         <el-table
           :data="tableData"
           height="270px">
           <el-table-column
-            prop="orderId"
+            type="index"
+            prop="id"
             label="编号"
             width="135px"
             :show-overflow-tooltip="true">
           </el-table-column>
           <el-table-column
-            prop="orderName"
+            prop="name"
             label="指令名称">
           </el-table-column>
         </el-table>
@@ -57,41 +60,36 @@
       return {
         manageOrders: true,
         selectId: 0,
-        selectName:'',
+        key: 0,
+        selectName: '',
         delOrder: false,
         chooseBrand: false,
-        templateData: [{
-          'templateId': '1',
-          'templateName': '格力空调', 'templateInfo': [{
-            orderId: '1',
-            orderName: '开机',
-          }, {
-            orderId: '2',
-            orderName: '恒温制冷26度',
-          }, {
-            orderId: '3',
-            orderName: '恒温制热20度',
-          }]
-        }, {
-          'templateId': '2',
-          'templateName': '美的空调', 'templateInfo': [{
-            orderId: '1',
-            orderName: '开机',
-          }, {
-            orderId: '2',
-            orderName: '恒温制冷26度',
-          }, {
-            orderId: '3',
-            orderName: '恒温制热20度',
-          }]
-        }],
+        templateData: [],
         tableData: [],
       }
     },
     methods: {
+      // 展示模板列表
+      getTempList () {
+        let self = this
+        $.ajax({
+          type: 'GET',
+          async: false,
+          url: this.api + 'templates',
+          success (data) {
+            console.log(data)
+            self.templateData = data
+          }
+        })
+      },
+
       // 选中预设
-      selectOrder (id, name) {
+      selectOrder (id, name, index) {
+        let self = this
         this.selectId = id
+        if (index) {
+          this.key = index
+        }
         this.selectName = name
         this.tableData = []
         this.$nextTick(function () {
@@ -105,45 +103,53 @@
             }
           }
         })
-        for (let i = 0; i < this.templateData.length; i++) {
-          if (id === this.templateData[i].templateId) {
-            this.tableData = this.templateData[i].templateInfo
+        $.ajax({
+          type: 'GET',
+          url: this.api + 'templates/' + id + '/instructs',
+          success (data) {
+            self.tableData = data
           }
-        }
+        })
       },
 
-      modifyTemplate(){
+      // 修改模板名称
+      modifyTemplate () {
         let self = this
-        let id = this.selectId
         // 将需要修改的div被输入框覆盖
         let div = document.getElementsByClassName('el-card__body')
         let newDiv = document.createElement('div')
         newDiv.setAttribute('class', 'ordersName')// 设置class属性
-        newDiv.innerHTML = '<input type="text" value=' + this.selectName + ' style="text-align: center"/>'// 添加input框
-        console.log(div[0])
-        div[0].insertBefore(newDiv, div[0].childNodes[1])// 插入有input框的div
-        div[0].childNodes[2].style.display = 'none'// 隐藏要修改的div
+        newDiv.innerHTML = '<input type="text" style="text-align: center"/>'// 添加input框
+        div[0].insertBefore(newDiv, div[0].childNodes[this.key + 1])// 插入有input框的div
+        div[0].childNodes[this.key + 2].style.display = 'none'// 隐藏要修改的div
+        newDiv.childNodes[0].value = this.selectName// 确保焦点在文字后方
+        newDiv.childNodes[0].focus()// input框获取焦点
         newDiv.childNodes[0].addEventListener('blur', function () {// input框失焦后的操作
-        //   let newCampus = newDiv.childNodes[0].value// 取值
-        //   let campusData = newCampus.split('校区')[0]// 取出校区前的文字判断是否填写校区名
-        //   if (campusData) {
-        //     // 调用修改校区接口
-        //     self.allCampuses[index].name = newCampus// 取得返回值并修改数组
-        //     div[0].childNodes[index + 2].style.display = 'block'// 显示修改后的div
-        //     newDiv.remove()// 移除div
-        //   } else {
-        //     console.log('请按照XX校区的格式修改')
-        //     newDiv.childNodes[0].focus()
-        //   }
+          let newTempName = newDiv.childNodes[0].value// 取值
+          if (newTempName) {// 调用修改校区接口
+            $.ajax({
+              type: 'PUT',
+              url: self.api + 'templates/' + self.selectId + '/' + newTempName,
+              success (data) {
+                self.getTempList()
+                newDiv.remove()// 移除div
+                div[0].childNodes[self.key + 1].style.display = 'block'// 显示修改后的div
+                self.selectName = newTempName
+              }
+            })
+          } else {
+            self.$message.error('指令模板名不能为空！')
+            newDiv.childNodes[0].focus()
+          }
         })
-        // let inputSelect = newDiv.childNodes[0]
-        // inputSelect.focus()// input框获取焦点
       },
 
+      // 展示删除模态框
       showDelModel () {
         this.delOrder = true
       },
 
+      // 展示批量导入模板
       showBrandsList () {
         this.chooseBrand = true
       },
@@ -152,6 +158,7 @@
       closeModel () {
         this.delOrder = false
         this.chooseBrand = false
+        this.getTempList()
       },
 
       closeAllModel () {
@@ -160,7 +167,8 @@
       }
     },
     mounted () {
-      this.selectOrder(this.templateData[0].templateId, this.templateData[0].templateName)
+      this.getTempList()
+      this.selectOrder(this.templateData[0].id, this.templateData[0].name)
     }
   }
 </script>
