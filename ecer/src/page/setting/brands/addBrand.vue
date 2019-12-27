@@ -48,13 +48,26 @@
           headers: {
             'Content-Type': 'application/json',
           },
-          dataType: 'json',
           data: JSON.stringify({
             'brandName': self.deviceData.brandName,
             'modelName': self.deviceData.brandType
           }),
           success (data) {
-            self.closeModel()
+            let jsonData = JSON.parse(data)
+            if (jsonData === true) {
+              self.$message({
+                message: '设备品牌型号添加成功！',
+                type: 'success'
+              })
+              self.closeModel()
+            } else if (jsonData.status === 1) {
+              self.$message({
+                message: '该品牌型号已被添加！',
+                type: 'warning'
+              })
+            } else {
+              this.$message.error('添加失败，请重试！');
+            }
           }
         })
       },

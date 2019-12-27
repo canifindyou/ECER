@@ -42,10 +42,14 @@
             'id': self.delId,
           },
           success (data) {
-            console.log(data)
             let jsonData = JSON.parse(data)
-            if (jsonData.status === 1) {// 校区名重复
-              self.$message.error('存在该品牌型号的设备，无法删除！')
+            if (jsonData === true) {
+              self.$message({
+                message: '该设备品牌型号删除成功！',
+                type: 'success'
+              })
+            } else if (jsonData.status === 1) {// 校区名重复
+              self.$message.error('存在该品牌型号的设备或控制项模板，无法删除！')
             }
             self.closeModel()
           }
@@ -86,7 +90,7 @@
 
   .el-button {
     margin: 0 0 0 10px;
-.    font-size: 15px;
+  . font-size: 15 px;
     padding: 10px 20px;
   }
 </style>

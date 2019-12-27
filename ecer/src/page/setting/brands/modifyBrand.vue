@@ -51,14 +51,25 @@
           headers: {
             'Content-Type': 'application/json',
           },
-          dataType: 'json',
           data: JSON.stringify({
             'id': self.modifyId,
             'brandName': self.deviceData.brandName,
             'modelName': self.deviceData.brandType
           }),
-          success () {
-            self.closeModel()
+          success (data) {
+            let jsonData = JSON.parse(data)
+            if (jsonData === true) {
+              self.$message({
+                message: '设备品牌型号修改成功！',
+                type: 'success'
+              })
+              self.closeModel()
+            } else if (jsonData.status === 1) {
+              self.$message({
+                message: '该品牌型号已存在，请确认修改内容！',
+                type: 'warning'
+              })
+            }
           }
         })
       },
