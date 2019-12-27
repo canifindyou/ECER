@@ -34,12 +34,23 @@
     },
     methods: {
       delTemp () {
+        let self = this
         $.ajax({
           type: 'DELETE',
           url: this.api + 'templates/' + this.delId,
-          success (data){
+          success (data) {
             console.log(data)
-          },
+            let jsonData = JSON.parse(data)
+            if (jsonData === true) {
+              self.$message({
+                message: '该控制项模板删除成功！',
+                type: 'success'
+              })
+            } else if (jsonData.status === 1) {// 校区名重复
+              self.$message.error('存在该品牌型号的设备或控制项模板，无法删除！')
+            }
+            self.closeModel()
+          }
         })
       },
 

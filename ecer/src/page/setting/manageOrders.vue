@@ -77,7 +77,6 @@
           async: false,
           url: this.api + 'templates',
           success (data) {
-            console.log(data)
             self.templateData = data
           }
         })
@@ -131,10 +130,19 @@
               type: 'PUT',
               url: self.api + 'templates/' + self.selectId + '/' + newTempName,
               success (data) {
-                self.getTempList()
-                newDiv.remove()// 移除div
-                div[0].childNodes[self.key + 1].style.display = 'block'// 显示修改后的div
-                self.selectName = newTempName
+                let jsonData = JSON.parse(data)
+                if (jsonData === true) {
+                  self.getTempList()
+                  newDiv.remove()// 移除div
+                  div[0].childNodes[self.key + 1].style.display = 'block'// 显示修改后的div
+                  self.selectName = newTempName
+                  self.$message({
+                    message: '该模板名修改成功！',
+                    type: 'success'
+                  })
+                }else {
+                  self.$message.error('修改失败请重试！')
+                }
               }
             })
           } else {

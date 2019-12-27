@@ -71,7 +71,7 @@
       },
 
       // 文件上传成功
-      onSuccess (res, file,) {
+      onSuccess (res, file) {
         console.log(res)
         console.log(file)
         if (res === true) {
