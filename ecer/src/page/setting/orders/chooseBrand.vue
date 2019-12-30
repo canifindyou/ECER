@@ -18,7 +18,6 @@
           ref="upload"
           name="part"
           :action="uploadUrl"
-          :data={name:formData.tempName}
           :limit="1"
           :file-list="fileList"
           :on-success="onSuccess"
@@ -73,14 +72,14 @@
       // 文件上传成功
       onSuccess (res, file) {
         console.log(res)
-        console.log(file)
         if (res === true) {
           this.$message({
             message: '模板上传成功！',
             type: 'success'
           })
           this.closeModel()
-        } else if (res.status === 1) {//待改
+        } else if (res.status === 1) {
+          this.$refs.upload.clearFiles()
           this.$message({
             message: '模板名不能为空！',
             type: 'warning'
@@ -88,6 +87,11 @@
         } else if (res.status === 21) {
           this.$message({
             message: '该品牌型号的指令模板已上传，请上传正确的文件！',
+            type: 'warning',
+          })
+        }else if(res.status === 51){
+          this.$message({
+            message: '请在设备品牌管理内添加文件中的品牌类型后，再导入该模板！',
             type: 'warning',
           })
         } else {
@@ -102,7 +106,9 @@
 
       // 上传文件
       submitUpload () {
-        this.uploadUrl = 'http://172.16.211.75:8080/templates/upload'
+        // :data={name:formData.tempName}
+        this.uploadUrl = 'http://172.16.211.75:8080/templates/upload/'+this.formData.tempName
+        console.log(this.uploadUrl)
         this.$nextTick(() => {// 手动上传
           this.$refs.upload.submit()
         })

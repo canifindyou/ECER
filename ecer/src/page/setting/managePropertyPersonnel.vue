@@ -2,7 +2,7 @@
   <div class="table">
     <el-table
       :data="tableData"
-      style="width: 90%">
+      style="width: 100%">
       <el-table-column
         type="index"
         prop="id"
@@ -125,6 +125,9 @@
 </script>
 
 <style scoped>
+  .table{
+
+  }
   .table >>> .el-table--fit {
     margin: 10px auto;
 
@@ -132,6 +135,10 @@
 
   .el-table{
     min-width: 970px;
+    height: 50px;
+    /*width: 100%;*/
+    overflow-y: auto;
+    overflow-x: auto;
   }
 
   .table >>> .el-table th.is-leaf {
