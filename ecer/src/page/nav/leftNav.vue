@@ -90,7 +90,9 @@
           {
             name: '全局配置',
             controlItem: 'globalControl'
-          }
+          },
+       
+         
         ]
       }
     },

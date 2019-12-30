@@ -72,7 +72,7 @@
           >
           </el-option>
         </el-select>
-        <el-select
+        <!-- <el-select
           v-model="selectDevice"
           :disabled="selectRooms"
           placeholder="选择设备"
@@ -86,7 +86,7 @@
             :value="item.value"
           >
           </el-option>
-        </el-select>
+        </el-select> -->
         <div style="display:inline-block" v-if="flag">
           <el-date-picker
             v-model="startTime"
@@ -213,7 +213,7 @@ export default {
       this.selectFloorOptions = [];
       this.selectRoomOptions = [];
       this.selectRooms = "";
-      this.pubilcFnAxios(`buildings/floors/${this.selectBuild}`, {})
+      this.pubilcFnAxios(`buildings/${this.selectBuild}/floors`, {})
         .then(data => {
           console.log(data);
           for (let i = 1; i < data + 1; i++) {
@@ -232,6 +232,9 @@ export default {
         this.selectRoomOptions,
         {}
       );
+    },
+    selectDevice(){
+
     },
 
     constructData(urlString, obj, params) {

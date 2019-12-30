@@ -10,7 +10,7 @@
     :show-close="false" -->
     <!-- :before-close="handleClose" -->
 
-    <el-dialog width="520px" title="设置" :visible.sync="inner" append-to-body>
+    <el-dialog width="520px" title="设置" :visible.sync="inner"  append-to-body>
       <div class="radiotabBox">
         <template>
           <el-radio v-model="radio" label="控制项">控制项</el-radio>
@@ -65,7 +65,7 @@
 
           <div class="contentText timerItem">
             <div class="block" style="margin-top:15px">
-              开始时：
+              设置时间：
               <el-date-picker
                 v-model="startTime"
                 type="datetime"
@@ -77,41 +77,10 @@
               >
               </el-date-picker>
             </div>
-            <div class="block" style="margin-top:15px">
-              结束时：
-              <el-date-picker
-                v-model="endTime"
-                type="datetime"
-                placeholder="结束时间"
-                size="mini"
-                format="yyyy-MM-dd HH:mm"
-                :picker-options="pickerOptions2"
-              >
-              </el-date-picker>
-            </div>
           </div>
 
           <div class="contentText checkTimer">
             校准时间
-            <div class="contentText selectItemTimer">
-              <div>
-                控制项：
-                <el-select
-                  v-model="controlItem"
-                  placeholder="请选择"
-                  size="mini"
-                  style="width:150px;"
-                >
-                  <el-option
-                    v-for="item in control"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
-                  >
-                  </el-option>
-                </el-select>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -168,7 +137,7 @@
           >* 提交 {{ radio }} 将生效</span
         >
         <el-button @click="innerCancle">取 消</el-button>
-        <el-button type="primary" @click="innerConfirm">确 定</el-button>
+        <el-button type="primary" :loading="loading" @click="innerConfirm">确 定</el-button>
       </span>
     </el-dialog>
 
@@ -250,7 +219,7 @@
 
     <span slot="footer" class="dialog-footer">
       <el-button @click="cancle">取 消</el-button>
-      <el-button type="primary" @click="outConfirm">确 定</el-button>
+      <el-button type="primary"  @click="outConfirm">确 定</el-button>
     </span>
   </el-dialog>
 </template>
@@ -267,6 +236,7 @@ export default {
   },
   data() {
     return {
+      loading:false,
       pickerOptions1: {
         disabledDate(time) {
           return time.getTime() < Date.now() - 8.64e7;
@@ -340,6 +310,10 @@ export default {
     batchOperatClose() {
       //弹窗关闭事件
       this.$emit("batchOperatClose"); //事件分发
+      //弹窗关闭，清空所有已选择数据
+      this.selectDeviceList =[],
+      this.checkedItem =[],
+      this.deviceIds  =[]
     },
     cancle() {
       //取消按钮事件
@@ -377,16 +351,20 @@ export default {
     },
     innerConfirm() {
       //内层弹窗确定按钮事件
-      this.inner = false;
+     this.loading = true
       this.$emit("batchOperatClose");
       switch (this.radio) {
         case "控制项":
+          
           this.pubilcFnAxios("devices/perform", {
             ids: this.deviceIds.toString(),
             itemName: this.controlItem
           })
             .then(data => {
               console.log(data);
+              this.messageSuccess()
+              this.loading = false
+               this.inner = false;
             })
             .catch(() => {
               console.log("批量控制项执行失败");
@@ -395,8 +373,63 @@ export default {
         case "定时设置":
           break;
         case "自控设置":
+          if(this.controlselfItem == 0){
+            this.pubilcFnAxios("devices/auto/off", {
+            ids: this.deviceIds.toString()
+          })
+            .then(data => {
+              console.log(data);
+              this.messageSuccess()
+              this.loading = false
+              this.inner = false;
+            })
+            .catch(() => {
+              console.log("批量自控失败执行失败");
+            });
+          }else{
+             this.pubilcFnAxios("devices/auto/on", {
+             ids: this.deviceIds.toString()
+          })
+            .then(data => {
+              console.log(data);
+              this.messageSuccess()
+              this.loading = false
+               this.inner = false;
+            })
+            .catch(() => {
+              console.log("批量自控失败执行失败");
+            });
+          }
+          
           break;
         case "继电器设置":
+          if(this.controlselfItem == 0){
+            this.pubilcFnAxios("devices/relay/off", {
+            ids: this.deviceIds.toString()
+          })
+            .then(data => {
+              console.log(data);
+              this.messageSuccess()
+              this.loading = false
+              this.inner = false;
+            })
+            .catch(() => {
+              console.log("批量继电器控制执行失败");
+            });
+          }else{
+             this.pubilcFnAxios("devices/relay/on", {
+             ids: this.deviceIds.toString()
+          })
+            .then(data => {
+              console.log(data);
+              this.messageSuccess()
+              this.loading = false
+               this.inner = false;
+            })
+            .catch(() => {
+              console.log("批量继电器控制执行失败");
+            });
+          }
           break;
       }
     },

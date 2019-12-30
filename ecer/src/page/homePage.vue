@@ -13,6 +13,7 @@
         <manage-brands v-if="showBrandsModel" @closeModel="closeModel"></manage-brands>
         <manage-orders v-if="showOrdersModel" @closeModel="closeModel"></manage-orders>
         <global-control v-if="showGlobalControl" @closeModel="closeModel"></global-control>
+       
       </el-main>
     </el-container>
     <!--  </el-container>-->
@@ -27,6 +28,8 @@
   import manageOrders from './setting/manageOrders'
   import globalControl from './setting/globalControl'
 
+ 
+
   export default {
     name: 'homePage',
     components: {
@@ -35,7 +38,8 @@
       manageStrategies,
       manageBrands,
       manageOrders,
-      globalControl
+      globalControl,
+      
     },
     data () {
       return {
