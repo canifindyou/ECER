@@ -25,7 +25,7 @@
         >
         <template>
           <el-select
-            v-model="selectBuild"
+            v-model="selectfloorSearch"
             placeholder="请选择楼层"
             size="mini"
             style="width:120px;"
@@ -61,7 +61,7 @@
               <el-form-item label="IP:">
                 <span>{{ props.row.ip }}</span>
               </el-form-item>
-              <el-form-item label="位置:">
+              <el-form-item label="端口号:">
                 <span>{{ props.row.location }}</span>
               </el-form-item>
               <el-form-item label="编号:">
@@ -78,7 +78,7 @@
         <el-table-column label="品牌" prop="brandge" align="center">
         </el-table-column>
         <el-table-column label="环境温度" align="center">
-          <template slot-scope="scope"> {{ scope.row.ter }}℃ </template>
+          <template slot-scope="scope"> {{ scope.row.ter }} </template>
         </el-table-column>
         <el-table-column label="当前状态" prop="status" align="center">
         </el-table-column>
@@ -90,8 +90,11 @@
               v-model="controlItem[props.$index]['control' + props.$index]"
               placeholder="请选择"
               size="small"
+              :disabled="controllIsDone"
               style="width:150px;"
+              @change="controllSelectClick(props.row.id,controlItem[props.$index]['control' + props.$index])"
             >
+              <!--  -->
               <el-option
                 v-for="item in props.row.control"
                 :key="item.value"
@@ -105,12 +108,14 @@
         <el-table-column label="自控状态" prop="selfControl" align="center">
           <template slot-scope="props">
             <el-switch
+              v-if="props.row.selfControl !== 'null'"
               v-model="props.row.selfControl"
               active-color="#13ce66"
               inactive-color="#ff3342"
               @change="switchChange($event, props.$index)"
             >
             </el-switch>
+            <span v-else>暂无</span>
           </template>
         </el-table-column>
         <el-table-column
@@ -120,17 +125,30 @@
           width="200"
         >
           <template slot-scope="props">
-            <el-popover
-              v-if="props.row.selfControl"
-              placement="top-start"
-              title="提示"
-              width="100"
-              trigger="hover"
-              content="您需要关闭自控状态后操作"
-            >
+            <template v-if="props.row.jdControl !== 'null'">
+              <el-popover
+                v-if="props.row.selfControl"
+                placement="top-start"
+                title="提示"
+                width="100"
+                trigger="hover"
+                content="您需要关闭自控状态后操作"
+              >
+                <el-switch
+                  slot="reference"
+                  disabled="!props.row.selfControl"
+                  v-model="props.row.jdControl"
+                  active-color="#13ce66"
+                  inactive-color="#ff3342"
+                  @change="
+                    switchChange2($event, props.$index, props.row.selfControl)
+                  "
+                >
+                </el-switch>
+              </el-popover>
               <el-switch
+                v-if="!props.row.selfControl"
                 slot="reference"
-                disabled="!props.row.selfControl"
                 v-model="props.row.jdControl"
                 active-color="#13ce66"
                 inactive-color="#ff3342"
@@ -139,18 +157,8 @@
                 "
               >
               </el-switch>
-            </el-popover>
-            <el-switch
-              v-if="!props.row.selfControl"
-              slot="reference"
-              v-model="props.row.jdControl"
-              active-color="#13ce66"
-              inactive-color="#ff3342"
-              @change="
-                switchChange2($event, props.$index, props.row.selfControl)
-              "
-            >
-            </el-switch>
+            </template>
+            <span v-else>暂无</span>
           </template>
         </el-table-column>
         <el-table-column
@@ -162,7 +170,15 @@
           <template slot-scope="scope">
             <el-button
               size="mini"
-              @click="handleEdit(scope.row.addSchoolAera, scope.row.addBuild)"
+              @click="
+                handleEdit(
+                  scope.row.id,
+                  scope.row.ip,
+                  scope.row.location,
+                  scope.row.name,
+                  scope.row.numCode
+                )
+              "
               >修改</el-button
             >
             <el-button
@@ -174,6 +190,20 @@
           </template>
         </el-table-column>
       </el-table>
+
+      <div style="text-align:center;margin:20px 0 0 0 ">
+        <!-- <el-switch v-model="pages"> </el-switch> -->
+        <el-pagination
+          :hide-on-single-page="pages"
+          :total="total"
+          :page-size="10"
+          layout="prev, pager, next"
+          @current-change="changePage"
+          @prev-click="prevClick"
+          @next-click="nextClick"
+        >
+        </el-pagination>
+      </div>
     </template>
     <!-- 添加弹窗 -->
 
@@ -356,7 +386,15 @@
         >
       </span>
     </el-dialog>
-    <editDevice :showDialog="showDialog" @editClose="editClose"></editDevice
+    <editDevice
+      :showDialog="showDialog"
+      :editid="editid"
+      :editname="editname"
+      :editip="editip"
+      :editport="editport"
+      :editnum ="numCode"
+      @editClose="editClose"
+    ></editDevice
     ><!-- 修改设备 -->
     <batchDialog
       :showBatch="showBatch"
@@ -382,9 +420,15 @@ export default {
   data() {
     return {
       /* 此处为添加功能弹窗值绑定值*/
-
+      timerId:"",//定时器id
+      controllIsDone:false,//下拉框执行是否完成，完成前所有下拉框禁用
+      pages: true,
+      pagesNum: 1,
+      total: 0,
       schoolLoaded: true, //添加弹窗加载动画
-
+      test: "",
+      isSearch: false,
+      selectfloorSearch: "", //筛选楼层条件
       addName: "东二209", //空调名称
       addIp: "172.16.22.209", //空调ip
       addId: "01", //空调编号
@@ -417,6 +461,11 @@ export default {
       id: "",
       ip: "",
       name: "",
+      editid: "",
+      editname: "",
+      editip: "",
+      editport: "",
+      numCode:"",
 
       /* 批量导入 */
       showUpLoad: false,
@@ -436,118 +485,50 @@ export default {
       schoolId: this.$route.query.sch
         ? this.$route.query.sch
         : localStorage.getItem("initschoolId"), //校区ID
-      controlItem: "", //控制项下拉框绑定值
+      controlItem: [], //控制项下拉框绑定值
       selfBtnValue: "",
       options: [
         //楼层搜索下拉框
       ],
+      control: [],
+      controlItemLength: "", //下拉框绑定值
       tableData: [
         //列表数据
-        {
-          type: "1P",
-          brandge: "格力",
-          ter: "26",
-          status: "通电未开机",
-          nums: "200度",
-          control: [
-            {
-              value: "开机",
-              label: "开机"
-            },
-            {
-              value: "关机",
-              label: "关机"
-            },
-            {
-              value: "高风制冷20度",
-              label: "高风制冷20度"
-            },
-            {
-              value: "高风制冷18度",
-              label: "高风制冷18度"
-            },
-            {
-              value: "低风制冷18度",
-              label: "低风制冷18度"
-            }
-          ],
-          selfControl: false,
-          jdControl: true,
-          location: "东二209",
-          name: "空调一",
-          id: "1123",
-          ip: "172.16.22.18"
-        },
-        {
-          type: "1P",
-          brandge: "格力",
-          ter: "26",
-          status: "断电",
-          nums: "200度",
-          control: [
-            {
-              value: "开机",
-              label: "开机"
-            },
-            {
-              value: "关机",
-              label: "关机"
-            },
-            {
-              value: "高风制冷20度",
-              label: "高风制冷20度"
-            },
-            {
-              value: "高风制冷18度",
-              label: "高风制冷18度"
-            },
-            {
-              value: "低风制冷18度",
-              label: "低风制冷18度"
-            }
-          ],
-          selfControl: false,
-          jdControl: true,
-          location: "东二209",
-          name: "空调一",
-          id: "1123",
-          ip: "172.16.22.18"
-        },
-        {
-          type: "1P",
-          brandge: "格力",
-          ter: "26",
-          status: "开机",
-          nums: "200度",
-          control: [
-            {
-              value: "开机",
-              label: "开机"
-            },
-            {
-              value: "关机",
-              label: "关机"
-            },
-            {
-              value: "高风制冷20度",
-              label: "高风制冷20度"
-            },
-            {
-              value: "高风制冷18度",
-              label: "高风制冷18度"
-            },
-            {
-              value: "低风制冷18度",
-              label: "低风制冷18度"
-            }
-          ],
-          selfControl: false,
-          jdControl: true,
-          location: "东二209",
-          name: "空调一",
-          id: "1123",
-          ip: "172.16.22.18"
-        }
+        // {
+        //   type: "1P",
+        //   brandge: "格力",
+        //   ter: "26",
+        //   status: "通电未开机",
+        //   nums: "200度",
+        //   control: [
+        //     {
+        //       value: "开机",
+        //       label: "开机"
+        //     },
+        //     {
+        //       value: "关机",
+        //       label: "关机"
+        //     },
+        //     {
+        //       value: "高风制冷20度",
+        //       label: "高风制冷20度"
+        //     },
+        //     {
+        //       value: "高风制冷18度",
+        //       label: "高风制冷18度"
+        //     },
+        //     {
+        //       value: "低风制冷18度",
+        //       label: "低风制冷18度"
+        //     }
+        //   ],
+        //   selfControl: false,
+        //   jdControl: true,
+        //   location: "东二209",
+        //   name: "空调一",
+        //   id: "1123",
+        //   ip: "172.16.22.18"
+        // },
       ]
     };
   },
@@ -557,6 +538,70 @@ export default {
     batchExport
   },
   methods: {
+    controllSelectClick(id,event){
+      console.log(id,event)
+      this.controllIsDone = true
+
+      axios.get(this.api + "devices/perform",{params:{ids:id,itemName:event}})
+      .then(()=>{
+        this.controllIsDone = false
+      })
+      .catch(()=>{
+        console.log("指令执行失败")
+      })
+      setTimeout(()=>{
+        this.controllIsDone = false
+      },500)
+    },
+    inintList(List, data) {
+      data.forEach(item => {
+        List.push({
+          type: item.model_name,
+          brandge: item.brand_name,
+          ter: item.log ? item.log.contextT + "℃" : "暂无",
+          status: item.log
+            ? (item.log.relayStatus ? "通电" : "未通电") +
+              (item.log.onOffStatus ? "开机" : "未开机")
+            : "暂无",
+          nums: item.log ? item.log.electricConsume + "度" : "暂无",
+          selfControl: item.log
+            ? item.log.autoStatus == 0
+              ? false
+              : true
+            : "null",
+          control: this.control,
+          jdControl: item.log
+            ? item.log.relayStatus == 0
+              ? false
+              : true
+            : "null",
+          location: item.port,
+          name: item.name,
+          id: item.id,
+          ip: item.ip_address,
+          numCode:item.address_code
+        });
+      });
+    },
+    changePage($event) {
+      //分页页码改变
+      console.log($event);
+      this.pagesNum = $event;
+
+      if (this.isSearch) {
+        this.getPageAfterList();
+      } else {
+        this.getListData();
+      }
+    },
+    prevClick($event) {
+      //上一页按钮事件
+      console.log($event);
+    },
+    nextClick($event) {
+      //下一页按钮事件
+      console.log($event);
+    },
     addDevice() {
       //添加设备
       let params = {
@@ -570,18 +615,18 @@ export default {
       $.ajax({
         type: "POST",
         url: this.api + "devices",
-        data: params,
-        success:(data) =>{
+        data: JSON.stringify(params),
+        contentType: "application/json",
+        success: data => {
           // 刷新列表
+          console.log(data);
           this.messageSuccess();
           this.centerDialogVisible = false;
         },
-        error:()=>{
-          this.messageErr()
+        error: () => {
+          this.messageErr();
         }
-        
       });
-     
     },
     selectSchool(e) {
       //校区下拉框数据加载
@@ -610,7 +655,7 @@ export default {
       this.addFloorOptions = [];
       this.addRoomOptions = [];
       this.addRoom = "";
-      this.pubilcFnAxios(`buildings/floors/${this.addBuilding}`, {})
+      this.pubilcFnAxios(`buildings/${this.addBuilding}/floors`, {})
         .then(data => {
           console.log(data);
           for (let i = 1; i < data + 1; i++) {
@@ -671,24 +716,25 @@ export default {
     pubilcFnAxios(urlString, params, method) {
       //公用axios数据请求
       return new Promise((resolve, reject) => {
-          axios
-            .get(this.api + urlString, { params: params })
-            .then(res => {
-              resolve(res.data);
-            })
-            .catch(err => {
-              reject("get请求错误");
-            });
-        
+        axios
+          .get(this.api + urlString, { params: params })
+          .then(res => {
+            resolve(res.data);
+          })
+          .catch(err => {
+            reject("get请求错误");
+          });
       });
     },
 
     buildControlModel() {
       //构造下拉框绑定值
       let arr = [];
-      for (let i = 0; i < 10; i++) {
+      let i = 0;
+      for (i; i < this.controlItemLength; i++) {
         arr.push({ ["control" + i]: "" });
       }
+      console.log(arr);
       return arr;
     },
     switchChange(el, id) {
@@ -701,6 +747,23 @@ export default {
     },
     searchClick() {
       //搜索功能
+      this.pubilcFnAxios(
+        `devices/${this.schoolId || localStorage.getItem("initschoolId")}/${this
+          .buildId || localStorage.getItem("initBuildId")}/${
+          this.selectfloorSearch
+        }`
+      )
+        .then(data => {
+          this.tableData = [];
+          this.isSearch = true;
+          this.total = data.total;
+          this.controlItemLength = data.list.length; //下拉框绑定值
+          this.controlItem = this.buildControlModel();
+          this.inintList(this.tableData, data.list);
+        })
+        .catch(() => {
+          console.log("筛选请求失败");
+        });
     },
     editClose() {
       //修改设备弹窗，子组件调用函数，关闭弹窗
@@ -712,12 +775,18 @@ export default {
       console.log("子组件触发成功");
       this.showBatch = false;
     },
-    handleEdit(id, name) {
+    handleEdit(id, ip, port, name,code) {
       //修改按钮绑定事件
-      this.showDialog = true;
-      console.log(id, name);
+     
+      this.editid = id.toString();
+      this.editname = name;
+      this.editip = ip;
+      this.editport = port.toString();
+      this.numCode = code.toString()
+       this.showDialog = true;
+      console.log(id, ip, port, name,code);
     },
-    open(name) {
+    open(name, id) {
       //删除提示框
       this.$confirm(`此操作将删除${name}, 是否继续?`, "提示", {
         confirmButtonText: "确定",
@@ -725,10 +794,26 @@ export default {
         type: "warning"
       })
         .then(() => {
-          this.$message({
-            type: "success",
-            message: "删除成功!"
-          });
+          axios
+            .delete(this.api + `/devices/${id}`)
+            .then(res => {
+              console.log(res.data);
+              this.$message({
+                type: "success",
+                message: "删除成功!"
+              });
+              if (this.isSearch) {
+                this.getPageAfterList();
+              } else {
+                this.getListData();
+              }
+            })
+            .catch(() => {
+              this.$message({
+                type: "error",
+                message: "删除失败!"
+              });
+            });
         })
         .catch(() => {
           this.$message({
@@ -753,7 +838,7 @@ export default {
     },
     handleDelete(name, id) {
       //按钮点击事件
-      this.open(name);
+      this.open(name, id);
     },
     batchOperat() {
       //批量管理点击事件
@@ -783,27 +868,117 @@ export default {
     constructSearchInput() {
       //构造搜索项下拉框数据
       for (let i = 0; i < this.floorNum; i++) {
-        this.options.push({ value: `${i + 1}F`, label: `${i + 1}F` });
+        this.options.push({ value: `${i + 1}`, label: `${i + 1}F` });
       }
-    }
+    },
+    getListData() {
+      let params = {
+        pageNum: this.pagesNum,
+        pageSize: 10
+      };
+      this.pubilcFnAxios(
+        `devices/${this.schoolId || localStorage.getItem("initschoolId")}/${this
+          .buildId || localStorage.getItem("initBuildId")}`,
+        params
+      )
+        .then(data => {
+          this.tableData = [];
+          this.total = data.total;
+          this.controlItemLength = data.list.length; //下拉框绑定值
+          this.controlItem = this.buildControlModel();
+          this.inintList(this.tableData, data.list);
+        })
+        .catch(() => {
+          console.log("请求失败");
+        });
+    },
+    getPageAfterList() {
+      let params = {
+        pageNum: this.pagesNum,
+        pageSize: 10
+      };
+      this.pubilcFnAxios(
+        `devices/${this.schoolId || localStorage.getItem("initschoolId")}/${this
+          .buildId || localStorage.getItem("initBuildId")}/${
+          this.selectfloorSearch
+        }`,
+        params
+      )
+        .then(data => {
+          this.tableData = [];
+          this.isSearch = true;
+          this.total = data.total;
+          this.controlItemLength = data.list.length; //下拉框绑定值
+          this.controlItem = this.buildControlModel();
+          this.inintList(this.tableData, data.list);
+        })
+        .catch(() => {
+          console.log("筛选请求失败");
+        });
+    },
+    refresh(){
+      this.timerId = setInterval(() => {
+        console.log("定时器执行" + new Date())
+         if (this.isSearch) {
+                this.getPageAfterList();
+              } else {
+                this.getListData();
+              }
+      }, 20000);
+    },
+     clear() {
+      clearInterval(this.timerId); //清除计时器
+      this.timerId = null; //设置为null
+    },
   },
   watch: {
     $route() {
       //监听路由参数变化触发事件，在这里进行页面切换时请求接口
       // this.code = this.$route.query.b;
+      this.tableData = [];
       this.buildId = this.$route.query.build;
       this.floorNum = this.$route.query.fNum;
       this.schoolId = this.$route.query.sch;
+      localStorage.setItem("initschoolId", this.$route.query.sch);
+      localStorage.setItem("initBuildId", this.$route.query.build);
+      localStorage.setItem("initFloorNum", this.$route.query.fNum);
       this.options = [];
       this.constructSearchInput();
+      this.pubilcFnAxios("items")
+        .then(data => {
+          this.control = [];
+          for (let i = 0; i < data.length; i++) {
+            this.control.push({ label: data[i], value: data[i] });
+          }
+          this.getListData();
+        })
+        .catch(() => {
+          console.log("构造列表失败");
+        });
     }
   },
   mounted() {
-    this.controlItem = this.buildControlModel(); //初始化下拉框绑定值
+    //初始化下拉框绑定值
     // this.openMessage();
     this.constructSearchInput();
     console.log(this.$route.query.code);
-  }
+    this.pubilcFnAxios("items")
+      .then(data => {
+        this.control = [];
+        for (let i = 0; i < data.length; i++) {
+          this.control.push({ label: data[i], value: data[i] });
+        }
+        this.getListData();
+      })
+      .catch(() => {
+        console.log("构造列表失败");
+      });
+    // this.refresh()
+ },
+ destroyed (){
+   console.log("页面销毁")
+   this.clear()
+ }
 };
 </script>
 

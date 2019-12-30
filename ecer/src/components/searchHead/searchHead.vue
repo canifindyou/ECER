@@ -74,6 +74,7 @@
         </el-select>
         <el-select
           v-model="selectDevice"
+          :disabled="selectRooms"
           placeholder="选择设备"
           size="mini"
           style="width:120px;margin:0 10px 0 30px"
@@ -88,15 +89,39 @@
         </el-select>
         <div style="display:inline-block" v-if="flag">
           <el-date-picker
+            v-model="startTime"
+            type="datetime"
+            format="yyyy-MM-dd"
+            placeholder="开始时间"
+            size="mini"
+            :picker-options="pickerOptions"
+            style="width:150px;margin:0 10px 0 30px"
+            @change="initOptions2"
+          >
+          </el-date-picker>
+
+          <el-date-picker
+            v-model="endTime"
+            type="datetime"
+            placeholder="结束时间"
+            size="mini"
+            :disabled = "startTime == ''"
+            format="yyyy-MM-dd"
+            style="width:150px;margin:0 10px 0 30px"
+            :picker-options="pickerOptions2"
+          >
+          </el-date-picker>
+
+          <!-- <el-date-picker
             v-model="time"
-            type="datetimerange"
+            type="daterange"
             range-separator="至"
             start-placeholder="开始日期"
             end-placeholder="结束日期"
             size="mini"
             style="margin:0 0 0 30px"
           >
-          </el-date-picker>
+          </el-date-picker> -->
           <el-button
             size="mini"
             style="margin:0 10px 0 10px"
@@ -117,8 +142,8 @@
 </template>
 
 <script>
-import axios from "axios"
-import qs from "qs"
+import axios from "axios";
+import qs from "qs";
 export default {
   props: {
     flag: {
@@ -128,6 +153,14 @@ export default {
   },
   data() {
     return {
+       pickerOptions1: {
+          			disabledDate(time) {
+          	 			return time.getTime() < Date.now() - 8.64e7;
+          			}
+            },
+            pickerOptions2:{},
+      startTime:"",
+      endTime:"",
       selectSchool: "",
       selectSchoolOptions: [],
       selectBuild: "",
@@ -142,9 +175,17 @@ export default {
     };
   },
   methods: {
-    searchClick() {
-      
+     initOptions2($event){
+      //设置结束时间时间范围
+      console.log($event.getTime())
+      console.log(Date.now())
+      this.pickerOptions2 =  {
+          			disabledDate(time) {
+          	 			return time.getTime() < $event.getTime() - 8.64e7 + 1 ;
+          			}
+        		}
     },
+    searchClick() {},
     selectSchools(e) {
       //校区下拉框数据加载
       this.selectSchoolOptions = [];
@@ -169,9 +210,9 @@ export default {
     },
     selectFloors(params) {
       //楼层下拉数据加载
-      this.addFloorOptions = [];
-      this.addRoomOptions = [];
-      this.addRoom = "";
+      this.selectFloorOptions = [];
+      this.selectRoomOptions = [];
+      this.selectRooms = "";
       this.pubilcFnAxios(`buildings/floors/${this.selectBuild}`, {})
         .then(data => {
           console.log(data);
@@ -185,14 +226,14 @@ export default {
     },
     selectRoom() {
       //加载教室下拉框数据
-      this.addRoomOptions = [];
+      this.selectRoomOptions = [];
       this.constructData(
         `rooms/${this.selectBuild}/${this.selectFloor}`,
         this.selectRoomOptions,
         {}
       );
     },
-    
+
     constructData(urlString, obj, params) {
       //构造下拉菜单数据结构
       this.pubilcFnAxios(urlString, params)
@@ -213,17 +254,16 @@ export default {
     pubilcFnAxios(urlString, params, method) {
       //公用axios数据请求
       return new Promise((resolve, reject) => {
-          axios
-            .get(this.api + urlString, { params: params })
-            .then(res => {
-              resolve(res.data);
-            })
-            .catch(err => {
-              reject("get请求错误");
-            });
-        
+        axios
+          .get(this.api + urlString, { params: params })
+          .then(res => {
+            resolve(res.data);
+          })
+          .catch(err => {
+            reject("get请求错误");
+          });
       });
-    },
+    }
   }
 };
 </script>

@@ -9,19 +9,19 @@
     <!-- :close-on-click-modal="false"
     :show-close="false" -->
     <!-- :before-close="handleClose" -->
+
     <el-dialog width="520px" title="设置" :visible.sync="inner" append-to-body>
       <div class="radiotabBox">
         <template>
-          <el-radio v-model="radio" label="1">控制项</el-radio>
-          <el-radio v-model="radio" label="2">定时设置</el-radio>
-          <el-radio v-model="radio" label="3">自控设置</el-radio>
-          <el-radio v-model="radio" label="4">继电器设置</el-radio>
+          <el-radio v-model="radio" label="控制项">控制项</el-radio>
+          <el-radio v-model="radio" label="定时设置">定时设置</el-radio>
+          <el-radio v-model="radio" label="自控设置">自控设置</el-radio>
+          <el-radio v-model="radio" label="继电器设置">继电器设置</el-radio>
         </template>
       </div>
 
       <div style="overflow:hidden;position:relative">
-        <!-- <transition> -->
-        <div class="tabBoxContent " v-show="radio == 1">
+        <div class="tabBoxContent " v-show="radio == '控制项'">
           <div class="selectItemBox">
             控制项：<el-select
               v-model="controlItem"
@@ -39,9 +39,8 @@
             </el-select>
           </div>
         </div>
-        <!-- </transition> -->
-        <!-- <transition> -->
-        <div class="tabBoxContent " v-show="radio == 2">
+
+        <div class="tabBoxContent " v-show="radio == '定时设置'">
           <!-- <span class="headText">定时控制</span> -->
 
           <div class="contentText selectItemTimer">
@@ -115,19 +114,26 @@
             </div>
           </div>
         </div>
-        <!-- </transition> -->
-        <!-- <transition> -->
-        <div class="tabBoxContent " v-show="radio == 3">
+
+        <div class="tabBoxContent " v-show="radio == '自控设置'">
           <div class="selectItemBox">
-            自控状态：<el-switch
-              v-model="switchAll"
-              active-color="#13ce66"
-              inactive-color="#ff4949"
+            自控状态：<el-select
+              v-model="controlselfItem"
+              placeholder="请选择"
+              size="small"
+              style="width:150px;"
             >
-            </el-switch>
+              <el-option
+                v-for="item in controlself"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              >
+              </el-option>
+            </el-select>
           </div>
         </div>
-        <div class="tabBoxContent " v-show="radio == 4">
+        <div class="tabBoxContent " v-show="radio == '继电器设置'">
           <div class="selectItemBox">
             <!-- 继电器控制：<el-switch
               v-model="switchAll"
@@ -135,17 +141,32 @@
               inactive-color="#ff4949"
             >
             </el-switch> -->
-            继电器控制： <el-button type="success">闭合</el-button>
-            <el-button type="info">断开</el-button>
+            继电器控制：<el-select
+              v-model="controlJdItem"
+              placeholder="请选择"
+              size="small"
+              style="width:150px;"
+            >
+              <el-option
+                v-for="item in controlJd"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              >
+              </el-option>
+            </el-select>
             <p style="color:red;padding:20px 0 10px 0">
               提示：对多个设备执行该操作时，将关闭所有设备的自控状态
             </p>
           </div>
         </div>
-        <!-- </transition> -->
       </div>
 
       <span slot="footer" class="dialog-footer">
+        <span
+          style="display:inline-block;float:left;text-align:center;color:red;font-size: 5px"
+          >* 提交 {{ radio }} 将生效</span
+        >
         <el-button @click="innerCancle">取 消</el-button>
         <el-button type="primary" @click="innerConfirm">确 定</el-button>
       </span>
@@ -218,7 +239,7 @@
               <span class="deviceListItem_del ">
                 <i
                   class="el-tag__close el-icon-close del-tag"
-                  @click="deleteDeviceItem(index, item.id)"
+                  @click="deleteDeviceItem(index, item.deleteId)"
                 ></i>
               </span>
             </li>
@@ -229,7 +250,7 @@
 
     <span slot="footer" class="dialog-footer">
       <el-button @click="cancle">取 消</el-button>
-      <el-button type="primary" @click="confirm">确 定</el-button>
+      <el-button type="primary" @click="outConfirm">确 定</el-button>
     </span>
   </el-dialog>
 </template>
@@ -247,15 +268,27 @@ export default {
   data() {
     return {
       pickerOptions1: {
-          			disabledDate(time) {
-          	 			return time.getTime() < Date.now() - 8.64e7;
-          			}
-            },
-            pickerOptions2:{},
+        disabledDate(time) {
+          return time.getTime() < Date.now() - 8.64e7;
+        }
+      },
+      controlselfItem: "", //自控状态值
+      controlself: [
+        { value: 0, label: "关闭" },
+        { value: 1, label: "开启" }
+      ],
+      controlJdItem: "",
+      controlJd: [
+        { value: 0, label: "闭合" },
+        { value: 1, label: "断开" }
+      ],
+      flag2: "", //校区id
+      pickerOptions2: {},
       buildFlag: "", //动态标记楼栋id
       startTime: "",
       endTime: "",
       inner: false, //内层弹窗控制
+      deviceIds: [], //已选设备id数组
       props: {
         label: "name",
         children: "zones",
@@ -270,29 +303,8 @@ export default {
       count: 0,
       selectDeviceList: [], //已选设备列表中间储存
       selectDeviceListBox: [], //已选设备最终储存
-      radio: "2",
-      control: [
-        {
-          value: "开机",
-          label: "开机"
-        },
-        {
-          value: "关机",
-          label: "关机"
-        },
-        {
-          value: "高风制冷20度",
-          label: "高风制冷20度"
-        },
-        {
-          value: "高风制冷18度",
-          label: "高风制冷18度"
-        },
-        {
-          value: "低风制冷18度",
-          label: "低风制冷18度"
-        }
-      ],
+      radio: "定时设置",
+      control: [],
       controlItem: "",
       selectTime: "",
       switchAll: false,
@@ -303,16 +315,20 @@ export default {
       }
     };
   },
+  watch: {
+    radio() {
+      console.log(this.radio);
+    }
+  },
   methods: {
-    initOptions2($event){
+    initOptions2($event) {
       //设置结束时间时间范围
-      console.log($event.getTime())
-      console.log(Date.now())
-      this.pickerOptions2 =  {
-          			disabledDate(time) {
-          	 			return time.getTime() < $event.getTime() - 8.64e7 + 1 ;
-          			}
-        		}
+
+      this.pickerOptions2 = {
+        disabledDate(time) {
+          return time.getTime() < $event.getTime() - 8.64e7 + 1;
+        }
+      };
     },
     handleClose(done) {
       this.$confirm("确认关闭？")
@@ -334,26 +350,89 @@ export default {
       //内层cancle
       this.inner = false;
     },
-    confirm() {
+    outConfirm() {
       //确定按钮事件
       //   this.$emit("batchOperatClose"); //事件分发
       this.inner = true;
+      this.deviceIds = [];
+      this.selectDeviceList.forEach(item => {
+        this.deviceIds.push(item.id);
+      });
+      console.log(this.deviceIds);
+      this.getControlItem();
+    },
+    messageSuccess() {
+      this.$message({
+        showClose: true,
+        message: "操作成功",
+        type: "success"
+      });
+    },
+    messageErr() {
+      this.$message({
+        showClose: true,
+        message: "操作失败，请检查网络",
+        type: "error"
+      });
     },
     innerConfirm() {
       //内层弹窗确定按钮事件
       this.inner = false;
       this.$emit("batchOperatClose");
+      switch (this.radio) {
+        case "控制项":
+          this.pubilcFnAxios("devices/perform", {
+            ids: this.deviceIds.toString(),
+            itemName: this.controlItem
+          })
+            .then(data => {
+              console.log(data);
+            })
+            .catch(() => {
+              console.log("批量控制项执行失败");
+            });
+          break;
+        case "定时设置":
+          break;
+        case "自控设置":
+          break;
+        case "继电器设置":
+          break;
+      }
     },
-    handleCheckChange(data, checked, indeterminate) {
-      console.log(data, checked, indeterminate);
-    },
+    handleCheckChange(data, checked, indeterminate) {},
     handleNodeClick(data, node) {
       //点击层级事件
-      if (node.level === 4) {
+      if (node.level === 3) {
         this.selectData = [];
         this.allOptions = [];
-        this.selectData = ["设备一", "设备二", "设备三"];
-        this.allOptions = ["设备一", "设备二", "设备三"];
+
+        this.pubilcFnAxios(`rooms/${this.flag}/${node.data.label}`)
+          .then(data => {
+            let arr = [];
+            data.forEach(item => {
+              arr.push({
+                name: item.name,
+                label:
+                  "r" +
+                  this.flag2 +
+                  "r" +
+                  this.flag +
+                  "r" +
+                  node.data.label +
+                  "r" +
+                  item.id
+              }); //label 包含校区id + 楼栋id + r + 楼层id + 教室id
+            });
+
+            this.selectData = [];
+            this.allOptions = [];
+
+            this.buildSelectDate(arr);
+          })
+          .catch(() => {
+            console.log("初始化树形结构请求出错");
+          });
       }
       this.checkAll = this.findItem(this.selectData, this.checkedItem);
     },
@@ -371,13 +450,26 @@ export default {
           });
       });
     },
+    pubilcFnAxiosDevice(urlString, params) {
+      //公用数据请求
+      //公用axios数据请求
+      return new Promise((resolve, reject) => {
+        axios
+          .get(this.api + urlString, { params: params })
+          .then(res => {
+            resolve(res.data.list);
+          })
+          .catch(err => {
+            reject("get请求错误");
+          });
+      });
+    },
     loadNode(node, resolve) {
       //点击层级加载子层级的数据
       let schoolId = [];
       if (node.level == 0) {
         this.pubilcFnAxios("schoolZones", {})
           .then(data => {
-            console.log(data);
             let arr = [];
             data.forEach(item => {
               arr.push({ name: item.name, label: item.id });
@@ -407,12 +499,12 @@ export default {
         if (node.level == 2) {
           //楼栋子菜单加载数据
           this.flag = node.data.label;
-          this.pubilcFnAxios(`buildings/floors/${node.data.label}`)
+          this.pubilcFnAxios(`buildings/${node.data.label}/floors`)
             .then(data => {
               let arr = [];
               for (let i = 1; i < data + 1; i++) {
                 //根据返回楼层数，创建楼层
-                arr.push({ name: i + "层", label: i });
+                arr.push({ name: i + "层", label: i, leaf: true });
               }
               return resolve(arr);
             })
@@ -424,7 +516,6 @@ export default {
           //楼层子菜单加载数据
           this.pubilcFnAxios(`rooms/${this.flag}/${node.data.label}`)
             .then(data => {
-              console.log(data);
               let arr = [];
               data.forEach(item => {
                 arr.push({ name: item.name, label: item.id, leaf: true });
@@ -442,20 +533,24 @@ export default {
     selectItemLoadData(node, date) {
       // 展开层级，加载
       // 选择层级，展示可选择的数据，填充数据功能
-      console.log("点击改变 ");
+
       if (date.level == 2) {
         //楼栋层级展开时，需要将楼栋id值保存
         this.flag = date.data.label;
       }
       if (date.level == 1) {
         //文津校区子菜单加载数据
+        this.flag2 = date.data.label; //校区id
         this.pubilcFnAxios("buildings", { zoneId: date.data.label })
           .then(data => {
             let arr = [];
             data.forEach(item => {
-              arr.push({ "name": item.name, "label": item.id });
+              arr.push({
+                name: item.name,
+                label: "l" + date.data.label + "l" + item.id
+              });
             });
-            console.log(arr)
+            console.log(arr);
             this.selectData = [];
             this.allOptions = [];
 
@@ -467,15 +562,20 @@ export default {
       }
       if (date.level == 2) {
         //楼栋子菜单加载数据
-        this.flag = date.data.label;
-        this.pubilcFnAxios(`buildings/floors/${date.data.label}`)
+        this.flag = date.data.label; //当前楼栋id
+        this.pubilcFnAxios(`buildings/${date.data.label}/floors`)
           .then(data => {
             let arr = [];
             for (let i = 1; i < data + 1; i++) {
               //根据返回楼层数，创建楼层
-              arr.push({ "name": i + "层", "label": i + "l" + date.data.label,"id":i });
+              arr.push({
+                name: i + "层",
+                label: "f" + this.flag2 + "f" + date.data.label + "f" + i,
+                id: i
+              });
             }
-              console.log(arr)
+            console.log(arr);
+
             this.selectData = [];
             this.allOptions = [];
 
@@ -487,27 +587,8 @@ export default {
       }
       if (date.level == 3) {
         //楼层子菜单加载数据
-        this.pubilcFnAxios(`rooms/${this.flag}/${date.data.label}`)
-          .then(data => {
-            console.log(data);
-            let arr = [];
-            data.forEach(item => {
-              arr.push({ "name": item.name, "label": item.id});
-            });
-              console.log(arr)
-            this.selectData = [];
-            this.allOptions = [];
-
-            this.buildSelectDate(arr);
-          })
-          .catch(() => {
-            console.log("初始化树形结构请求出错");
-          });
       }
-      this.id = node.id;
-
-
-
+      // this.id = node.id;
 
       console.log(this.checkAll);
     },
@@ -520,8 +601,8 @@ export default {
         this.allOptions.push(data[i].label);
       }
       this.checkAll = this.findItem(this.selectData, this.checkedItem);
-       console.log(this.selectData);
-       console.log("----------------------------")
+      console.log(this.selectData);
+      console.log("----------------------------");
       console.log(this.checkedItem);
     },
     cleanSelectdate() {
@@ -561,6 +642,7 @@ export default {
     },
     handleCheckedCitiesChange(value) {
       //单选按钮事件
+      console.log("单选");
       let checkedCount = value.length;
       this.checkAll = this.findItem(this.selectData, this.checkedItem);
       this.isIndeterminate =
@@ -582,14 +664,95 @@ export default {
       } else {
         let arr = [];
         for (let j = 0; j < secondArr.length; j++) {
-          for (let i = 0; i < 3; i++) {
-            arr.unshift({
-              id: `${secondArr[j]}`,
-              text: `${secondArr[j]}设备${i}`
+          if (secondArr[j][0] == "l") {
+            let str = secondArr[j].split("l");
+            this.pubilcFnAxiosDevice(`devices/${str[1]}/${str[2]}`).then(
+              data => {
+                data.forEach(item => {
+                  arr.push({
+                    id: item.id,
+                    text: item.name,
+                    roomId: item.room_id,
+                    buildId: item.model_id,
+                    deleteId: "l" + this.flag2 + "l" + item.model_id
+                  });
+                });
+
+                let obj = {};
+                this.selectDeviceList = arr.reduce((cur, next) => {
+                  obj[next.id] ? "" : (obj[next.id] = true && cur.push(next));
+                  return cur;
+                }, []);
+                console.log(this.selectDeviceList);
+              }
+            );
+          }
+          if (secondArr[j][0] == "f") {
+            let str = secondArr[j].split("f");
+            this.pubilcFnAxiosDevice(
+              `devices/${str[1]}/${str[2]}/${str[3]}`
+            ).then(data => {
+              data.forEach(item => {
+                arr.push({
+                  id: item.id,
+                  text: item.name,
+                  roomId: item.room_id,
+                  buildId: item.model_id,
+                  deleteId:
+                    "l" +
+                    this.flag2 +
+                    "l" +
+                    item.model_id +
+                    "f" +
+                    this.flag2 +
+                    "f" +
+                    item.model_id +
+                    "f" +
+                    str[3]
+                });
+              });
+
+              let obj = {};
+              this.selectDeviceList = arr.reduce((cur, next) => {
+                obj[next.id] ? "" : (obj[next.id] = true && cur.push(next));
+                return cur;
+              }, []);
+              console.log(this.selectDeviceList);
             });
           }
+          if (secondArr[j][0] == "r") {
+            let str = secondArr[j].split("r");
+            this.pubilcFnAxiosDevice(
+              `devices/${str[1]}/${str[2]}/${str[3]}`
+            ).then(data => {
+              data.forEach(item => {
+                arr.push({
+                  id: item.id,
+                  text: item.name,
+                  roomId: item.room_id,
+                  buildId: item.model_id,
+                  deleteId:
+                    "l" +
+                    this.flag2 +
+                    "l" +
+                    item.model_id +
+                    "f" +
+                    this.flag2 +
+                    "f" +
+                    item.model_id +
+                    "f" +
+                    str[3]
+                });
+              });
 
-          this.selectDeviceList = arr;
+              let obj = {};
+              this.selectDeviceList = arr.reduce((cur, next) => {
+                obj[next.id] ? "" : (obj[next.id] = true && cur.push(next));
+                return cur;
+              }, []);
+              console.log(this.selectDeviceList);
+            });
+          }
         }
 
         // this.addItem(arr, this.selectDeviceList);
@@ -599,7 +762,9 @@ export default {
       this.selectDeviceList.splice(index, 1); //删除设备节点
       /* 查询设备列表中是否包含该楼栋下的设备 */
       let isCloudeId = this.selectDeviceList.some(item => {
-        return item.id == flag;
+        return (
+          item.deleteId.indexOf(flag) > -1 || flag.indexOf(item.deleteId) > -1
+        );
       });
       if (!isCloudeId) {
         this.checkedItem.splice(this.checkedItem.indexOf(flag), 1);
@@ -613,6 +778,18 @@ export default {
         this.selectDeviceList.splice(index, 1);
         this.construtDeviceList(this.selectDeviceList);
       }
+    },
+    getControlItem() {
+      this.control = [];
+      this.pubilcFnAxios("items")
+        .then(data => {
+          data.forEach(item => {
+            this.control.push({ value: item, label: item });
+          });
+        })
+        .catch(() => {
+          console.log("控制项数据请求失败");
+        });
     }
   },
   mounted() {}
