@@ -65,16 +65,15 @@
         if (this.delGroupType === '校区') {// 删除校区
           $.ajax({
             type: 'DELETE',
-            url: 'http://172.16.211.75:8080/schoolZones',
-            data: {
-              'id': this.delId
-            },
+            url: this.api + 'schoolZones',
+            data: {'id': this.delId},
             success (data) {
               let jsonData = JSON.parse(data)
               if (jsonData.status === 1) {// 删除失败，存在分组
                 self.$message.error('请将该校区下所有分组删除后再进行该操作！')
               } else {// 删除成功
-                self.$emit('getCampusesList')
+                // self.$emit('getCampusesList')
+                self.$emit('clearCSS',0)
                 self.$message({
                   message: '删除成功',
                   type: 'success'
@@ -86,16 +85,15 @@
         } else if (this.delGroupType === '楼栋') {// 删除校区
           $.ajax({
             type: 'DELETE',
-            url: 'http://172.16.211.75:8080/buildings',
-            data: {
-              'id': this.delId
-            },
+            url: this.api + 'buildings',
+            data: {'id': this.delId},
             success (data) {
               let jsonData = JSON.parse(data)
               if (jsonData.status === 1) {// 删除失败，存在分组
                 self.$message.error('请将该楼栋下所有分组删除后再进行该操作！')
               } else {// 删除成功
                 self.$emit('getBuildingsList', self.campusId)
+                self.$emit('clearCSS',1)
                 self.$message({
                   message: '删除成功',
                   type: 'success'
@@ -107,16 +105,15 @@
         } else if (this.delGroupType === '教室') {
           $.ajax({
             type: 'DELETE',
-            url: 'http://172.16.211.75:8080/rooms',
-            data: {
-              'id': this.delId
-            },
+            url: this.api + 'rooms',
+            data: {'id': this.delId},
             success (data) {
               let jsonData = JSON.parse(data)
               if (jsonData.status === 1) {// 删除失败，存在分组
                 self.$message.error('请将该教室下的设备删除或更换分组后再进行该操作！')
               } else {// 删除成功
                 self.$emit('getClassroomsList', self.buildingId)
+                self.$emit('clearCSS',2)
                 self.$message({
                   message: '删除成功',
                   type: 'success'

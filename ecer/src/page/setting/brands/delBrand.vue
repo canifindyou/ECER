@@ -28,27 +28,42 @@
       delBrand: Boolean
     },
     data () {
-      return {}
+      return {
+        showDel: false
+      }
     },
     methods: {
       clickDel () {
         let self = this
         $.ajax({
           type: 'DELETE',
-          url: 'http://172.16.211.75:8080/models',
+          url: this.api + 'models',
           data: {
             'id': self.delId,
           },
           success (data) {
-            console.log(data)
+            let jsonData = JSON.parse(data)
+            if (jsonData === true) {
+              self.$message({
+                message: '该设备品牌型号删除成功！',
+                type: 'success'
+              })
+            } else if (jsonData.status === 1) {
+              self.$message.error('存在该品牌型号的设备或控制项模板，无法删除！')
+            }
             self.closeModel()
           }
         })
       },
       closeModel () {
-        this.delBrand = false
+        this.showDel = false
         this.$emit('showBrandsList')
         this.$emit('closeModel')
+      }
+    },
+    watch: {
+      delBrand (newVal) {
+        this.showDel = newVal
       }
     }
   }
@@ -75,8 +90,7 @@
 
   .el-button {
     margin: 0 0 0 10px;
-    border-radius: 8px;
-    font-size: 15px;
+  . font-size: 15 px;
     padding: 10px 20px;
   }
 </style>

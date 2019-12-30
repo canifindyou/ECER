@@ -83,39 +83,44 @@
         modifyStrategy: false,
         delStrategy: false,
         groupModel: false,
-        strategiesList: [{
-          'id': 1,
-          'name': '预设一',
-          'executionTime': ['星期一', '星期二', '星期一', '星期二', '星期一', '星期二', '星期一'],
-          'executionStrategy': '按时段执行',
-          'startTime': '08:00',
-          'endTime': '17:00',
-          'transPowerSTemp': '26',
-          'failPowerSTemp': '26',
-          'callbackSTemp': '26',
-          'transPowerWTemp': '10',
-          'failPowerWTemp': '10',
-          'callbackWTemp': '10',
+        strategiesList: [],
+        strategyInfo: {
+          'executionStrategy': '',
+          'executionTime': '',
+          'startTimeHour': '',
+          'endTimeHour': '',
+          'transPowerSTemp': 0,
+          'failPowerSTemp': 0,
+          'callbackSTemp': 0,
+          'transPowerWTemp': 0,
+          'failPowerWTemp': 0,
+          'callbackWTemp': 0
         },
-          {
-            'id': 2,
-            'name': '预设二',
-            'executionTime': ['星期一', '星期二'],
-            'executionStrategy': '全天执行',
-            'startTime': '00:00',
-            'endTime': '00:00'
-          },],
-        strategyInfo: {}
+        days: ['星期一', '星期二', '星期三', '星期四', '星期五', '星期六', '星期日']
       }
     },
     methods: {
+      getStrategiesList () {
+        let self = this
+        $.ajax({
+          type: 'GET',
+          async: false,
+          url: this.api + 'strategies',
+          success (data) {
+            self.strategiesList = data
+          }
+        })
+      },
+
       showGroupModel () {
         this.groupModel = true
       },
 
       // 选中预设
       selectStrategy (id, name) {
-        let hour, min
+        let self = this
+        let sHour, eHour, sMin, eMin, executionStrategy
+        let timeArr = []
         this.selectId = id
         this.$nextTick(function () {
           let strategiesName = document.getElementsByClassName('strategiesName')
@@ -130,18 +135,47 @@
         })
         for (let i = 0; i < this.strategiesList.length; i++) {
           if (id === this.strategiesList[i].id) {
-            this.strategyInfo = this.strategiesList[i]
-            if ((typeof this.strategyInfo.executionTime == 'object') && this.strategyInfo.executionTime.constructor === Array) {
-              this.strategyInfo.executionTime = this.strategyInfo.executionTime.join('、')
-            }
-            hour = this.strategyInfo.startTime.split(':')[0]
-            min = this.strategyInfo.startTime.split(':')[1]
-            this.strategyInfo.startTimeHour = hour
-            this.strategyInfo.startTimeMin = min
-            hour = this.strategyInfo.endTime.split(':')[0]
-            min = this.strategyInfo.endTime.split(':')[1]
-            this.strategyInfo.endTimeHour = hour
-            this.strategyInfo.endTimeMin = min
+            $.ajax({
+              type: 'GET',
+              url: this.api + 'strategies/' + id + '/days',
+              success (data) {
+                console.log(data)
+                sHour = data[0].startTime.split(':')[0]
+                sMin = data[0].startTime.split(':')[1]
+                eHour = data[0].endTime.split(':')[0]
+                eMin = data[0].endTime.split(':')[1]
+                if (sHour === '00' && sMin === '00' && eHour === '23' && eHour === '59') {
+                  executionStrategy = '全天执行'
+                } else {
+                  executionStrategy = '指定时间段'
+                }
+                self.strategyInfo.executionStrategy = executionStrategy
+                for (let i = 0; i < data.length; i++) {
+                  timeArr.push(self.days[data[i].day])
+                  self.strategyInfo.executionTime = timeArr.join('、')
+                }
+                self.strategyInfo.startTimeHour = sHour
+                self.strategyInfo.startTimeMin = sMin
+                self.strategyInfo.endTimeHour = eHour
+                self.strategyInfo.endTimeMin = eMin
+                self.strategyInfo.transPowerSTemp = data[0].summerHighestT
+                self.strategyInfo.failPowerSTemp = data[0].summerLowestT
+                self.strategyInfo.callbackSTemp = data[0].summerConstantT
+                self.strategyInfo.transPowerWTemp = data[0].winterLowestT
+                self.strategyInfo.failPowerWTemp = data[0].winterHighestT
+                self.strategyInfo.callbackWTemp = data[0].winterConstantT
+              }
+            })
+            //   this.strategyInfo = this.strategiesList[i]
+            //   if ((typeof this.strategyInfo.executionTime == 'object') && this.strategyInfo.executionTime.constructor === Array) {
+            //     this.strategyInfo.executionTime = this.strategyInfo.executionTime.join('、')
+            //   }
+            //   this.strategyInfo.startTimeHour = hour
+            //   this.strategyInfo.startTimeMin = min
+            //   hour = this.strategyInfo.endTime.split(':')[0]
+            //   min = this.strategyInfo.endTime.split(':')[1]
+            //   this.strategyInfo.endTimeHour = hour
+            //   this.strategyInfo.endTimeMin = min
           }
         }
       },
@@ -172,6 +206,7 @@
       }
     },
     mounted () {
+      this.getStrategiesList()
       this.selectStrategy(this.strategiesList[0].id, this.strategiesList[0].name)
     }
   }

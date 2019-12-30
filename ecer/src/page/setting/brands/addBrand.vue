@@ -31,6 +31,7 @@
     },
     data () {
       return {
+        showAdd: false,
         labelPosition: 'left',
         deviceData: {
           brandName: '',
@@ -43,31 +44,46 @@
         let self = this
         $.ajax({
           type: 'POST',
-          url: 'http://172.16.211.75:8080/models',
+          url: this.api + 'models',
           headers: {
             'Content-Type': 'application/json',
           },
-          dataType: 'json',
           data: JSON.stringify({
             'brandName': self.deviceData.brandName,
             'modelName': self.deviceData.brandType
           }),
           success (data) {
-            console.log(data)
-            self.closeModel()
+            let jsonData = JSON.parse(data)
+            if (jsonData === true) {
+              self.$message({
+                message: '设备品牌型号添加成功！',
+                type: 'success'
+              })
+              self.closeModel()
+            } else if (jsonData.status === 1) {
+              self.$message({
+                message: '该品牌型号已被添加！',
+                type: 'warning'
+              })
+            } else {
+              this.$message.error('添加失败，请重试！');
+            }
           }
         })
       },
 
       closeModel () {
-        this.addBrand = false
-        this.deviceData.brandName=''
-        this.deviceData.brandType=''
+        this.showAdd = false
+        this.deviceData.brandName = ''
+        this.deviceData.brandType = ''
         this.$emit('showBrandsList')
         this.$emit('closeModel')
       }
     },
-    mounted () {
+    watch: {
+      addBrand (newVal) {
+        this.showAdd = newVal
+      }
     }
   }
 </script>

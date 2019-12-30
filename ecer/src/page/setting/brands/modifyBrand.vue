@@ -32,9 +32,10 @@
     },
     data () {
       return {
+        showModify: false,
         name: '修改品牌型号',
         labelPosition: 'left',
-        modifyId:0,
+        modifyId: 0,
         deviceData: {
           brandName: '',
           brandType: ''
@@ -46,34 +47,46 @@
         let self = this
         $.ajax({
           type: 'PUT',
-          url: 'http://172.16.211.75:8080/models',
+          url: this.api + 'models',
           headers: {
             'Content-Type': 'application/json',
           },
-          dataType: 'json',
           data: JSON.stringify({
             'id': self.modifyId,
             'brandName': self.deviceData.brandName,
             'modelName': self.deviceData.brandType
           }),
           success (data) {
-            console.log(data)
-            self.closeModel()
+            let jsonData = JSON.parse(data)
+            if (jsonData === true) {
+              self.$message({
+                message: '设备品牌型号修改成功！',
+                type: 'success'
+              })
+              self.closeModel()
+            } else if (jsonData.status === 1) {
+              self.$message({
+                message: '该品牌型号已存在，请确认修改内容！',
+                type: 'warning'
+              })
+            }
           }
         })
       },
 
       closeModel () {
-        this.modifyBrand = false
+        this.showModify = false
         this.$emit('showBrandsList')
         this.$emit('closeModel')
       }
     },
     watch: {
+      modifyBrand (newVal) {
+        this.showModify = newVal
+      },
+
       modifyInfo (newVal) {
-        console.log(this.modifyInfo)
         this.modifyId = newVal.id
-        console.log(this.modifyId)
         this.deviceData.brandName = newVal.brandName
         this.deviceData.brandType = newVal.modelName
       }

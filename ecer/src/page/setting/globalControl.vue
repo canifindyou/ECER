@@ -12,24 +12,24 @@
         <div class="title">报警设置</div>
         <div class="manageData">
           <div class="highTemp">温度高于:
-            <el-input-number v-model="controlData.highTemp" :precision="0" size="mini"
+            <el-input-number v-model="controlData.maxT" :precision="0" size="mini"
                              controls-position="right" @change="handleChange"></el-input-number>
             度
           </div>
           <div>温度低于:
-            <el-input-number v-model="controlData.lowTemp" :precision="0" size="mini"
+            <el-input-number v-model="controlData.minT" :precision="0" size="mini"
                              controls-position="right" @change="handleChange"></el-input-number>
             度
           </div>
         </div>
         <div class="manageElectric">
           <div class="highElectric">电流高于:
-            <el-input-number v-model="controlData.highElectric" :precision="0" size="mini"
+            <el-input-number v-model="controlData.maxCurrent" :precision="0" size="mini"
                              controls-position="right" @change="handleChange"></el-input-number>
             A&nbsp;
           </div>
           <div>电流低于:
-            <el-input-number v-model="controlData.lowElectric" :precision="0" size="mini"
+            <el-input-number v-model="controlData.minCurrent" :precision="0" size="mini"
                              controls-position="right" @change="handleChange"></el-input-number>
             A
           </div>
@@ -38,7 +38,7 @@
       <div class="titleBoundary">
         <div class="title">采集数据</div>
         <div class="manageData">数据采集间隔时间:
-          <el-input-number v-model="controlData.selectDataTime" :precision="0" size="mini"
+          <el-input-number v-model="controlData.dataCollection" :precision="0" size="mini"
                            controls-position="right" @change="handleChange"></el-input-number>
           分钟
         </div>
@@ -46,7 +46,7 @@
       <div class="titleBoundary">
         <div class="title">数据清理</div>
         <div class="manageData">清除
-          <el-input-number v-model="controlData.clearDataTime" :precision="0" size="mini"
+          <el-input-number v-model="controlData.dataClean" :precision="0" size="mini"
                            controls-position="right" @change="handleChange"></el-input-number>
           天以前的数据
         </div>
@@ -54,7 +54,7 @@
       <div class="titleBoundary">
         <div class="title">控制设置</div>
         <div class="manageData">控制指令重复次数:
-          <el-input-number v-model="controlData.orderTimes" :precision="0" size="mini"
+          <el-input-number v-model="controlData.instructTimes" :precision="0" size="mini"
                            controls-position="right" @change="handleChange"></el-input-number>
           次
         </div>
@@ -63,7 +63,7 @@
     <hr class="boundary">
     <div slot="footer" class="dialog-footer">
       <el-button @click="closeModel">取 消</el-button>
-      <el-button type="primary">保 存</el-button>
+      <el-button type="primary" @click="submit">保 存</el-button>
     </div>
   </el-dialog>
 </template>
@@ -75,29 +75,49 @@
         globalControl: true,
         labelPosition: 'left',
         controlData: {
-          highTemp:0,
-          lowTemp:0,
+          highTemp: 0,
+          lowTemp: 0,
           highElectric: 0,
           lowElectric: 0,
           selectDataTime: 0,
           clearDataTime: 0,
-          orderTimes:0
+          orderTimes: 0
         },
       }
     },
     methods: {
+      getControlData () {
+        let self = this
+        $.ajax({
+          type: 'GET',
+          url: this.api + 'globalConfig',
+          success(data){
+            self.controlData = data[0]
+          }
+        })
+      },
+
+      submit(){
+        // $.ajax({
+        //   type: 'PUT',
+        //   url: this.api + 'globalConfig?id='+this.controlData.id+'maxT=',
+        //   success(data){
+        //     self.controlData = data[0]
+        //   }
+        // })
+      },
+
       closeModel () {
         this.globalControl = false
         this.$emit('closeModel')
       },
 
-      handleCheckedCitiesChange (value) {
-        console.log(value)
-      },
-
       handleChange (value) {
         console.log(value)
       }
+    },
+    mounted () {
+      this.getControlData()
     }
   }
 </script>
