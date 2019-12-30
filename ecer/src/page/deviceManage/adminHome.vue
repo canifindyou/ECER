@@ -92,7 +92,12 @@
               size="small"
               :disabled="controllIsDone"
               style="width:150px;"
-              @change="controllSelectClick(props.row.id,controlItem[props.$index]['control' + props.$index])"
+              @change="
+                controllSelectClick(
+                  props.row.id,
+                  controlItem[props.$index]['control' + props.$index]
+                )
+              "
             >
               <!--  -->
               <el-option
@@ -112,7 +117,7 @@
               v-model="props.row.selfControl"
               active-color="#13ce66"
               inactive-color="#ff3342"
-              @change="switchChange($event, props.$index)"
+              @change="switchChange($event, props.row.id)"
             >
             </el-switch>
             <span v-else>暂无</span>
@@ -141,7 +146,7 @@
                   active-color="#13ce66"
                   inactive-color="#ff3342"
                   @change="
-                    switchChange2($event, props.$index, props.row.selfControl)
+                    switchChange2($event, props.row.id, props.row.selfControl)
                   "
                 >
                 </el-switch>
@@ -153,7 +158,7 @@
                 active-color="#13ce66"
                 inactive-color="#ff3342"
                 @change="
-                  switchChange2($event, props.$index, props.row.selfControl)
+                  switchChange2($event, props.row.id, props.row.selfControl)
                 "
               >
               </el-switch>
@@ -392,7 +397,7 @@
       :editname="editname"
       :editip="editip"
       :editport="editport"
-      :editnum ="numCode"
+      :editnum="numCode"
       @editClose="editClose"
     ></editDevice
     ><!-- 修改设备 -->
@@ -420,8 +425,8 @@ export default {
   data() {
     return {
       /* 此处为添加功能弹窗值绑定值*/
-      timerId:"",//定时器id
-      controllIsDone:false,//下拉框执行是否完成，完成前所有下拉框禁用
+      timerId: "", //定时器id
+      controllIsDone: false, //下拉框执行是否完成，完成前所有下拉框禁用
       pages: true,
       pagesNum: 1,
       total: 0,
@@ -465,7 +470,7 @@ export default {
       editname: "",
       editip: "",
       editport: "",
-      numCode:"",
+      numCode: "",
 
       /* 批量导入 */
       showUpLoad: false,
@@ -538,20 +543,23 @@ export default {
     batchExport
   },
   methods: {
-    controllSelectClick(id,event){
-      console.log(id,event)
-      this.controllIsDone = true
+    controllSelectClick(id, event) {
+      console.log(id, event);
+      this.controllIsDone = true;
 
-      axios.get(this.api + "devices/perform",{params:{ids:id,itemName:event}})
-      .then(()=>{
-        this.controllIsDone = false
-      })
-      .catch(()=>{
-        console.log("指令执行失败")
-      })
-      setTimeout(()=>{
-        this.controllIsDone = false
-      },500)
+      axios
+        .get(this.api + "devices/perform", {
+          params: { ids: id, itemName: event }
+        })
+        .then(() => {
+          this.controllIsDone = false;
+        })
+        .catch(() => {
+          console.log("指令执行失败");
+        });
+      setTimeout(() => {
+        this.controllIsDone = false;
+      }, 500);
     },
     inintList(List, data) {
       data.forEach(item => {
@@ -579,7 +587,7 @@ export default {
           name: item.name,
           id: item.id,
           ip: item.ip_address,
-          numCode:item.address_code
+          numCode: item.address_code
         });
       });
     },
@@ -738,12 +746,47 @@ export default {
       return arr;
     },
     switchChange(el, id) {
+      //自控状态开关控制
       //推拉框回调函数
       console.log(el, id);
+      if (el) {
+        this.pubilcFnAxios("devices/auto/on", { ids: [id].toString() })
+          .then(data => {
+            console.log("自控状态操作成功");
+          })
+          .catch(() => {
+            console.log("打开自控状态请求失败");
+          });
+      } else {
+        this.pubilcFnAxios("devices/auto/off", { ids: [id].toString() })
+          .then(data => {
+            console.log("自控状态操作成功");
+          })
+          .catch(() => {
+            console.log("关闭自控状态请求失败");
+          });
+      }
     },
-    switchChange2(el, id, selfStatus) {
+    switchChange2(el, id, selfStatus) {//继电器开关控制
       // this.tableData[id].selfControl = !this.tableData[id].selfControl;
       console.log(id);
+      if (el) {
+        this.pubilcFnAxios("devices/relay/on", { ids: [id].toString() })
+          .then(data => {
+            console.log("继电器操作成功");
+          })
+          .catch(() => {
+            console.log("打开继电器请求失败");
+          });
+      } else {
+        this.pubilcFnAxios("devices/relay/off", { ids: [id].toString() })
+          .then(data => {
+            console.log("继电器操作成功");
+          })
+          .catch(() => {
+            console.log("关闭继电器请求失败");
+          });
+      }
     },
     searchClick() {
       //搜索功能
@@ -775,16 +818,16 @@ export default {
       console.log("子组件触发成功");
       this.showBatch = false;
     },
-    handleEdit(id, ip, port, name,code) {
+    handleEdit(id, ip, port, name, code) {
       //修改按钮绑定事件
-     
+
       this.editid = id.toString();
       this.editname = name;
       this.editip = ip;
       this.editport = port.toString();
-      this.numCode = code.toString()
-       this.showDialog = true;
-      console.log(id, ip, port, name,code);
+      this.numCode = code.toString();
+      this.showDialog = true;
+      console.log(id, ip, port, name, code);
     },
     open(name, id) {
       //删除提示框
@@ -916,20 +959,20 @@ export default {
           console.log("筛选请求失败");
         });
     },
-    refresh(){
+    refresh() {
       this.timerId = setInterval(() => {
-        console.log("定时器执行" + new Date())
-         if (this.isSearch) {
-                this.getPageAfterList();
-              } else {
-                this.getListData();
-              }
+        console.log("定时器执行" + new Date());
+        if (this.isSearch) {
+          this.getPageAfterList();
+        } else {
+          this.getListData();
+        }
       }, 20000);
     },
-     clear() {
+    clear() {
       clearInterval(this.timerId); //清除计时器
       this.timerId = null; //设置为null
-    },
+    }
   },
   watch: {
     $route() {
@@ -974,11 +1017,11 @@ export default {
         console.log("构造列表失败");
       });
     // this.refresh()
- },
- destroyed (){
-   console.log("页面销毁")
-   this.clear()
- }
+  },
+  destroyed() {
+    console.log("页面销毁");
+    this.clear();
+  }
 };
 </script>
 

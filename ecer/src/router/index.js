@@ -15,6 +15,7 @@ import userHome from '@/page/userHome'
 import userDeviceList from '@/page/user/userHome'
 import userStrategies from '@/page/setting/userStrategies'
 import login from '@/page/login/login'
+import timerList from "@/page/dataHistory/timerList"
 
 Vue.use(Router)
 
@@ -66,7 +67,6 @@ export default new Router({
         {
           path: '/admin/data',
           name: '历史数据',
-      
           components: {
             default: data,
             top: titleNav,
@@ -75,13 +75,11 @@ export default new Router({
           childNode: true,
           needData: false,
           children: [{
-       
             path: '/admin/dataHistory/dataHistory',
             name: '历史状态',
             component: historyData
           },
             {
-          
               path: '/admin/dataHistory/instructHistory',
               name: '历史指令',
               component: instructHistory
@@ -91,6 +89,12 @@ export default new Router({
               path: '/admin/dataHistory/selfControlStatus',
               name: '自控状态',
               component: selfControlStatus
+            },
+            {
+        
+              path: '/admin/dataHistory/timerList',
+              name: '定时信息',
+              component: timerList
             }]
         },
         {
