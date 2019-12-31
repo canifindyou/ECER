@@ -20,14 +20,30 @@
         </el-table>
       </template>
     </div>
+        <div style="text-align:center;margin:20px 0 0 0 ">
+        <!-- <el-switch v-model="pages"> </el-switch> -->
+        <el-pagination
+          :hide-on-single-page="pages"
+          :total="total"
+          :page-size="10"
+          layout="prev, pager, next"
+          @current-change="changePage"
+        >
+        </el-pagination>
+      </div>
   </div>
 </template>
 
 <script>
 import searchHead from "../../components/searchHead/searchHead"
+ import axios from "axios"
 export default {
   data() {
     return {
+       isSearch:false,
+        pages:"",
+        total:10,
+        pageNum:1,
       tableData: [
         {
           name: "空调一",
@@ -97,12 +113,79 @@ export default {
     };
   },
   methods:{
-    instructSearch(){
+     changePage(el){
+       this.pageNum = el
+        if(this.isSearch){
+          this.requestObj["pageNum"] = this.pageNum
+          this.requestObj["pageSize"] = 10
+          this.pubilcFnAxios("/instructLogs",{pageNum:this.pageNum,pageSize:10})
+        .then(data =>{
+          console.log(data)
+          this.total = data.total
+          this.tableData = data.list
+        })
+        .catch(()=>{
+          console.log("失败")
+        })
+        }else{
+          this.pubilcFnAxios("/instructLogs",{pageNum:this.pageNum,pageSize:10})
+        .then(data =>{
+          console.log(data)
+          this.total = data.total
+          this.tableData = data.list
+        })
+        .catch(()=>{
+          console.log("失败")
+        })
+        }
+      },
+    instructSearch(data){
       console.log("历史指令搜索事件触发")
-    }
+      this.isSearch = true
+        if(data.endTime == ""){
+          delete data.startTime
+          delete data.endTime
+        }
+        this.requestObj = data
+        this.pubilcFnAxios("/instructLogs",this.requestObj)
+        .then(data =>{
+          this.total = data.total
+          this.tableData = data.list
+        })
+    },
+       getTableDate(){
+        this.pubilcFnAxios("/instructLogs")
+        .then(data =>{
+          console.log(data)
+          this.total = data.total
+          this.tableData = data.list
+          
+        })
+        .catch(()=>{
+          console.log("失败")
+        })
+      },
+
+     pubilcFnAxios(urlString, params, method) {
+      //公用axios数据请求
+      return new Promise((resolve, reject) => {
+        axios
+          .get(this.api + urlString, { params: params })
+          .then(res => {
+          
+            resolve(res.data);
+          })
+          .catch(err => {
+            reject("get请求错误");
+          });
+      });
+    },
   },
   components:{
       searchHead
+  },
+  mounted(){
+    this.getTableDate()
   }
 };
 </script>

@@ -208,7 +208,7 @@ export default {
         startTime:this.startTime,
         endTime:this.endTime
         }
-        this.$emit("searchHistory");
+        this.$emit("searchHistory",params);
       }else if(this.pageFlag == 2){
       
         params = 
@@ -222,7 +222,16 @@ export default {
         }
         this.$emit("searchSelfStatus",params)
       }else{
-        this.$emit("instructSearch")
+          params = 
+          {
+        zoneId:this.selectSchool,
+        buildingId:this.selectBuild,
+        floor:this.selectFloor,
+        roomId:this.selectRooms,
+        startTime:this.startTime,
+        endTime:this.endTime
+        }
+        this.$emit("instructSearch",params)
       }
     },
     selectSchools(e) {
