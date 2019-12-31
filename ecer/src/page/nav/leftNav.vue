@@ -1,5 +1,5 @@
 <template>
-  <el-aside width="180px" v-if="sideData.length !== 0" >
+  <el-aside width="180px" v-if="sideData.length !== 0">
     <el-menu :default-active="index" router @open="open">
       <!-- <template v-for="all in this.$router.options.routes"> -->
       <template v-for="item in this.$router.options.routes[id].children">
@@ -50,7 +50,7 @@
         id: '',
         myindex: 0,
         // code: "A18",
-        index: localStorage.getItem("index") || 0,
+        index: localStorage.getItem('index') || 0,
         clickIndex: '',
         schoolIds: [], //校区id数组
         count: 0,
@@ -65,7 +65,7 @@
           //   flag:true
           // },
         ],
-        listId:0,
+        listId: 0,
         setList: [
           {
             name: '教职工管理',
@@ -91,8 +91,7 @@
             name: '全局配置',
             controlItem: 'globalControl'
           },
-       
-         
+
         ]
       }
     },
@@ -100,9 +99,9 @@
       open (key) {
         console.log(key)
       },
-      clickNode (buildId, fnum, schoolId,index) {
+      clickNode (buildId, fnum, schoolId, index) {
         // this.code = buildId;
-        localStorage.setItem("index",index.toString())
+        localStorage.setItem('index', index.toString())
         console.log(index)
         if (this.$route.path.split('/')[1] == 'admin') {
           this.$router.replace({
@@ -124,9 +123,9 @@
           })
         }
       },
-      clickNode1(path){
-        
-        localStorage.setItem("index",path)
+      clickNode1 (path) {
+
+        localStorage.setItem('index', path)
       },
       chooseSettings (index, controlItem) {
         console.log(index)
@@ -227,7 +226,7 @@
   }
 
   .el-submenu__title, .el-menu-item {
-    color: hsla(0, 0%, 100%, .65);
+    color: #BBBBBB;
   }
 
   .el-submenu.is-active .el-submenu__title {

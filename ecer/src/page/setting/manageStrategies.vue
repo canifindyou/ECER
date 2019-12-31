@@ -166,22 +166,24 @@
                 self.strategyInfo.callbackWTemp = data[0].winterConstantT
               }
             })
-            //   this.strategyInfo = this.strategiesList[i]
-            //   if ((typeof this.strategyInfo.executionTime == 'object') && this.strategyInfo.executionTime.constructor === Array) {
-            //     this.strategyInfo.executionTime = this.strategyInfo.executionTime.join('、')
-            //   }
-            //   this.strategyInfo.startTimeHour = hour
-            //   this.strategyInfo.startTimeMin = min
-            //   hour = this.strategyInfo.endTime.split(':')[0]
-            //   min = this.strategyInfo.endTime.split(':')[1]
-            //   this.strategyInfo.endTimeHour = hour
-            //   this.strategyInfo.endTimeMin = min
           }
         }
       },
 
       // 添加新策略
       showAddModel () {
+        this.strategyInfo.executionTime.split('、')
+        console.log(this.strategyInfo.executionTime)
+        console.log(this.strategyInfo.startTimeHour)
+        console.log(this.strategyInfo.startTimeMin)
+        console.log(this.strategyInfo.endTimeHour)
+        console.log(this.strategyInfo.endTimeMin)
+        console.log(this.strategyInfo.transPowerSTemp)
+        console.log(this.strategyInfo.failPowerSTemp)
+        console.log(this.strategyInfo.callbackSTemp)
+        console.log(this.strategyInfo.transPowerWTemp)
+        console.log(this.strategyInfo.failPowerWTemp)
+        console.log(this.strategyInfo.callbackWTemp)
         this.addStrategy = true
       },
 
