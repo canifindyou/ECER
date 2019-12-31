@@ -64,13 +64,6 @@
             @click="selectFileBtnClick"
             >选取文件</el-button
           >
-          <!-- <el-button
-            style="margin-left: 10px;"
-            size="small"
-            type="success"
-            @click="submitUpload"
-            >上传</el-button
-          > -->
           <div slot="tip" style="margin:25px 0 0 0" class="el-upload__tip">
             只能上传csv文件，且每次只能上传单个文件
           </div>

@@ -93,6 +93,7 @@
             type="datetime"
             format="yyyy-MM-dd"
             placeholder="开始时间"
+            value-format="yyyy-MM-dd"
             size="mini"
             :picker-options="pickerOptions1"
             style="width:150px;margin:0 10px 0 30px"
@@ -104,6 +105,7 @@
             v-model="endTime"
             type="datetime"
             placeholder="结束时间"
+            value-format="yyyy-MM-dd"
             size="mini"
             :disabled="startTime == ''"
             format="yyyy-MM-dd"
@@ -125,6 +127,7 @@
           <el-button
             size="mini"
             style="margin:0 10px 0 10px"
+           
             @click="searchClick"
             >搜索</el-button
           >
@@ -132,6 +135,7 @@
         <el-button
           v-else
           size="mini"
+         
           style="margin:0 10px 0 30px"
           @click="searchClick"
           >搜索</el-button
@@ -190,17 +194,32 @@ export default {
     },
     searchClick() {
       //1代表数据历史，2代表自控状态，3代表历史指令
-      let params = {
+     
+      var params = {}
+      console.log(this.pageFlag);
+      if (this.pageFlag == 1) {
+          console.log(this.startTime)
+          params = 
+          {
         zoneId:this.selectSchool,
         buildingId:this.selectBuild,
         floor:this.selectFloor,
         roomId:this.selectRooms,
-        
-      }
-      console.log(this.pageFlag);
-      if (this.pageFlag == 1) {
+        startTime:this.startTime,
+        endTime:this.endTime
+        }
         this.$emit("searchHistory");
       }else if(this.pageFlag == 2){
+      
+        params = 
+          {
+        zoneId:this.selectSchool,
+        buildingId:this.selectBuild,
+        floor:this.selectFloor,
+        roomId:this.selectRooms,
+        startTime:this.startTime,
+        endTime:this.endTime
+        }
         this.$emit("searchSelfStatus",params)
       }else{
         this.$emit("instructSearch")
@@ -288,4 +307,4 @@ export default {
 };
 </script>
 
-<style></style>
+

@@ -125,6 +125,3 @@ data() {
 }
 </script>
 
-<style>
-
-</style>

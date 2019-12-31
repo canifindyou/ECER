@@ -30,6 +30,17 @@
         </el-table>
       </template>
     </div>
+    <div style="text-align:center;margin:20px 0 0 0 ">
+        <!-- <el-switch v-model="pages"> </el-switch> -->
+        <el-pagination
+          :hide-on-single-page="pages"
+          :total="total"
+          :page-size="10"
+          layout="prev, pager, next"
+          @current-change="changePage"
+        >
+        </el-pagination>
+      </div>
   </div>
 </template>
 
@@ -39,18 +50,20 @@
   export default {
     data () {
       return {
+        pages:"",
+        total:"",
         tableData: [
-          {
-            name: '空调一',
-            warningDevice: '开启',
-            temp: '22',
-            usedElectric: '500V',
-            powerStatus: '电源',
-            voltage: '220V',
-            current: '5A',
-            obtainTime: '2019.12.1 12:22',
-            selfControllStatus: '开启'
-          },
+          // {
+          //   name: '空调一',
+          //   warningDevice: '开启',
+          //   temp: '22',
+          //   usedElectric: '500V',
+          //   powerStatus: '电源',
+          //   voltage: '220V',
+          //   current: '5A',
+          //   obtainTime: '2019.12.1 12:22',
+          //   selfControllStatus: '开启'
+          // },
 
         ]
       }
@@ -63,24 +76,31 @@
         console.log("触发搜索事件",data)
       },
       getTableDate(){
-        this.publicAxios("http://192.168.1.105:8080/dataLogs")
+        this.pubilcFnAxios("http://192.168.1.105:8080/dataLogs")
         .then(data =>{
-          this.tableData = data.list
           console.log(data)
+          this.tableData = data.list
+          
+        })
+        .catch(()=>{
+          console.log("失败")
         })
       },
 
-      publicAxios(urlString,params){
-        return new Promise((reject,resolve)=>{
-          axios.get(urlString,{params:params})
-          .then(res=>{
-            reject(res.data)
+     pubilcFnAxios(urlString, params, method) {
+      //公用axios数据请求
+      return new Promise((resolve, reject) => {
+        axios
+          .get(urlString, { params: params })
+          .then(res => {
+          
+            resolve(res.data);
           })
-          .cath((error)=>{
-            console.log(error)
-          })
-        })
-      }
+          .catch(err => {
+            reject("get请求错误");
+          });
+      });
+    },
     },
     mounted(){
       this.getTableDate()
