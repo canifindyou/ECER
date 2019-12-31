@@ -9,10 +9,10 @@
           </el-table-column>
           <el-table-column align="center" prop="buzzer_status" label="蜂鸣器">
           </el-table-column>
-          <!-- <el-table-column align="center" label="温度">
+          <el-table-column align="center" label="温度">
             <template slot-scope="scope">
-              {{scope.row.temp}}℃
-            </template> -->
+              {{scope.row.context_t}}℃
+            </template>
           </el-table-column>
           <el-table-column align="center" prop="electric_consume" label="已用电量">
           </el-table-column>
@@ -50,8 +50,11 @@
   export default {
     data () {
       return {
+        requestObj:{},
+        isSearch:false,
         pages:"",
-        total:"",
+        total:10,
+        pageNum:1,
         tableData: [
           // {
           //   name: '空调一',
@@ -72,13 +75,51 @@
       searchHead
     },
     methods:{
-      searchHistory(data){
-        console.log("触发搜索事件",data)
-      },
-      getTableDate(){
-        this.pubilcFnAxios("http://192.168.1.105:8080/dataLogs")
+      changePage(el){
+       this.pageNum = el
+        if(this.isSearch){
+          this.requestObj["pageNum"] = this.pageNum
+          this.requestObj["pageSize"] = 10
+          this.pubilcFnAxios("/dataLogs",{pageNum:this.pageNum,pageSize:10})
         .then(data =>{
           console.log(data)
+          this.total = data.total
+          this.tableData = data.list
+        })
+        .catch(()=>{
+          console.log("失败")
+        })
+        }else{
+          this.pubilcFnAxios("/dataLogs",{pageNum:this.pageNum,pageSize:10})
+        .then(data =>{
+          console.log(data)
+          this.total = data.total
+          this.tableData = data.list
+        })
+        .catch(()=>{
+          console.log("失败")
+        })
+        }
+      },
+      searchHistory(data){
+        console.log("触发搜索事件",data)
+        this.isSearch = true
+        if(data.endTime == ""){
+          delete data.startTime
+          delete data.endTime
+        }
+        this.requestObj = data
+        this.pubilcFnAxios("/dataLogs",this.requestObj)
+        .then(data =>{
+          this.total = data.total
+          this.tableData = data.list
+        })
+      },
+      getTableDate(){
+        this.pubilcFnAxios("/dataLogs")
+        .then(data =>{
+          console.log(data)
+          this.total = data.total
           this.tableData = data.list
           
         })
@@ -91,7 +132,7 @@
       //公用axios数据请求
       return new Promise((resolve, reject) => {
         axios
-          .get(urlString, { params: params })
+          .get(this.api + urlString, { params: params })
           .then(res => {
           
             resolve(res.data);

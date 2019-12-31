@@ -66,7 +66,7 @@ export default {
       if(this.isSearch){
          this.requestObj["pageNum"] = this.pageNum
          this.requestObj["pageSize"] = 10
-       axios.get("http://192.168.1.106:8080/deviceAutoStatus",{params:this.requestObj})
+       axios.get(this.api + "/deviceAutoStatus",{params:this.requestObj})
         .then(res=>{
            res.data.list.forEach(item =>{
              this.total = res.data.total
@@ -77,7 +77,7 @@ export default {
         })
         .catch()
       }else{
-       axios.get("http://192.168.1.106:8080/deviceAutoStatus",{params:{pageNum:this.pageNum,pageSize:10}})
+       axios.get(this.api + "/deviceAutoStatus",{params:{pageNum:this.pageNum,pageSize:10}})
         .then(res=>{
            res.data.list.forEach(item =>{
              this.total = res.data.total
@@ -116,7 +116,7 @@ export default {
         this.isSearch = true
         console.log("自控状态历史搜索事件")
         console.log(data)
-        axios.get("http://192.168.1.106:8080/deviceAutoStatus",{params:data})
+        axios.get(this.api + "/deviceAutoStatus",{params:data})
         .then(res=>{
            res.data.list.forEach(item =>{
              this.total = res.data.total
@@ -129,7 +129,7 @@ export default {
 
       },
       getTableData(){
-        axios.get("http://192.168.1.106:8080/deviceAutoStatus")
+        axios.get(this.api + "/deviceAutoStatus")
         .then(res=>{
            res.data.list.forEach(item =>{
              this.total = res.data.total
