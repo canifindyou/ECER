@@ -849,7 +849,7 @@ export default {
 }
 /* 滚动槽 */
 ::-webkit-scrollbar-track {
-  -webkit-box-shadow: inset006pxrgba(0, 0, 0, 0.3);
+   -webkit-box-shadow: inset006pxrgba(0, 0, 0, 0.3);
   border-radius: 5px;
 }
 /* 滚动条滑块 */
@@ -861,12 +861,7 @@ export default {
 ::-webkit-scrollbar-thumb:window-inactive {
   background: rgba(255, 0, 0, 0);
 }
-.selectBatchBox .boxLeft {
-}
-.selectBatchBox .boxCenter {
-}
-.selectBatchBox .boxRight {
-}
+
 .selectBatchBox .commonBox .boxHead {
   display: inline-block;
   width: 100%;
