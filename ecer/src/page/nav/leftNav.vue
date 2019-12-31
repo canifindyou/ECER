@@ -209,7 +209,7 @@
     }
   }
 </script>
-<style scoped>
+<style>
   /*el-container*/
   .el-aside {
     position: absolute;
