@@ -64,6 +64,11 @@
   cursor:pointer
 }
 
+.noData{
+  line-height: 260px;
+  color: #BBBBBB;
+}
+
 /*.text:active{*/
 /*  background: #CCCCCC;*/
 /*}*/

@@ -72,13 +72,12 @@
               if (jsonData.status === 1) {// 删除失败，存在分组
                 self.$message.error('请将该校区下所有分组删除后再进行该操作！')
               } else {// 删除成功
-                // self.$emit('getCampusesList')
+                self.$emit('getCampusesList')
                 self.$emit('clearCSS',0)
                 self.$message({
                   message: '删除成功',
                   type: 'success'
                 })
-                self.closeModel()
               }
             }
           })
@@ -98,7 +97,6 @@
                   message: '删除成功',
                   type: 'success'
                 })
-                self.closeModel()
               }
             }
           })
@@ -118,11 +116,11 @@
                   message: '删除成功',
                   type: 'success'
                 })
-                self.closeModel()
               }
             }
           })
         }
+        self.closeModel()
       },
 
       // 关闭窗口

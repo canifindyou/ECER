@@ -20,6 +20,7 @@
           </div>
         </div>
         <div class="cardFooter"><i class="el-icon-circle-plus" @click="addNewDiv(campusType)"></i></div>
+        <div v-show="haveCampuses" class="noData">暂无数据</div>
       </el-card>
       <el-card class="cardGroups">
         <div slot="header" class="clearfix">
@@ -34,6 +35,7 @@
           </div>
         </div>
         <div class="cardFooter"><i class="el-icon-circle-plus" @click="addNewDiv(buildingType)"></i></div>
+        <div v-show="haveBuildings" class="noData">暂无数据</div>
       </el-card>
       <el-card class="cardGroups">
         <div slot="header" class="clearfix">
@@ -48,14 +50,15 @@
           </div>
         </div>
         <div class="cardFooter"><i class="el-icon-circle-plus" @click="addNewDiv(classroomType)"></i></div>
+        <div v-show="haveClassrooms" class="noData">暂无数据</div>
       </el-card>
     </div>
     <hr class="boundary">
     <del-group :delGroupType="delGroupType" :delGroup="delGroup" :delId="delId"
                :campusId="campusId" :buildingId="buildingId" @closeModel="closeModel"
                @getCampusesList="getCampusesList" @getBuildingsList="getBuildingsList"
-               @getClassroomsList="getClassroomsList"></del-group>
-    <batch-addition :batchAddition="batchAddition" @closeModel="closeModel" @clearCSS="clearCSS"></batch-addition>
+               @getClassroomsList="getClassroomsList" @clearCSS="clearCSS"></del-group>
+    <batch-addition :batchAddition="batchAddition" @closeModel="closeModel"></batch-addition>
     <div slot="footer" class="dialog-footer">
       <el-button type="success" @click="showBatchAddition">批量添加</el-button>
       <el-button @click="closeAllModel">关 闭</el-button>
@@ -75,15 +78,19 @@
     data () {
       return {
         manageGroups: true,
-        clickList: true,
+        clickList: true,//分组是否可点
+        haveCampuses: true,
         campusId: -1,
         campusType: 0,
         allCampuses: [],
         showCampusOperate: -1,
+        haveBuildings: true,
         buildingId: -1,
         buildingType: 1,
+        modifyBtn: true,
         buildingsData: [],
         showBuildingOperate: -1,
+        haveClassrooms: true,
         classroomId: -1,
         classroomType: 2,
         classroomsData: [],
@@ -105,6 +112,7 @@
           this.buildingsData = []
           this.classroomsData = []
           this.showBuildingOperate = -1// 清除楼栋显示的修改删除按钮
+          this.haveClassrooms = true// 选择校区时，教室始终无数据
           // 更改试图样式
           this.selectList(type, name, index)
           // 获取列表
@@ -174,21 +182,26 @@
 
       // 添加操作
       addNewDiv (type) {
-        // 生成输入div
-        let div = document.getElementsByClassName('el-card__body')
-        let newDiv = document.createElement('div')
-        newDiv.setAttribute('class', 'groupList')// 设置class属性
-        newDiv.innerHTML = '<input type="text" style="text-align: center"/>'// 添加input框
-        if (type === 0) {// 添加校区
-          this.addCampus(newDiv)
-        } else if (type === 1) {// 添加楼栋
-          newDiv.innerHTML = '<input type="text" value="( )" style="text-align: center"/>'
-          this.addBuilding(newDiv)
-        } else if (type === 2) {// 添加教室
-          this.addClassroom(newDiv)
+        if (this.modifyBtn === false) {
+          return false
+        } else {
+          // 生成输入div
+          let div = document.getElementsByClassName('el-card__body')
+          let newDiv = document.createElement('div')
+          newDiv.setAttribute('class', 'groupList')// 设置class属性
+          newDiv.innerHTML = '<input type="text" style="text-align: center"/>'// 添加input框
+          if (type === 0) {// 添加校区
+            this.addCampus(newDiv)
+            this.haveCampuses = false
+          } else if (type === 1) {// 添加楼栋
+            newDiv.innerHTML = '<input type="text" value="( )" style="text-align: center"/>'
+            this.addBuilding(newDiv)
+          } else if (type === 2) {// 添加教室
+            this.addClassroom(newDiv)
+          }
+          div[type].appendChild(newDiv)// 插入div
+          newDiv.childNodes[0].focus()
         }
-        div[type].appendChild(newDiv)// 插入div
-        newDiv.childNodes[0].focus()
       },
 
       // 增加校区
@@ -200,20 +213,30 @@
             $.ajax({
               type: 'POST',
               url: self.api + 'schoolZones',
+              dataType: 'json',
               data: {'name': newCampus},
               success (data) {
-                let jsonData = JSON.parse(data)
-                if (jsonData.status === 1) {// 校区名重复
-                  self.clickList = false// 不能切换分组
-                  newDiv.childNodes[0].focus()// input框获取焦点
-                  self.$message.error('校区名不能重复！')
-                } else {// 更新数据并移除输入框
-                  self.getCampusesList()
+                if (data === 1) {// 更新数据并移除输入框
                   newDiv.remove()
+                  self.getCampusesList()
                   self.$message({
-                    message: '校区添加成功',
+                    message: '校区添加成功！',
                     type: 'success'
                   })
+                  self.modifyBtn = true
+                } else if (data.status === 1) {
+                  self.clickList = false// 不能切换分组
+                  newDiv.childNodes[0].focus()// input框获取焦点
+                  self.$message({
+                    message: '校区名不能重复！',
+                    type: 'warning'
+                  })
+                  self.modifyBtn = false
+                } else {
+                  self.modifyBtn = true
+                  newDiv.remove()
+                  self.getCampusesList()
+                  self.$message.error('校区添加失败！')
                 }
               }
             })
@@ -227,10 +250,13 @@
       // 增加楼栋
       addBuilding (newDiv) {
         if (this.campusId === -1) {// 未选择校区的情况下
-          newDiv.remove()
+          newDiv.childNodes[0].addEventListener('blur', function () {// input框失焦后的操作
+            newDiv.remove()
+          })
           alert('请选择校区后再添加新楼栋')
         } else {// 选择校区的情况下
           let self = this
+          this.haveBuildings = false
           newDiv.childNodes[0].addEventListener('blur', function () {// input框失焦后的操作
             let buildingData = newDiv.childNodes[0].value// 取值
             let newBuilding = buildingData.split('(')[0]// 取出楼栋名
@@ -249,30 +275,43 @@
                   'floors': newFloor
                 }),
                 success (data) {
-                  if (data.status === 1) {// 存在子分组，删除失败
-                    self.$message.error('楼栋名不能重复！')
-                    newDiv.childNodes[0].focus()// input框获取焦点
-                    self.clickList = false// 不能切换分组
-                  } else {// 更新数据
-                    self.getBuildingsList(self.campusId)
+                  if (data === 1) {// 更新数据并移除输入框
                     newDiv.remove()
+                    self.getBuildingsList(self.campusId)
                     self.$message({
-                      message: '楼栋添加成功',
+                      message: '楼栋添加成功！',
                       type: 'success'
                     })
+                    self.modifyBtn = true
+                  } else if (data.status === 1) {
+                    self.clickList = false// 不能切换分组
+                    newDiv.childNodes[0].focus()// input框获取焦点
+                    self.$message({
+                      message: '楼栋名不能重复！',
+                      type: 'warning'
+                    })
+                    self.modifyBtn = false
+                  } else {
+                    self.modifyBtn = true
+                    newDiv.remove()
+                    self.getBuildingsList(self.campusId)
+                    self.$message.error('楼栋添加失败！')
                   }
                 }
               })
             } else if (!newBuilding && newFloor) {// 楼栋未填写，楼层填写
               self.clickList = false
+              self.modifyBtn = false
               self.$message.error('请在括号前填写楼栋名！')
               newDiv.childNodes[0].focus()
             } else if (newBuilding && !newFloor) {// 楼栋填写，楼层未填写
               self.clickList = false
+              self.modifyBtn = false
               self.$message.error('请检查括号内是否正确填写该楼栋的楼层数')
               newDiv.childNodes[0].focus()
             } else {
               self.clickList = true
+              self.modifyBtn = true
               newDiv.remove()// 移除div
             }
           })
@@ -283,6 +322,7 @@
       addClassroom (newDiv) {
         if (this.campusId !== -1 && this.buildingId !== -1) {// 选中校区及楼层
           let self = this
+          this.haveClassrooms = false
           // 在列表最后一项插入新div
           newDiv.childNodes[0].addEventListener('blur', function () {//  input框失焦后的操作
             let newClassroom = newDiv.childNodes[0].value// 取值
@@ -301,41 +341,51 @@
                   'floor': roomFloor
                 }),
                 success (data) {
-                  if (data.status === 1) {
-                    self.clickList = false// 不能切换分组
-                    newDiv.childNodes[0].focus()// input框获取焦点
-                    self.$message.error('教室名不能重复！')
-                  } else {// 更新数据并移除输入框
+                  if (data === 1) {// 更新数据并移除输入框
                     newDiv.remove()
                     self.getClassroomsList(self.buildingId)
                     self.$message({
-                      message: '教室添加成功',
+                      message: '教室添加成功！',
                       type: 'success'
                     })
+                    self.modifyBtn = true
+                  } else if (data.status === 1) {
+                    self.clickList = false// 不能切换分组
+                    newDiv.childNodes[0].focus()// input框获取焦点
+                    self.$message({
+                      message: '教室名不能重复！',
+                      type: 'warning'
+                    })
+                    self.modifyBtn = false
+                  } else {
+                    self.modifyBtn = true
+                    newDiv.remove()
+                    self.getClassroomsList(self.buildingId)
+                    self.$message.error('教室添加失败！')
                   }
                 }
               })
             } else if (newClassroom && !roomFloor) {
               self.clickList = false// 不能切换分组
+              self.modifyBtn = false
               newDiv.childNodes[0].focus()// input框获取焦点
               self.$message.error('请填写正确的教室格式')
             } else {
               self.clickList = true
+              self.modifyBtn = true
               newDiv.remove()// 移除div
             }
           })
         } else if (this.campusId === -1) {
-          this.$message({
-            message: '请选择校区及楼栋后再添加新教室',
-            type: 'warning'
+          newDiv.childNodes[0].addEventListener('blur', function () {// input框失焦后的操作
+            newDiv.remove()
           })
-          newDiv.remove()// 移除div
+          alert('请选择校区及楼栋后再添加新教室')
         } else if (this.buildingId === -1) {
-          this.$message({
-            message: '请选择楼栋后再添加新教室',
-            type: 'warning'
+          newDiv.childNodes[0].addEventListener('blur', function () {// input框失焦后的操作
+            newDiv.remove()
           })
-          newDiv.remove()// 移除div
+          alert('请选择楼栋后再添加新教室')
         }
       },
 
@@ -375,16 +425,40 @@
                 'name': newCampus
               }),
               success (data) {
-                self.getCampusesList()
-                newDiv.remove()
-                // 显示修改后的div
-                div.childNodes[index + 1].style.display = 'block'
-                div.childNodes[index + 1].style.background = '#BBB'
+                if (data === 1) {
+                  self.getCampusesList()
+                  newDiv.remove()
+                  // 显示修改后的div
+                  div.childNodes[index + 1].style.display = 'block'
+                  div.childNodes[index + 1].style.background = '#BBB'
+                  self.$message({
+                    message: '校区名修改成功！',
+                    type: 'success'
+                  })
+                  self.modifyBtn = true
+                } else if (data.status === 1) {
+                  self.clickList = false// 不能切换分组
+                  newDiv.childNodes[0].focus()// input框获取焦点
+                  self.$message({
+                    message: '校区名不能重复！',
+                    type: 'warning'
+                  })
+                  self.modifyBtn = false
+                } else {
+                  self.getCampusesList()
+                  self.modifyBtn = true
+                  newDiv.remove()
+                  // 显示修改后的div
+                  div.childNodes[index + 1].style.display = 'block'
+                  div.childNodes[index + 1].style.background = '#BBB'
+                  self.$message.error('校区名修改失败！')
+                }
               }
             })
           } else {// 校区名无数据
             self.$message.error('校区名不能为空')
             self.clickList = false
+            self.modifyBtn = false
             newDiv.childNodes[0].focus()// input框获取焦点
           }
         })
@@ -412,18 +486,46 @@
                 'zoneId': self.campusId
               }),
               success (data) {// 更新楼栋列表
+                if (data === 1) {
+                  self.getBuildingsList(self.campusId)
+                  newDiv.remove()// 移除div
+                  div.childNodes[index + 1].style.display = 'block'// 显示修改后的div
+                  div.childNodes[index + 1].style.background = '#BBB'// 显示修改后的div
+                  self.$message({
+                    message: '楼栋名修改成功！',
+                    type: 'success'
+                  })
+                  self.modifyBtn = true
+                } else if (data.status === 1) {
+                  self.clickList = false// 不能切换分组
+                  newDiv.childNodes[0].focus()// input框获取焦点
+                  self.$message({
+                    message: '楼栋名不能重复！',
+                    type: 'warning'
+                  })
+                  self.modifyBtn = false
+                } else {
+                  self.getBuildingsList(self.campusId)
+                  newDiv.remove()// 移除div
+                  div.childNodes[index + 1].style.display = 'block'// 显示修改后的div
+                  div.childNodes[index + 1].style.background = '#BBB'// 显示修改后的div
+                  self.$message.error('楼栋名修改失败！')
+                  self.modifyBtn = true
+                }
+              },
+              error () {
                 self.getBuildingsList(self.campusId)
+                self.modifyBtn = true
                 newDiv.remove()// 移除div
                 div.childNodes[index + 1].style.display = 'block'// 显示修改后的div
                 div.childNodes[index + 1].style.background = '#BBB'// 显示修改后的div
-              },
-              error () {
                 console.log('error')
               }
             })
           } else {
             self.$message.error('请按照"楼栋名(层数)"的格式修改')
             self.clickList = false
+            self.modifyBtn = false
             newDiv.childNodes[0].focus()// input框获取焦点
           }
         })
@@ -450,15 +552,38 @@
                 'buildingId': self.buildingId
               }),
               success (data) {
-                self.getClassroomsList(self.buildingId)
-                newDiv.remove()// 移除div
-                div.childNodes[index + 1].style.display = 'block'
-                div.childNodes[index + 1].style.background = '#BBB'
+                if (data === 1) {
+                  self.getClassroomsList(self.buildingId)
+                  newDiv.remove()// 移除div
+                  div.childNodes[index + 1].style.display = 'block'
+                  div.childNodes[index + 1].style.background = '#BBB'
+                  self.$message({
+                    message: '教室修改成功！',
+                    type: 'success'
+                  })
+                  self.modifyBtn = true
+                } else if (data.status === 1) {
+                  self.clickList = false// 不能切换分组
+                  newDiv.childNodes[0].focus()// input框获取焦点
+                  self.$message({
+                    message: '教室名不能重复！',
+                    type: 'warning'
+                  })
+                  self.modifyBtn = false
+                } else {
+                  self.getClassroomsList(self.buildingId)
+                  self.modifyBtn = true
+                  newDiv.remove()// 移除div
+                  div.childNodes[index + 1].style.display = 'block'
+                  div.childNodes[index + 1].style.background = '#BBB'
+                  self.$message.error('教室修改失败！')
+                }
               }
             })
           } else {// 教室名无数据
             self.$message.error('教室名不能为空')
             self.clickList = false
+            self.modifyBtn = false
             newDiv.childNodes[0].focus()
           }
         })
@@ -477,27 +602,31 @@
         this.delGroup = true
       },
 
+      // 清除样式
       clearCSS (type) {
         console.log(type)
         let campusesList = document.getElementsByClassName('campusesList')
         let buildingsList = document.getElementsByClassName('buildingsList')
         let classroomsList = document.getElementsByClassName('classroomsList')
         if (type === 0) {// 选择校区
+          this.showCampusOperate = -1
           for (let i = 0; i < campusesList.length; i++) {
             campusesList[i].style.background = '#FFF'
           }
         } else if (type === 1) {// 选择楼栋
+          this.showBuildingOperate = -1
           for (let i = 0; i < buildingsList.length; i++) {
             buildingsList[i].style.background = '#FFF'
           }
         } else if (type === 2) {// 选择教室
+          this.showClassroomOperate = -1
           for (let i = 0; i < classroomsList.length; i++) {
             classroomsList[i].style.background = '#FFF'
           }
         }
       },
 
-      // 调用校区列表接口
+      // 获取校区列表
       getCampusesList () {
         let self = this
         this.clickList = true
@@ -506,6 +635,11 @@
           async: false,
           url: this.api + 'schoolZones',
           success (data) {
+            if (data.length === 0) {
+              self.haveCampuses = true
+            } else {
+              self.haveCampuses = false
+            }
             self.allCampuses = data
           },
           error () {
@@ -514,33 +648,45 @@
         })
       },
 
-      // 调用楼栋列表接口
+      // 获取楼栋列表
       getBuildingsList (id) {
         let self = this
         this.clickList = true
         $.ajax({
-          type: 'GET',
-          url: this.api + 'buildings',
-          data: {'zoneId': id},
-          success (data) {
-            self.buildingsData = data
-            // self.$emit('updateNav')
-          },
-          error () {
-            console.log('获取数据失败')
+            type: 'GET',
+            url: this.api + 'buildings',
+            data: {'zoneId': id},
+            success (data) {
+              // self.$emit('updateNav')
+              if (data.length === 0) {
+                self.haveBuildings = true
+              } else {
+                self.haveBuildings = false
+              }
+              self.buildingsData = data
+            },
+            error () {
+              console.log('获取数据失败')
+            }
           }
-        })
+        )
       },
 
-      // 调用教室列表接口
+      // 获取教室列表
       getClassroomsList (id) {
         let self = this
         this.clickList = true
+
         // 根据选中的楼栋id获取教室列表
         $.ajax({
           type: 'GET',
           url: this.api + 'rooms/' + id,
           success (data) {
+            if (data.length === 0) {
+              self.haveClassrooms = true
+            } else {
+              self.haveClassrooms = false
+            }
             self.classroomsData = data
           }
         })
@@ -554,7 +700,6 @@
       // 关闭子级模态框
       closeModel () {
         this.delGroup = false
-        this.showCampusOperate = -1
         this.batchAddition = false
       },
 

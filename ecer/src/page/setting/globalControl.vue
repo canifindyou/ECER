@@ -24,12 +24,12 @@
         </div>
         <div class="manageElectric">
           <div class="highElectric">电流高于:
-            <el-input-number v-model="controlData.maxCurrent" :precision="0" size="mini"
+            <el-input-number v-model="controlData.minCurrent" :precision="0" size="mini"
                              controls-position="right" @change="handleChange"></el-input-number>
             A&nbsp;
           </div>
           <div>电流低于:
-            <el-input-number v-model="controlData.minCurrent" :precision="0" size="mini"
+            <el-input-number v-model="controlData.maxCurrent" :precision="0" size="mini"
                              controls-position="right" @change="handleChange"></el-input-number>
             A
           </div>
@@ -74,15 +74,7 @@
       return {
         globalControl: true,
         labelPosition: 'left',
-        controlData: {
-          highTemp: 0,
-          lowTemp: 0,
-          highElectric: 0,
-          lowElectric: 0,
-          selectDataTime: 0,
-          clearDataTime: 0,
-          orderTimes: 0
-        },
+        controlData: {},
       }
     },
     methods: {
@@ -90,21 +82,47 @@
         let self = this
         $.ajax({
           type: 'GET',
+          async: false,
           url: this.api + 'globalConfig',
-          success(data){
+          success (data) {
             self.controlData = data[0]
           }
         })
       },
 
-      submit(){
-        // $.ajax({
-        //   type: 'PUT',
-        //   url: this.api + 'globalConfig?id='+this.controlData.id+'maxT=',
-        //   success(data){
-        //     self.controlData = data[0]
-        //   }
-        // })
+      submit () {
+        let self = this
+        $.ajax({
+          type: 'PUT',
+          url: this.api + 'globalConfig',
+          // url: 'http://192.168.1.106:8080/globalConfig',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          data: JSON.stringify({
+            'maxT': this.controlData.maxT,
+            'minT': this.controlData.minT,
+            'maxCurrent': this.controlData.maxCurrent,
+            'minCurrent': this.controlData.minCurrent,
+            'dataCollection': this.controlData.dataCollection,
+            'dataClean': this.controlData.dataClean,
+            'instructTimes': this.controlData.instructTimes
+          }),
+          success (data) {
+            if (data === 1) {
+              self.$message({
+                message: '保存成功！',
+                type: 'success'
+              })
+              self.closeModel()
+            } else if (data === 0) {
+              self.$message({
+                message: '保存失败！',
+                type: 'warning'
+              })
+            }
+          }
+        })
       },
 
       closeModel () {
