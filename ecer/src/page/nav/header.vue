@@ -3,11 +3,22 @@
     <div class="head">
       <div style="margin: 0 50px">
         <img src="../../../static/pic/school.png" class="head-img" alt="">
-        <div class="exit">退出系统</div>
+        <div class="exit" >退出系统</div>
       </div>
     </div>
   </el-header>
 </template>
+
+
+<script>
+export default {
+  method:{
+    loginout(){//退出登录
+      this.$route.replace("")
+    }
+  }
+}
+</script>
 
 <style scoped>
   /*el-header*/

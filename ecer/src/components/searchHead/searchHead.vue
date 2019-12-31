@@ -94,7 +94,7 @@
             format="yyyy-MM-dd"
             placeholder="开始时间"
             size="mini"
-            :picker-options="pickerOptions"
+            :picker-options="pickerOptions1"
             style="width:150px;margin:0 10px 0 30px"
             @change="initOptions2"
           >
@@ -105,7 +105,7 @@
             type="datetime"
             placeholder="结束时间"
             size="mini"
-            :disabled = "startTime == ''"
+            :disabled="startTime == ''"
             format="yyyy-MM-dd"
             style="width:150px;margin:0 10px 0 30px"
             :picker-options="pickerOptions2"
@@ -149,18 +149,21 @@ export default {
     flag: {
       type: Boolean,
       default: false
+    },
+    pageFlag: {
+      type: Number
     }
   },
   data() {
     return {
-       pickerOptions1: {
-          			disabledDate(time) {
-          	 			return time.getTime() < Date.now() - 8.64e7;
-          			}
-            },
-            pickerOptions2:{},
-      startTime:"",
-      endTime:"",
+      pickerOptions1: {
+        disabledDate(time) {
+          return time.getTime() < Date.now() - 8.64e7;
+        }
+      },
+      pickerOptions2: {},
+      startTime: "",
+      endTime: "",
       selectSchool: "",
       selectSchoolOptions: [],
       selectBuild: "",
@@ -175,17 +178,34 @@ export default {
     };
   },
   methods: {
-     initOptions2($event){
+    initOptions2($event) {
       //设置结束时间时间范围
-      console.log($event.getTime())
-      console.log(Date.now())
-      this.pickerOptions2 =  {
-          			disabledDate(time) {
-          	 			return time.getTime() < $event.getTime() - 8.64e7 + 1 ;
-          			}
-        		}
+      console.log($event.getTime());
+      console.log(Date.now());
+      this.pickerOptions2 = {
+        disabledDate(time) {
+          return time.getTime() < $event.getTime() - 8.64e7 + 1;
+        }
+      };
     },
-    searchClick() {},
+    searchClick() {
+      //1代表数据历史，2代表自控状态，3代表历史指令
+      let params = {
+        zoneId:this.selectSchool,
+        buildingId:this.selectBuild,
+        floor:this.selectFloor,
+        roomId:this.selectRooms,
+        
+      }
+      console.log(this.pageFlag);
+      if (this.pageFlag == 1) {
+        this.$emit("searchHistory");
+      }else if(this.pageFlag == 2){
+        this.$emit("searchSelfStatus",params)
+      }else{
+        this.$emit("instructSearch")
+      }
+    },
     selectSchools(e) {
       //校区下拉框数据加载
       this.selectSchoolOptions = [];
@@ -232,9 +252,6 @@ export default {
         this.selectRoomOptions,
         {}
       );
-    },
-    selectDevice(){
-
     },
 
     constructData(urlString, obj, params) {

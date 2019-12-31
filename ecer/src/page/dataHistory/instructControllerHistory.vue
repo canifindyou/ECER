@@ -1,6 +1,6 @@
 <template>
   <div>
-    <searchHead :flag="true"></searchHead>
+    <searchHead :flag="true" :pageFlag="3" @instructSearch="instructSearch"></searchHead>
     <div style="margin:10px 0 0 0">
       <template>
         <el-table :data="tableData" align="center" style="width: 100%">
@@ -95,6 +95,11 @@ export default {
 
       ]
     };
+  },
+  methods:{
+    instructSearch(){
+      console.log("历史指令搜索事件触发")
+    }
   },
   components:{
       searchHead
