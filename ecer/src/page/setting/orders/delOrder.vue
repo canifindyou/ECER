@@ -78,13 +78,7 @@
       },
 
       closeModel () {
-        let self = this
         this.showDel = false
-        // this.$nextTick(function () {
-          self.$emit('getTempList')
-          console.log('345')
-        // })
-        console.log('123')
         this.$emit('closeModel')
       }
     },

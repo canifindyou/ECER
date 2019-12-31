@@ -86,7 +86,6 @@
               self.noData = false
             }
             self.templateData = data
-            console.log(self.templateData)
           }
         })
       },
@@ -189,14 +188,12 @@
 
       // 关闭子级模态框
       closeModel () {
-        console.log(this.templateData.length)
-        console.log(this.templateData)
+        this.getTempList()
         if (this.templateData.length===0){
           this.tableData=[]
         }
         this.delOrder = false
         this.chooseBrand = false
-        this.getTempList()
       },
 
       closeAllModel () {
