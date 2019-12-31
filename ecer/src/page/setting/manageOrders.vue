@@ -18,11 +18,12 @@
         <div class="cardFooter"><i class="el-icon-delete" @click="showDelModel"></i><i class="el-icon-edit"
                                                                                        @click="modifyTemplate"></i>
         </div>
+        <div v-show="noData" class="noData">暂无数据</div>
       </el-card>
       <div class="strategyContent">
         <el-table
           :data="tableData"
-          height="270px">
+          height="280px">
           <el-table-column
             type="index"
             prop="id"
@@ -39,7 +40,7 @@
     </div>
     <hr class="boundary">
     <del-order :delOrder="delOrder" :delId="selectId" @closeModel="closeModel"></del-order>
-    <choose-brand :chooseBrand="chooseBrand" @closeModel="closeModel"></choose-brand>
+    <choose-brand :chooseBrand="chooseBrand"  @closeModel="closeModel" ></choose-brand>
     <div slot="footer" class="dialog-footer">
       <el-button @click="closeAllModel">关 闭</el-button>
       <el-button type="success" @click="showBrandsList">导入指令模板</el-button>
@@ -64,6 +65,7 @@
         selectName: '',
         delOrder: false,
         chooseBrand: false,
+        noData: true,
         templateData: [],
         tableData: [],
       }
@@ -77,7 +79,14 @@
           async: false,
           url: this.api + 'templates',
           success (data) {
+            console.log(data)
+            if (data.length === 0) {
+              self.noData = true
+            } else {
+              self.noData = false
+            }
             self.templateData = data
+            console.log(self.templateData)
           }
         })
       },
@@ -180,7 +189,11 @@
 
       // 关闭子级模态框
       closeModel () {
-        // this.tableData=[]
+        console.log(this.templateData.length)
+        console.log(this.templateData)
+        if (this.templateData.length===0){
+          this.tableData=[]
+        }
         this.delOrder = false
         this.chooseBrand = false
         this.getTempList()
@@ -193,7 +206,9 @@
     },
     mounted () {
       this.getTempList()
-      this.selectOrder(this.templateData[0].id, this.templateData[0].name)
+      if (this.templateData.length !== 0) {
+        this.selectOrder(this.templateData[0].id, this.templateData[0].name)
+      }
     }
   }
 </script>
@@ -261,6 +276,11 @@
     margin: 5px 7px 5px 5px;
     font-size: 20px;
     color: #AC3C3C;
+  }
+
+  .noData{
+    line-height: 230px;
+    color: #909399;
   }
 
   .strategyContent {

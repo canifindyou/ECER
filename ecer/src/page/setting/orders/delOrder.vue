@@ -69,7 +69,7 @@
                 message: '该控制项模板删除成功！',
                 type: 'success'
               })
-            } else if (jsonData.status === 1) {// 校区名重复
+            } else if (jsonData.status === 1) {
               self.$message.error('存在该品牌型号的设备或控制项模板，无法删除！')
             }
             self.closeModel()
@@ -78,7 +78,13 @@
       },
 
       closeModel () {
+        let self = this
         this.showDel = false
+        // this.$nextTick(function () {
+          self.$emit('getTempList')
+          console.log('345')
+        // })
+        console.log('123')
         this.$emit('closeModel')
       }
     },
