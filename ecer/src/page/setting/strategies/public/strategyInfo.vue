@@ -94,7 +94,7 @@
 
 <script>
   export default {
-    data() {
+    data () {
       return {
         labelPosition: 'left',
         radio: '1',
@@ -121,8 +121,7 @@
       }
     },
     methods: {
-      changeRadio() {
-        console.log(this.radio)
+      changeRadio () {
         if (this.radio === '2') {
           this.timeSlot = true
           this.strategyInfo.startTimeHour = 0
@@ -136,39 +135,59 @@
       },
 
       // 获取策略执行天数
-      checkedWeeks(value) {
+      checkedWeeks (value) {
         this.strategyInfo.weedsNum = []
         for (let i = 0; i < value.length; i++) {
           switch (this.strategyInfo.chooseWeeds[i]) {
             case '星期一':
-              this.strategyInfo.weedsNum.push(1);
-              break;
+              this.strategyInfo.weedsNum.push(1)
+              break
             case '星期二':
-              this.strategyInfo.weedsNum.push(2);
-              break;
+              this.strategyInfo.weedsNum.push(2)
+              break
             case '星期三':
-              this.strategyInfo.weedsNum.push(3);
-              break;
+              this.strategyInfo.weedsNum.push(3)
+              break
             case '星期四':
-              this.strategyInfo.weedsNum.push(4);
-              break;
+              this.strategyInfo.weedsNum.push(4)
+              break
             case '星期五':
-              this.strategyInfo.weedsNum.push(5);
-              break;
+              this.strategyInfo.weedsNum.push(5)
+              break
             case '星期六':
-              this.strategyInfo.weedsNum.push(6);
-              break;
+              this.strategyInfo.weedsNum.push(6)
+              break
             case '星期日':
-              this.strategyInfo.weedsNum.push(7);
-              break;
+              this.strategyInfo.weedsNum.push(7)
+              break
           }
         }
         this.$emit('getNewData', this.strategyInfo)
       },
 
-      handleChange() {
+      handleChange () {
         this.$emit('getNewData', this.strategyInfo)
       },
+
+      clearData () {
+        this.radio = '1'
+        this.timeSlot = false
+        this.strategyInfo = {
+          strategyName: '',
+          chooseWeeds: [],
+          weedsNum: [],
+          startTimeHour: 0,
+          startTimeMin: 0,
+          endTimeHour: 0,
+          endTimeMin: 0,
+          transPowerSTemp: 26,
+          failPowerSTemp: 26,
+          callbackSTemp: 26,
+          transPowerWTemp: 26,
+          failPowerWTemp: 26,
+          callbackWTemp: 26,
+        }
+      }
     }
   }
 </script>

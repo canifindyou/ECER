@@ -8,7 +8,7 @@
     :before-close="closeModel"
     append-to-body>
     <hr class="boundary">
-    <strategy-info @getNewData="getNewData"></strategy-info>
+    <strategy-info @getNewData="getNewData" ref="strategyInfo"></strategy-info>
     <hr class="boundary">
     <div slot="footer" class="dialog-footer">
       <el-button @click="closeModel">取 消</el-button>
@@ -64,28 +64,22 @@
           }),
           success(data){
             console.log(data)
-            console.log(typeof (data))
-            let jsonData = JSON.parse(data)
-            console.log(jsonData)
-            if (jsonData === true) {
+            if (data === true) {
               self.closeModel()
               self.$message({
                 message: '策略添加成功！',
                 type: 'success'
               })
+            }else {
+              self.$message.error('添加失败请重试！')
             }
-            // else if(jsonData.status === 41){
-            //     self.$message({
-            //         message: '策略名不能为空！',
-            //         type: 'warning'
-            //     })
-            // }
           }
         })
       },
 
       closeModel() {
         this.showAdd = false
+        this.$refs.strategyInfo.clearData()
         this.$emit('closeModel')
       },
     },
