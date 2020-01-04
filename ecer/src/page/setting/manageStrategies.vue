@@ -11,11 +11,13 @@
         <div slot="header" class="clearfix">
           <span>参数预设</span>
         </div>
-        <div class="strategiesName" v-for="(item,index) in strategiesList" @click="selectStrategy(item.id,item.name)">
+        <div class="strategiesName" v-for="(item,index) in strategiesList"
+             @click="selectStrategy(item.id,item.name)">
           {{item.name}}
         </div>
-        <div class="cardFooter"><i class="el-icon-remove" @click="showDelModel"></i><i class="el-icon-circle-plus"
-                                                                                       @click="showAddModel"></i></div>
+        <div class="cardFooter"><i class="el-icon-remove" @click="showDelModel"></i><i
+          class="el-icon-circle-plus"
+          @click="showAddModel"></i></div>
       </el-card>
       <div class="strategyContent">
         <div class="titleBoundary">
@@ -53,7 +55,8 @@
     </div>
     <hr class="boundary">
     <add-strategy :addStrategy="addStrategy" @closeModel="closeModel"></add-strategy>
-    <modify-strategy :modifyStrategy="modifyStrategy" @closeModel="closeModel"></modify-strategy>
+    <modify-strategy :modifyStrategy="modifyStrategy" :strategyInfo="strategyInfo"
+                     @closeModel="closeModel"></modify-strategy>
     <del-strategy :delStrategy="delStrategy" :delId="selectId" @closeModel="closeModel"></del-strategy>
     <use-strategy :groupModel="groupModel"></use-strategy>
     <div slot="footer" class="dialog-footer">
@@ -75,7 +78,7 @@
       delStrategy,
       useStrategy
     },
-    data () {
+    data() {
       return {
         manageStrategies: true,
         addStrategy: false,
@@ -100,24 +103,24 @@
       }
     },
     methods: {
-      getStrategiesList () {
+      getStrategiesList() {
         let self = this
         $.ajax({
           type: 'GET',
           async: false,
           url: this.api + 'strategies',
-          success (data) {
+          success(data) {
             self.strategiesList = data
           }
         })
       },
 
-      showGroupModel () {
+      showGroupModel() {
         this.groupModel = true
       },
 
       // 选中预设
-      selectStrategy (id, name) {
+      selectStrategy(id, name) {
         let self = this
         let sHour, eHour, sMin, eMin, executionStrategy
         let timeArr = []
@@ -138,20 +141,19 @@
             $.ajax({
               type: 'GET',
               url: this.api + 'strategies/' + id + '/days',
-              success (data) {
-                console.log(data)
+              success(data) {
                 sHour = data[0].startTime.split(':')[0]
                 sMin = data[0].startTime.split(':')[1]
                 eHour = data[0].endTime.split(':')[0]
                 eMin = data[0].endTime.split(':')[1]
-                if (sHour === '00' && sMin === '00' && eHour === '23' && eHour === '59') {
+                if (sHour === '00' && sMin === '00' && eHour === '23' && eMin === '59') {
                   executionStrategy = '全天执行'
                 } else {
                   executionStrategy = '指定时间段'
                 }
                 self.strategyInfo.executionStrategy = executionStrategy
                 for (let i = 0; i < data.length; i++) {
-                  timeArr.push(self.days[data[i].day])
+                  timeArr.push(self.days[data[i].day-1])
                   self.strategyInfo.executionTime = timeArr.join('、')
                 }
                 self.strategyInfo.startTimeHour = sHour
@@ -171,43 +173,45 @@
       },
 
       // 添加新策略
-      showAddModel () {
-        this.strategyInfo.executionTime.split('、')
-        console.log(this.strategyInfo.executionTime)
-        console.log(this.strategyInfo.startTimeHour)
-        console.log(this.strategyInfo.startTimeMin)
-        console.log(this.strategyInfo.endTimeHour)
-        console.log(this.strategyInfo.endTimeMin)
-        console.log(this.strategyInfo.transPowerSTemp)
-        console.log(this.strategyInfo.failPowerSTemp)
-        console.log(this.strategyInfo.callbackSTemp)
-        console.log(this.strategyInfo.transPowerWTemp)
-        console.log(this.strategyInfo.failPowerWTemp)
-        console.log(this.strategyInfo.callbackWTemp)
+      showAddModel() {
+        // console.log(this.strategyInfo)
+        // this.strategyInfo.executionTime.split('、')
+        // console.log(this.strategyInfo.executionTime)
+        // console.log(this.strategyInfo.startTimeHour)
+        // console.log(this.strategyInfo.startTimeMin)
+        // console.log(this.strategyInfo.endTimeHour)
+        // console.log(this.strategyInfo.endTimeMin)
+        // console.log(this.strategyInfo.transPowerSTemp)
+        // console.log(this.strategyInfo.failPowerSTemp)
+        // console.log(this.strategyInfo.callbackSTemp)
+        // console.log(this.strategyInfo.transPowerWTemp)
+        // console.log(this.strategyInfo.failPowerWTemp)
+        // console.log(this.strategyInfo.callbackWTemp)
         this.addStrategy = true
       },
 
-      showModifyModel () {
+      showModifyModel() {
         this.modifyStrategy = true
       },
 
-      showDelModel () {
+      showDelModel() {
         this.delStrategy = true
       },
 
       // 关闭子级模态框
-      closeModel () {
+      closeModel() {
         this.addStrategy = false
         this.modifyStrategy = false
         this.delStrategy = false
+        this.getStrategiesList()
       },
 
-      closeAllModel () {
+      closeAllModel() {
         this.manageStrategies = false
         this.$emit('closeModel')
       }
     },
-    mounted () {
+    mounted() {
       this.getStrategiesList()
       this.selectStrategy(this.strategiesList[0].id, this.strategiesList[0].name)
     }
