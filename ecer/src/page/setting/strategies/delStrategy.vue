@@ -2,7 +2,7 @@
   <div>
     <el-dialog title="删除"
                top="150px"
-               :visible.sync="delStrategy"
+               :visible.sync="showDel"
                :close-on-press-escape="false"
                :close-on-click-modal="false"
                :before-close="closeModel"
@@ -14,7 +14,7 @@
       <hr class="boundary">
       <div slot="footer" class="dialog-footer">
         <el-button @click="closeModel">关 闭</el-button>
-        <el-button type="danger" @click="">删 除</el-button>
+        <el-button type="danger" @click="delSucc">删 除</el-button>
       </div>
     </el-dialog>
   </div>
@@ -29,16 +29,42 @@
     },
     data () {
       return {
-
+        showDel: false
       }
     },
     methods: {
-      closeModel () {
-        this.delStrategy = false
-        this.$emit('closeModel')
+      delSucc () {
+        let self = this
+        $.ajax({
+          type: 'DELETE',
+          url: this.api + 'strategies/' + this.delId,
+          success (data) {
+            console.log(data)
+            if (data === true) {
+              self.$message({
+                type: 'success',
+                message: '策略删除成功！'
+              })
+              self.closeModel(1)
+            }else {
+              self.$message.error('删除失败，请重试！')
+              self.closeModel()
+            }
+          }
+        })
+      },
+
+      closeModel (type) {
+        // type存在删除操作成功
+        this.showDel = false
+        this.$emit('showStrategyInfo', this.delId)
+        this.$emit('closeModel',type)
       }
     },
     watch: {
+      delStrategy (newVal) {
+        this.showDel = newVal
+      }
     }
   }
 </script>

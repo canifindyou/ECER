@@ -57,7 +57,8 @@
     <add-strategy :addStrategy="addStrategy" @closeModel="closeModel"></add-strategy>
     <modify-strategy :modifyStrategy="modifyStrategy" :modifyId="selectId" :modifyInfo="modifyInfo"
                      @closeModel="closeModel" @showStrategyInfo="showStrategyInfo"></modify-strategy>
-    <del-strategy :delStrategy="delStrategy" :delId="selectId" @closeModel="closeModel"></del-strategy>
+    <del-strategy :delStrategy="delStrategy" :delId="selectId" @closeModel="closeModel"
+                  @showStrategyInfo="showStrategyInfo"></del-strategy>
     <use-strategy :groupModel="groupModel"></use-strategy>
     <div slot="footer" class="dialog-footer">
       <el-button @click="closeAllModel">关 闭</el-button>
@@ -154,7 +155,6 @@
             this.showStrategyInfo(id)
           }
         }
-        console.log(this.modifyInfo)
       },
 
       showStrategyInfo (id) {
@@ -165,7 +165,6 @@
           type: 'GET',
           url: this.api + 'strategies/' + id + '/days',
           success (data) {
-            console.log(data)
             sHour = data[0].startTime.split(':')[0]
             sMin = data[0].startTime.split(':')[1]
             eHour = data[0].endTime.split(':')[0]
@@ -230,10 +229,16 @@
       },
 
       // 关闭子级模态框
-      closeModel () {
-        this.addStrategy = false
-        this.modifyStrategy = false
-        this.delStrategy = false
+      closeModel (type) {
+        if (!type){
+          this.addStrategy = false
+          this.modifyStrategy = false
+        }else {
+          this.delStrategy = false
+          if (type===1){
+            this.selectStrategy(this.strategiesList[0].id, this.strategiesList[0].name)
+          }
+        }
         this.getStrategiesList()
       },
 

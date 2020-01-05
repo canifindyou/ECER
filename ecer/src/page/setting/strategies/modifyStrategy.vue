@@ -2,7 +2,7 @@
   <el-dialog
     title="修改策略"
     top="50px"
-    :visible.sync="modifyStrategy"
+    :visible.sync="showModify"
     :close-on-press-escape="false"
     :close-on-click-modal="false"
     :before-close="closeModel"
