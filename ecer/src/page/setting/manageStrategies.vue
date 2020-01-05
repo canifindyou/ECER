@@ -55,8 +55,8 @@
     </div>
     <hr class="boundary">
     <add-strategy :addStrategy="addStrategy" @closeModel="closeModel"></add-strategy>
-    <modify-strategy :modifyStrategy="modifyStrategy" :strategyInfo="strategyInfo"
-                     @closeModel="closeModel"></modify-strategy>
+    <modify-strategy :modifyStrategy="modifyStrategy" :modifyId="selectId" :modifyInfo="modifyInfo"
+                     @closeModel="closeModel" @showStrategyInfo="showStrategyInfo"></modify-strategy>
     <del-strategy :delStrategy="delStrategy" :delId="selectId" @closeModel="closeModel"></del-strategy>
     <use-strategy :groupModel="groupModel"></use-strategy>
     <div slot="footer" class="dialog-footer">
@@ -78,7 +78,7 @@
       delStrategy,
       useStrategy
     },
-    data() {
+    data () {
       return {
         manageStrategies: true,
         addStrategy: false,
@@ -88,43 +88,56 @@
         groupModel: false,
         strategiesList: [],
         strategyInfo: {
-          'executionStrategy': '',
-          'executionTime': '',
-          'startTimeHour': '',
-          'endTimeHour': '',
-          'transPowerSTemp': 0,
-          'failPowerSTemp': 0,
-          'callbackSTemp': 0,
-          'transPowerWTemp': 0,
-          'failPowerWTemp': 0,
-          'callbackWTemp': 0
+          executionStrategy: '',
+          executionTime: '',
+          startTimeHour: '',
+          endTimeHour: '',
+          transPowerSTemp: 0,
+          failPowerSTemp: 0,
+          callbackSTemp: 0,
+          transPowerWTemp: 0,
+          failPowerWTemp: 0,
+          callbackWTemp: 0
+        },
+        modifyInfo: {
+          strategyName: '',
+          chooseWeeds: [],
+          weedsNum: [],
+          startTimeHour: 0,
+          startTimeMin: 0,
+          endTimeHour: 0,
+          endTimeMin: 0,
+          transPowerSTemp: 26,
+          failPowerSTemp: 26,
+          callbackSTemp: 26,
+          transPowerWTemp: 26,
+          failPowerWTemp: 26,
+          callbackWTemp: 26,
         },
         days: ['星期一', '星期二', '星期三', '星期四', '星期五', '星期六', '星期日']
       }
     },
     methods: {
-      getStrategiesList() {
+      getStrategiesList () {
         let self = this
         $.ajax({
           type: 'GET',
           async: false,
           url: this.api + 'strategies',
-          success(data) {
+          success (data) {
             self.strategiesList = data
           }
         })
       },
 
-      showGroupModel() {
+      showGroupModel () {
         this.groupModel = true
       },
 
       // 选中预设
-      selectStrategy(id, name) {
-        let self = this
-        let sHour, eHour, sMin, eMin, executionStrategy
-        let timeArr = []
+      selectStrategy (id, name) {
         this.selectId = id
+        this.modifyInfo.strategyName = name
         this.$nextTick(function () {
           let strategiesName = document.getElementsByClassName('strategiesName')
           for (let i = 0; i < strategiesName.length; i++) {
@@ -138,80 +151,98 @@
         })
         for (let i = 0; i < this.strategiesList.length; i++) {
           if (id === this.strategiesList[i].id) {
-            $.ajax({
-              type: 'GET',
-              url: this.api + 'strategies/' + id + '/days',
-              success(data) {
-                sHour = data[0].startTime.split(':')[0]
-                sMin = data[0].startTime.split(':')[1]
-                eHour = data[0].endTime.split(':')[0]
-                eMin = data[0].endTime.split(':')[1]
-                if (sHour === '00' && sMin === '00' && eHour === '23' && eMin === '59') {
-                  executionStrategy = '全天执行'
-                } else {
-                  executionStrategy = '指定时间段'
-                }
-                self.strategyInfo.executionStrategy = executionStrategy
-                for (let i = 0; i < data.length; i++) {
-                  timeArr.push(self.days[data[i].day-1])
-                  self.strategyInfo.executionTime = timeArr.join('、')
-                }
-                self.strategyInfo.startTimeHour = sHour
-                self.strategyInfo.startTimeMin = sMin
-                self.strategyInfo.endTimeHour = eHour
-                self.strategyInfo.endTimeMin = eMin
-                self.strategyInfo.transPowerSTemp = data[0].summerHighestT
-                self.strategyInfo.failPowerSTemp = data[0].summerLowestT
-                self.strategyInfo.callbackSTemp = data[0].summerConstantT
-                self.strategyInfo.transPowerWTemp = data[0].winterLowestT
-                self.strategyInfo.failPowerWTemp = data[0].winterHighestT
-                self.strategyInfo.callbackWTemp = data[0].winterConstantT
-              }
-            })
+            this.showStrategyInfo(id)
           }
         }
+        console.log(this.modifyInfo)
+      },
+
+      showStrategyInfo (id) {
+        let self = this
+        let sHour, eHour, sMin, eMin, executionStrategy
+        let timeArr = []
+        $.ajax({
+          type: 'GET',
+          url: this.api + 'strategies/' + id + '/days',
+          success (data) {
+            console.log(data)
+            sHour = data[0].startTime.split(':')[0]
+            sMin = data[0].startTime.split(':')[1]
+            eHour = data[0].endTime.split(':')[0]
+            eMin = data[0].endTime.split(':')[1]
+            if (sHour === '00' && sMin === '00' && eHour === '23' && eMin === '59') {
+              executionStrategy = '全天执行'
+            } else {
+              executionStrategy = '指定时间段'
+            }
+            self.strategyInfo.executionStrategy = executionStrategy
+            for (let i = 0; i < data.length; i++) {
+              timeArr.push(self.days[data[i].day - 1])
+              self.modifyInfo.chooseWeeds = timeArr
+              self.modifyInfo.weedsNum.push(data[i].day)
+              self.strategyInfo.executionTime = timeArr.join('、')
+            }
+            self.strategyInfo.startTimeHour = sHour
+            self.modifyInfo.startTimeHour = sHour
+
+            self.strategyInfo.startTimeMin = sMin
+            self.modifyInfo.startTimeMin = sMin
+
+            self.strategyInfo.endTimeHour = eHour
+            self.modifyInfo.endTimeHour = eHour
+
+            self.strategyInfo.endTimeMin = eMin
+            self.modifyInfo.endTimeMin = eMin
+
+            self.strategyInfo.transPowerSTemp = data[0].summerHighestT
+            self.modifyInfo.transPowerSTemp = data[0].summerHighestT
+
+            self.strategyInfo.failPowerSTemp = data[0].summerLowestT
+            self.modifyInfo.failPowerSTemp = data[0].summerLowestT
+
+            self.strategyInfo.callbackSTemp = data[0].summerConstantT
+            self.modifyInfo.callbackSTemp = data[0].summerConstantT
+
+            self.strategyInfo.transPowerWTemp = data[0].winterLowestT
+            self.modifyInfo.transPowerWTemp = data[0].winterLowestT
+
+            self.strategyInfo.failPowerWTemp = data[0].winterHighestT
+            self.modifyInfo.failPowerWTemp = data[0].winterHighestT
+
+            self.strategyInfo.callbackWTemp = data[0].winterConstantT
+            self.modifyInfo.callbackWTemp = data[0].winterConstantT
+          }
+        })
       },
 
       // 添加新策略
-      showAddModel() {
-        // console.log(this.strategyInfo)
-        // this.strategyInfo.executionTime.split('、')
-        // console.log(this.strategyInfo.executionTime)
-        // console.log(this.strategyInfo.startTimeHour)
-        // console.log(this.strategyInfo.startTimeMin)
-        // console.log(this.strategyInfo.endTimeHour)
-        // console.log(this.strategyInfo.endTimeMin)
-        // console.log(this.strategyInfo.transPowerSTemp)
-        // console.log(this.strategyInfo.failPowerSTemp)
-        // console.log(this.strategyInfo.callbackSTemp)
-        // console.log(this.strategyInfo.transPowerWTemp)
-        // console.log(this.strategyInfo.failPowerWTemp)
-        // console.log(this.strategyInfo.callbackWTemp)
+      showAddModel () {
         this.addStrategy = true
       },
 
-      showModifyModel() {
+      showModifyModel () {
+        this.modifyInfo = Object.assign({}, this.modifyInfo)
         this.modifyStrategy = true
       },
 
-      showDelModel() {
+      showDelModel () {
         this.delStrategy = true
       },
 
       // 关闭子级模态框
-      closeModel() {
+      closeModel () {
         this.addStrategy = false
         this.modifyStrategy = false
         this.delStrategy = false
         this.getStrategiesList()
       },
 
-      closeAllModel() {
+      closeAllModel () {
         this.manageStrategies = false
         this.$emit('closeModel')
       }
     },
-    mounted() {
+    mounted () {
       this.getStrategiesList()
       this.selectStrategy(this.strategiesList[0].id, this.strategiesList[0].name)
     }

@@ -115,8 +115,6 @@
         },
         timeSlot: false,
         // 全选
-        // checkAll: false,
-        // isIndeterminate: true,
         weeks: ['星期一', '星期二', '星期三', '星期四', '星期五', '星期六', '星期日'],
       }
     },
@@ -193,89 +191,5 @@
 </script>
 
 <style scoped>
-  .strategyName {
-    margin: 10px auto;
-    width: 280px;
-  }
-
-  .strategyName >>> .el-form-item__label {
-    font-size: 17px;
-  }
-
-  .strategyName >>> .el-input__inner {
-    width: 200px;
-    height: 32px;
-  }
-
-  .el-dialog__wrapper >>> .el-input__inner {
-    border: 1px solid #BBB;
-  }
-
-  .titleBoundary {
-    position: relative;
-    margin: 20px auto 27px;
-    width: 91%;
-    border: 1px solid #BBBBBB;
-  }
-
-  .title {
-    position: absolute;
-    top: -12px;
-    left: 17px;
-    margin: 0;
-    font-size: 16px;
-    padding: 0 5px;
-    background-color: white;
-  }
-
-  .titleBoundary >>> .el-input__inner {
-    height: 28px;
-  }
-
-  .manageTime, .manageTemp {
-    font-size: 14px;
-    padding: 19px 0 12px 43px;
-  }
-
-  .manageTime div {
-    margin-bottom: 0;
-  }
-
-  .selectWeeks >>> .el-form-item__content {
-    padding-top: 10px;
-    line-height: 0;
-  }
-
-  .manageTime >>> .el-checkbox {
-    margin-right: 15px;
-  }
-
-  .manageTime >>> .el-checkbox__label {
-    padding: 0 0 10px 6px;
-  }
-
-  .manageTime >>> .el-input-number--mini, .manageTemp >>> >>> .el-input-number--mini {
-    width: 80px;
-  }
-
-  .word {
-    margin: 0 15px 0 5px;
-  }
-
-  .manageTemp {
-    height: 115px;
-    padding: 22px 17px 18px 13px;
-  }
-
-  .summerTemp {
-    float: left;
-  }
-
-  .winterTemp {
-    float: right;
-  }
-
-  .manageTemp >>> >>> .el-input-number--mini {
-    margin: 0 4px 15px 8px;
-  }
+  @import "../../../../assets/strategyInfo.css";
 </style>
