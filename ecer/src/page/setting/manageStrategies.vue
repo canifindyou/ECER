@@ -59,7 +59,7 @@
                      @closeModel="closeModel" @showStrategyInfo="showStrategyInfo"></modify-strategy>
     <del-strategy :delStrategy="delStrategy" :delId="selectId" @closeModel="closeModel"
                   @showStrategyInfo="showStrategyInfo"></del-strategy>
-    <use-strategy :groupModel="groupModel"></use-strategy>
+    <use-strategy :groupModel="groupModel" :useId="selectId" @closeModel="closeModel"></use-strategy>
     <div slot="footer" class="dialog-footer">
       <el-button @click="closeAllModel">关 闭</el-button>
     </div>
@@ -230,12 +230,13 @@
 
       // 关闭子级模态框
       closeModel (type) {
-        if (!type){
+        if (!type) {
           this.addStrategy = false
           this.modifyStrategy = false
-        }else {
+          this.groupModel = false
+        } else {
           this.delStrategy = false
-          if (type===1){
+          if (type === 1) {
             this.selectStrategy(this.strategiesList[0].id, this.strategiesList[0].name)
           }
         }
