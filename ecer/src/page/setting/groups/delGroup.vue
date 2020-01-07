@@ -51,6 +51,7 @@
     },
     data () {
       return {
+        cookieCode: '',
         deviceCount: 0,
         showDelGroup: false,
         showDelTip: false,
@@ -65,7 +66,10 @@
         if (this.delGroupType === '校区') {// 删除校区
           $.ajax({
             type: 'DELETE',
-            url: this.api + 'schoolZones',
+            url: this.api + 'schoolZones;' + this.cookieCode,
+            headers: {
+              'X-Requested-With': 'XMLHttpRequest'
+            },
             data: {'id': this.delId},
             success (data) {
               let jsonData = JSON.parse(data)
@@ -73,7 +77,7 @@
                 self.$message.error('请将该校区下所有分组删除后再进行该操作！')
               } else {// 删除成功
                 self.$emit('getCampusesList')
-                self.$emit('clearCSS',0)
+                self.$emit('clearCSS', 0)
                 self.$message({
                   message: '删除成功',
                   type: 'success'
@@ -84,7 +88,10 @@
         } else if (this.delGroupType === '楼栋') {// 删除校区
           $.ajax({
             type: 'DELETE',
-            url: this.api + 'buildings',
+            url: this.api + 'buildings;' + this.cookieCode,
+            headers:{
+              'X-Requested-With': 'XMLHttpRequest'
+            },
             data: {'id': this.delId},
             success (data) {
               let jsonData = JSON.parse(data)
@@ -92,7 +99,7 @@
                 self.$message.error('请将该楼栋下所有分组删除后再进行该操作！')
               } else {// 删除成功
                 self.$emit('getBuildingsList', self.campusId)
-                self.$emit('clearCSS',1)
+                self.$emit('clearCSS', 1)
                 self.$message({
                   message: '删除成功',
                   type: 'success'
@@ -103,7 +110,10 @@
         } else if (this.delGroupType === '教室') {
           $.ajax({
             type: 'DELETE',
-            url: this.api + 'rooms',
+            url: this.api + 'rooms;' + this.cookieCode,
+            headers:{
+              'X-Requested-With': 'XMLHttpRequest'
+            },
             data: {'id': this.delId},
             success (data) {
               let jsonData = JSON.parse(data)
@@ -111,7 +121,7 @@
                 self.$message.error('请将该教室下的设备删除或更换分组后再进行该操作！')
               } else {// 删除成功
                 self.$emit('getClassroomsList', self.buildingId)
-                self.$emit('clearCSS',2)
+                self.$emit('clearCSS', 2)
                 self.$message({
                   message: '删除成功',
                   type: 'success'
@@ -153,6 +163,11 @@
         // } else {
         //   this.showDelTip = newVal
         // }
+      }
+    },
+    mounted () {
+      if (sessionStorage.getItem('jsessionid') != null) {
+        this.cookieCode = 'jsessionid=' + sessionStorage.getItem('jsessionid')
       }
     }
   }

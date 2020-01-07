@@ -29,6 +29,7 @@
     },
     data() {
       return {
+        cookieCode: '',
         showAdd: false,
         strategyInfo:{}
       }
@@ -43,9 +44,10 @@
         console.log(this.strategyInfo.weedsNum,)
         $.ajax({
           type: 'POST',
-          url:this.api+'strategies',
+          url:this.api+'strategies;' + this.cookieCode,
           headers: {
             'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
           },
           data:JSON.stringify({
             'name':this.strategyInfo.strategyName,
@@ -86,6 +88,11 @@
     watch: {
       addStrategy(newVal) {
         this.showAdd = newVal
+      }
+    },
+    mounted () {
+      if (sessionStorage.getItem('jsessionid') != null) {
+        this.cookieCode = 'jsessionid=' + sessionStorage.getItem('jsessionid')
       }
     }
   }

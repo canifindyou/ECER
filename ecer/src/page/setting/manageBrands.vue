@@ -62,6 +62,7 @@
     },
     data () {
       return {
+        cookieCode: '',
         manageBrands: true,
         addBrand: false,
         modifyInfo: {},
@@ -76,7 +77,10 @@
         let self = this
         $.ajax({
           type: 'GET',
-          url: this.api + 'models',
+          url: this.api + 'models;' + this.cookieCode,
+          headers:{
+            'X-Requested-With': 'XMLHttpRequest'
+          },
           async: false,
           success (data) {
             self.brandData = data
@@ -117,7 +121,12 @@
       }
     },
     mounted () {
-      this.showBrandsList()
+      if (sessionStorage.getItem('jsessionid') != null) {
+        this.cookieCode = 'jsessionid=' + sessionStorage.getItem('jsessionid')
+      }
+      if (this.cookieCode !== '') {
+        this.showBrandsList()
+      }
     }
   }
 </script>

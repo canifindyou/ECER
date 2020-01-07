@@ -90,6 +90,7 @@
     },
     data () {
       return {
+        cookieCode: '',
         chooseGroup: false,
         flag2: '', //校区id
         deviceIds: [], //已选设备id数组
@@ -123,7 +124,10 @@
       pubilcFnAxios (urlString, params) {
         return new Promise((resolve, reject) => {
           axios
-            .get(this.api + urlString, {params: params})
+            .get(this.api + urlString + ';' + this.cookieCode, {
+              params: params,
+              headers: {'X-Requested-With': 'XMLHttpRequest'}
+            })
             .then(res => {
               resolve(res.data)
             })
@@ -316,7 +320,10 @@
         // 调用应用接口
         $.ajax({
           type: 'POST',
-          url: this.api + 'strategies/apply?strategyId=' + this.useId + '&deviceIds=' + idArr,
+          url: this.api + 'strategies/apply?strategyId=' + this.useId + '&deviceIds=' + idArr + ';' + this.cookieCode,
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+          },
           success (data) {
             if (data === true) {
               self.$message({
@@ -326,7 +333,6 @@
             } else {
               self.$message.error('策略应用失败！')
             }
-            console.log(data)
             self.closeModel()
           }
         })
@@ -334,7 +340,6 @@
 
       //关闭窗口
       closeModel () {
-        console.log('1')
         this.chooseGroup = false
         this.$emit('closeModel')
         //弹窗关闭，清空所有已选择数据
@@ -502,11 +507,12 @@
         //公用数据请求
         //公用axios数据请求
         return new Promise((resolve, reject) => {
-          axios
-            .get(this.api + urlString, {params: params})
-            .then(res => {
-              resolve(res.data.list)
-            })
+          axios.get(this.api + urlString + ';' + this.cookieCode, {
+            params: params,
+            headers: {'X-Requested-With': 'XMLHttpRequest'}
+          }).then(res => {
+            resolve(res.data.list)
+          })
             .catch(err => {
               reject('get请求错误')
             })
@@ -515,9 +521,13 @@
     },
     watch: {
       groupModel (newVal) {
-        console.log(newVal)
         this.chooseGroup = newVal
       },
+    },
+    mounted () {
+      if (sessionStorage.getItem('jsessionid') != null) {
+        this.cookieCode = 'jsessionid=' + sessionStorage.getItem('jsessionid')
+      }
     }
   }
 </script>

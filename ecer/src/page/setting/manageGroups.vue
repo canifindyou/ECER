@@ -77,6 +77,7 @@
     },
     data () {
       return {
+        cookieCode: '',
         manageGroups: true,
         clickList: true,//分组是否可点
         haveCampuses: true,
@@ -212,7 +213,10 @@
           if (newCampus) {// 存在校区名
             $.ajax({
               type: 'POST',
-              url: self.api + 'schoolZones',
+              url: self.api + 'schoolZones;' + this.cookieCode,
+              headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+              },
               dataType: 'json',
               data: {'name': newCampus},
               success (data) {
@@ -264,9 +268,10 @@
             if (newBuilding && newFloor) {// 楼栋名&层数均存在
               $.ajax({
                 type: 'POST',
-                url: self.api + 'buildings',
+                url: self.api + 'buildings;' + this.cookieCode,
                 headers: {
                   'Content-Type': 'application/json',
+                  'X-Requested-With': 'XMLHttpRequest'
                 },
                 dataType: 'json',
                 data: JSON.stringify({
@@ -330,9 +335,10 @@
             if (newClassroom && roomFloor) {// 教室名&楼层均存在
               $.ajax({
                 type: 'POST',
-                url: self.api + 'rooms',
+                url: self.api + 'rooms;' + this.cookieCode,
                 headers: {
                   'Content-Type': 'application/json',
+                  'X-Requested-With': 'XMLHttpRequest'
                 },
                 dataType: 'json',
                 data: JSON.stringify({
@@ -417,8 +423,8 @@
           if (newCampus) {// 校区名存在数据
             $.ajax({
               type: 'PUT',
-              url: self.api + 'schoolZones',
-              headers: {'Content-Type': 'application/json',},
+              url: self.api + 'schoolZones;' + this.cookieCode,
+              headers: {'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest'},
               dataType: 'json',
               data: JSON.stringify({
                 'id': self.campusId,
@@ -474,9 +480,10 @@
           if (newBuilding && newFloor) {// 调用修改楼栋接口
             $.ajax({
               type: 'PUT',
-              url: self.api + 'buildings',
+              url: self.api + 'buildings;' + this.cookieCode,
               headers: {
                 'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
               },
               dataType: 'json',
               data: JSON.stringify({
@@ -540,9 +547,10 @@
           if (newClassroom) {// 教室名存在数据
             $.ajax({
               type: 'PUT',
-              url: self.api + 'rooms',
+              url: self.api + 'rooms;' + this.cookieCode,
               headers: {
                 'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
               },
               dataType: 'json',
               data: JSON.stringify({
@@ -633,7 +641,10 @@
         $.ajax({
           type: 'GET',
           async: false,
-          url: this.api + 'schoolZones',
+          url: this.api + 'schoolZones;' + this.cookieCode,
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+          },
           success (data) {
             if (data.length === 0) {
               self.haveCampuses = true
@@ -654,7 +665,10 @@
         this.clickList = true
         $.ajax({
             type: 'GET',
-            url: this.api + 'buildings',
+            url: this.api + 'buildings;' + this.cookieCode,
+            headers: {
+              'X-Requested-With': 'XMLHttpRequest'
+            },
             data: {'zoneId': id},
             success (data) {
               // self.$emit('updateNav')
@@ -680,7 +694,10 @@
         // 根据选中的楼栋id获取教室列表
         $.ajax({
           type: 'GET',
-          url: this.api + 'rooms/' + id,
+          url: this.api + 'rooms/' + id + ';' + this.cookieCode,
+          headers:{
+            'X-Requested-With': 'XMLHttpRequest'
+          },
           success (data) {
             if (data.length === 0) {
               self.haveClassrooms = true
@@ -710,7 +727,12 @@
       }
     },
     mounted () {
-      this.getCampusesList()
+      if (sessionStorage.getItem('jsessionid') != null) {
+        this.cookieCode = 'jsessionid=' + sessionStorage.getItem('jsessionid')
+      }
+      if (this.cookieCode !== '') {
+        this.getCampusesList()
+      }
     }
   }
 </script>

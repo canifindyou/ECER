@@ -40,7 +40,7 @@
     </div>
     <hr class="boundary">
     <del-order :delOrder="delOrder" :delId="selectId" @closeModel="closeModel"></del-order>
-    <choose-brand :chooseBrand="chooseBrand"  @closeModel="closeModel" ></choose-brand>
+    <choose-brand :chooseBrand="chooseBrand" @closeModel="closeModel"></choose-brand>
     <div slot="footer" class="dialog-footer">
       <el-button @click="closeAllModel">关 闭</el-button>
       <el-button type="success" @click="showBrandsList">导入指令模板</el-button>
@@ -59,6 +59,7 @@
     },
     data () {
       return {
+        cookieCode: '',
         manageOrders: true,
         selectId: 0,
         key: 0,
@@ -77,7 +78,10 @@
         $.ajax({
           type: 'GET',
           async: false,
-          url: this.api + 'templates',
+          url: this.api + 'templates;' + this.cookieCode,
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+          },
           success (data) {
             console.log(data)
             if (data.length === 0) {
@@ -112,7 +116,10 @@
         })
         $.ajax({
           type: 'GET',
-          url: this.api + 'templates/' + id + '/instructs',
+          url: this.api + 'templates/' + id + '/instructs;' + this.cookieCode,
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+          },
           success (data) {
             self.tableData = data
           }
@@ -142,7 +149,10 @@
             if (newTempName) {// 调用修改校区接口
               $.ajax({
                 type: 'PUT',
-                url: self.api + 'templates/' + self.selectId + '/' + newTempName,
+                url: self.api + 'templates/' + self.selectId + '/' + newTempName + ';' + this.cookieCode,
+                headers: {
+                  'X-Requested-With': 'XMLHttpRequest'
+                },
                 success (data) {
                   let jsonData = JSON.parse(data)
                   if (jsonData === true) {
@@ -189,8 +199,8 @@
       // 关闭子级模态框
       closeModel () {
         this.getTempList()
-        if (this.templateData.length===0){
-          this.tableData=[]
+        if (this.templateData.length === 0) {
+          this.tableData = []
         }
         this.delOrder = false
         this.chooseBrand = false
@@ -202,9 +212,14 @@
       }
     },
     mounted () {
-      this.getTempList()
-      if (this.templateData.length !== 0) {
-        this.selectOrder(this.templateData[0].id, this.templateData[0].name)
+      if (sessionStorage.getItem('jsessionid') != null) {
+        this.cookieCode = 'jsessionid=' + sessionStorage.getItem('jsessionid')
+      }
+      if (this.cookieCode !== '') {
+        this.getTempList()
+        if (this.templateData.length !== 0) {
+          this.selectOrder(this.templateData[0].id, this.templateData[0].name)
+        }
       }
     }
   }
@@ -275,7 +290,7 @@
     color: #AC3C3C;
   }
 
-  .noData{
+  .noData {
     line-height: 230px;
     color: #909399;
   }

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <searchHead :flag="true" :pageFlag="1" @searchHistory = "searchHistory" ></searchHead>
+    <searchHead :flag="true" :pageFlag="1" @searchHistory="searchHistory"></searchHead>
 
     <div style="margin:10px 0 0 0">
       <template>
@@ -31,30 +31,32 @@
       </template>
     </div>
     <div style="text-align:center;margin:20px 0 0 0 ">
-        <!-- <el-switch v-model="pages"> </el-switch> -->
-        <el-pagination
-          :hide-on-single-page="pages"
-          :total="total"
-          :page-size="10"
-          layout="prev, pager, next"
-          @current-change="changePage"
-        >
-        </el-pagination>
-      </div>
+      <!-- <el-switch v-model="pages"> </el-switch> -->
+      <el-pagination
+        :hide-on-single-page="pages"
+        :total="total"
+        :page-size="10"
+        layout="prev, pager, next"
+        @current-change="changePage"
+      >
+      </el-pagination>
+    </div>
   </div>
 </template>
 
 <script>
   import searchHead from '../../components/searchHead/searchHead'
-   import axios from "axios"
+  import axios from 'axios'
+
   export default {
     data () {
       return {
-        requestObj:{},
-        isSearch:false,
-        pages:"",
-        total:10,
-        pageNum:1,
+        cookieCode: '',
+        requestObj: {},
+        isSearch: false,
+        pages: '',
+        total: 10,
+        pageNum: 1,
         tableData: [
           // {
           //   name: '空调一',
@@ -74,77 +76,85 @@
     components: {
       searchHead
     },
-    methods:{
-      changePage(el){
-       this.pageNum = el
-        if(this.isSearch){
-          this.requestObj["pageNum"] = this.pageNum
-          this.requestObj["pageSize"] = 10
-          this.pubilcFnAxios("/dataLogs",{pageNum:this.pageNum,pageSize:10})
-        .then(data =>{
-          console.log(data)
-          this.total = data.total
-          this.tableData = data.list
-        })
-        .catch(()=>{
-          console.log("失败")
-        })
-        }else{
-          this.pubilcFnAxios("/dataLogs",{pageNum:this.pageNum,pageSize:10})
-        .then(data =>{
-          console.log(data)
-          this.total = data.total
-          this.tableData = data.list
-        })
-        .catch(()=>{
-          console.log("失败")
-        })
+    methods: {
+      changePage (el) {
+        this.pageNum = el
+        if (this.isSearch) {
+          this.requestObj['pageNum'] = this.pageNum
+          this.requestObj['pageSize'] = 10
+          this.pubilcFnAxios('/dataLogs', {pageNum: this.pageNum, pageSize: 10})
+            .then(data => {
+              console.log(data)
+              this.total = data.total
+              this.tableData = data.list
+            })
+            .catch(() => {
+              console.log('失败')
+            })
+        } else {
+          this.pubilcFnAxios('/dataLogs', {pageNum: this.pageNum, pageSize: 10})
+            .then(data => {
+              console.log(data)
+              this.total = data.total
+              this.tableData = data.list
+            })
+            .catch(() => {
+              console.log('失败')
+            })
         }
       },
-      searchHistory(data){
-        console.log("触发搜索事件",data)
+      searchHistory (data) {
+        console.log('触发搜索事件', data)
         this.isSearch = true
-        if(data.endTime == ""){
+        if (data.endTime == '') {
           delete data.startTime
           delete data.endTime
         }
         this.requestObj = data
-        this.pubilcFnAxios("/dataLogs",this.requestObj)
-        .then(data =>{
-          this.total = data.total
-          this.tableData = data.list
-        })
+        this.pubilcFnAxios('/dataLogs', this.requestObj)
+          .then(data => {
+            this.total = data.total
+            this.tableData = data.list
+          })
       },
-      getTableDate(){
-        this.pubilcFnAxios("/dataLogs")
-        .then(data =>{
-          console.log(data)
-          this.total = data.total
-          this.tableData = data.list
-          
-        })
-        .catch(()=>{
-          console.log("失败")
-        })
+      getTableDate () {
+        this.pubilcFnAxios('/dataLogs')
+          .then(data => {
+            console.log(data)
+            this.total = data.total
+            this.tableData = data.list
+
+          })
+          .catch(() => {
+            console.log('失败')
+          })
       },
 
-     pubilcFnAxios(urlString, params, method) {
-      //公用axios数据请求
-      return new Promise((resolve, reject) => {
-        axios
-          .get(this.api + urlString, { params: params })
-          .then(res => {
-          
-            resolve(res.data);
-          })
-          .catch(err => {
-            reject("get请求错误");
-          });
-      });
+      pubilcFnAxios (urlString, params, method) {
+        //公用axios数据请求
+        return new Promise((resolve, reject) => {
+          axios
+            .get(this.api + urlString + ';' + this.cookieCode, {
+              params: params,
+              headers: {'X-Requested-With': 'XMLHttpRequest'}
+            })
+            .then(res => {
+
+              resolve(res.data)
+            })
+            .catch(err => {
+              reject('get请求错误')
+            })
+        })
+      },
     },
-    },
-    mounted(){
-      this.getTableDate()
+    mounted () {
+      if (sessionStorage.getItem('jsessionid') != null) {
+        this.cookieCode = 'jsessionid=' + sessionStorage.getItem('jsessionid')
+      }
+      if (this.cookieCode !== '') {
+        this.getTableDate()
+      }
     }
   }
 </script>

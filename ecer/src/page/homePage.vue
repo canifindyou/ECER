@@ -41,6 +41,7 @@
     },
     data () {
       return {
+        count: 0,
         cookieCode: '',
         showStaffsModel: false,
         showGroupsModel: false,
@@ -83,27 +84,21 @@
       },
 
       getUrlParam (sUrl, sKey) {
-        var left = sUrl.indexOf('?') + 1
-        var right = sUrl.lastIndexOf('#')
-        var parasString = sUrl.slice(left, right)
-        var paras = parasString.split('&')
-        var parasjson = {}
-        paras.forEach(function (value, index, arr) {
-          var a = value.split('=')
-          parasjson[a[0]] !== undefined ? parasjson[a[0]] = [].concat(parasjson[a[0]], a[1]) : parasjson[a[0]] = a[1]
-        })
-        let result = arguments[1] !== void 0 ? (parasjson[arguments[1]] || '') : parasjson
-        console.log(result)
-        return result
+        var left = sUrl.indexOf('=') + 1
+        var parasString = sUrl.slice(left)
+        console.log(parasString)
+        return parasString
       }
-    }, mounted () {
-      let url = window.location.href
-      this.cookieCode = this.getUrlParam(url, 'JSESSIONID')
-      console.log(this.cookieCode)
-      if (typeof (Storage) !== 'undefined') {
-        // 存储
-        sessionStorage.setItem('jsessionid', this.cookieCode)
-      }
+    }, created () {
+        let url = window.location.href
+        console.log(url)
+        this.cookieCode = this.getUrlParam(url, 'JSESSIONID')
+        console.log(this.cookieCode)
+        if (typeof (Storage) !== 'undefined') {
+          // 存储
+          sessionStorage.setItem('jsessionid', this.cookieCode)
+          console.log('1')
+        }
     },
   }
 </script>

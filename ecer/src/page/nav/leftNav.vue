@@ -47,6 +47,7 @@
   export default {
     data () {
       return {
+        cookieCode: '',
         id: '',
         myindex: 0,
         // code: "A18",
@@ -141,9 +142,16 @@
       },
       initLeftNav () {
         //获取校区侧边栏数据
-        axios.get(this.api + 'schoolZones').then(this.initLeftNavCallBack)
+        axios({
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          method: 'get',
+          url: this.api + 'schoolZones;' + this.cookieCode,
+        }).then(this.initLeftNavCallBack)
       },
       initLeftNavCallBack (res) {
+        console.log(res)
         res.data.forEach(item => {
           this.sideData.push({label: item.name, index: item.id, building: []})
           this.schoolIds.push(item.id)
@@ -155,12 +163,11 @@
         if (this.count >= this.schoolIds.length) {//递归结束条件
           return
         }
-        axios
-          .get(this.api + 'buildings', {
-            params: {
-              zoneId: this.schoolIds[this.count]
-            }
-          })
+        axios.get(this.api + 'buildings;' + this.cookieCode, {
+          params: {
+            zoneId: this.schoolIds[this.count]
+          }, headers: {'X-Requested-With': 'XMLHttpRequest'}
+        })
           .then(res => {
             console.log(this.count)
             this.inintBuilding(res)
@@ -198,14 +205,19 @@
     },
     watch: {},
     mounted () {
-      if (this.$route.path.split('/')[1] == 'user') {
-        this.id = 3
-      } else {
-        this.id = 2
+      if (sessionStorage.getItem('jsessionid') != null) {
+        this.cookieCode = 'jsessionid=' + sessionStorage.getItem('jsessionid')
       }
-      this.count = 0
-      this.sideData = []
-      this.initLeftNav()
+      if (this.cookieCode !== '') {
+        if (this.$route.path.split('/')[1] == 'user') {
+          this.id = 3
+        } else {
+          this.id = 2
+        }
+        this.count = 0
+        this.sideData = []
+        this.initLeftNav()
+      }
     }
   }
 </script>

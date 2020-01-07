@@ -81,6 +81,7 @@
     },
     data () {
       return {
+        cookieCode: '',
         manageStrategies: true,
         addStrategy: false,
         selectId: 0,
@@ -124,7 +125,10 @@
         $.ajax({
           type: 'GET',
           async: false,
-          url: this.api + 'strategies',
+          url: this.api + 'strategies;' + this.cookieCode,
+          headers:{
+            'X-Requested-With': 'XMLHttpRequest'
+          },
           success (data) {
             self.strategiesList = data
           }
@@ -163,7 +167,10 @@
         let timeArr = []
         $.ajax({
           type: 'GET',
-          url: this.api + 'strategies/' + id + '/days',
+          url: this.api + 'strategies/' + id + '/days;' + this.cookieCode,
+          headers:{
+            'X-Requested-With': 'XMLHttpRequest'
+          },
           success (data) {
             sHour = data[0].startTime.split(':')[0]
             sMin = data[0].startTime.split(':')[1]
@@ -249,8 +256,13 @@
       }
     },
     mounted () {
-      this.getStrategiesList()
-      this.selectStrategy(this.strategiesList[0].id, this.strategiesList[0].name)
+      if (sessionStorage.getItem('jsessionid') != null) {
+        this.cookieCode = 'jsessionid=' + sessionStorage.getItem('jsessionid')
+      }
+      if (this.cookieCode !== '') {
+        this.getStrategiesList()
+        this.selectStrategy(this.strategiesList[0].id, this.strategiesList[0].name)
+      }
     }
   }
 </script>

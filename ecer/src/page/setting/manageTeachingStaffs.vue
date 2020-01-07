@@ -6,35 +6,36 @@
              :close-on-click-modal="false"
              :before-close="closeAllModel">
     <hr class="boundary">
-    <el-table
-      :data="tableData"
-      height="270px"
-      style="width: 90%">
-      <el-table-column
-        prop="id"
-        label="用户工号"
-        width="135px"
-        :show-overflow-tooltip="true">
-      </el-table-column>
-      <el-table-column
-        prop="name"
-        label="用户姓名">
-      </el-table-column>
-      <el-table-column
-        prop="createTime"
-        label="添加时间"
-        width="110px"
-        :show-overflow-tooltip="true">
-      </el-table-column>
-      <el-table-column
-        label="操作"
-        width="180px">
-        <template slot-scope="scope">
-          <el-button size="small" @click="showModifyModel(scope.row.id)">修 改</el-button>
-          <el-button size="small" type="danger" @click="showDelModel(scope.row.id)">删 除</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
+    <div style="height:270px">暂未实现</div>
+<!--    <el-table-->
+<!--      :data="tableData"-->
+<!--      height="270px"-->
+<!--      style="width: 90%">-->
+<!--      <el-table-column-->
+<!--        prop="id"-->
+<!--        label="用户工号"-->
+<!--        width="135px"-->
+<!--        :show-overflow-tooltip="true">-->
+<!--      </el-table-column>-->
+<!--      <el-table-column-->
+<!--        prop="name"-->
+<!--        label="用户姓名">-->
+<!--      </el-table-column>-->
+<!--      <el-table-column-->
+<!--        prop="createTime"-->
+<!--        label="添加时间"-->
+<!--        width="110px"-->
+<!--        :show-overflow-tooltip="true">-->
+<!--      </el-table-column>-->
+<!--      <el-table-column-->
+<!--        label="操作"-->
+<!--        width="180px">-->
+<!--        <template slot-scope="scope">-->
+<!--          <el-button size="small" @click="showModifyModel(scope.row.id)">修 改</el-button>-->
+<!--          <el-button size="small" type="danger" @click="showDelModel(scope.row.id)">删 除</el-button>-->
+<!--        </template>-->
+<!--      </el-table-column>-->
+<!--    </el-table>-->
     <hr class="boundary">
     <add-user :addUser="addUser" @closeModel="closeModel"></add-user>
     <modify-user :modifyUser="modifyUser" :modifyId="modifyId" @closeModel="closeModel"></modify-user>
@@ -59,6 +60,7 @@
     },
     data () {
       return {
+        cookieCode: '',
         manageUsers: true,
         addUser: false,
         modifyId: 0,
@@ -73,7 +75,10 @@
         let self = this
         $.ajax({
           type: 'GET',
-          url: this.api + 'users',
+          url: this.api + 'userInfo;' + this.cookieCode,
+          headers:{
+            'X-Requested-With': 'XMLHttpRequest'
+          },
           success (data) {
             for (let i = 0;i<data.length;i++){
               data[i].createTime=data[i].createTime.split(' ')[0]
@@ -111,7 +116,12 @@
       }
     },
     mounted () {
-      this.getList()
+      if (sessionStorage.getItem('jsessionid') != null) {
+        this.cookieCode = 'jsessionid=' + sessionStorage.getItem('jsessionid')
+      }
+      if (this.cookieCode !== '') {
+        this.getList()
+      }
     }
   }
 </script>

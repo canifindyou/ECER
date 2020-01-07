@@ -31,6 +31,7 @@
     },
     data () {
       return {
+        cookieCode: '',
         showAdd: false,
         labelPosition: 'left',
         deviceData: {
@@ -44,9 +45,10 @@
         let self = this
         $.ajax({
           type: 'POST',
-          url: this.api + 'models',
+          url: this.api + 'models;' + this.cookieCode,
           headers: {
             'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
           },
           data: JSON.stringify({
             'brandName': self.deviceData.brandName,
@@ -66,7 +68,7 @@
                 type: 'warning'
               })
             } else {
-              this.$message.error('添加失败，请重试！');
+              this.$message.error('添加失败，请重试！')
             }
           }
         })
@@ -83,6 +85,11 @@
     watch: {
       addBrand (newVal) {
         this.showAdd = newVal
+      }
+    },
+    mounted () {
+      if (sessionStorage.getItem('jsessionid') != null) {
+        this.cookieCode = 'jsessionid=' + sessionStorage.getItem('jsessionid')
       }
     }
   }

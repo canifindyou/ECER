@@ -1,48 +1,49 @@
 <template>
   <div class="table">
-    <el-table
-      :data="tableData"
-      style="width: 100%">
-      <el-table-column
-        type="index"
-        prop="id"
-        label="序号"
-        width="135px"
-        :show-overflow-tooltip="true">
-      </el-table-column>
-      <el-table-column
-        prop="userName"
-        label="姓名">
-      </el-table-column>
-      <el-table-column
-        prop="addTime"
-        label="性别"
-        :show-overflow-tooltip="true">
-      </el-table-column>
-      <el-table-column
-        prop="affiliatedCampus"
-        label="所属校区"
-        :show-overflow-tooltip="true">
-      </el-table-column>
-      <el-table-column
-        prop="phoneNum"
-        label="手机号码"
-        :show-overflow-tooltip="true">
-      </el-table-column>
-      <el-table-column
-        prop="addTime"
-        label="添加时间"
-        :show-overflow-tooltip="true">
-      </el-table-column>
-      <el-table-column
-        label="操作"
-        width="180px">
-        <template slot-scope="scope">
-          <el-button size="small" @click="showModifyModel(scope.row.id)">修 改</el-button>
-          <el-button size="small" type="danger" @click="showDelModel(scope.row.id)">删 除</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
+    暂未实现
+<!--    <el-table-->
+<!--      :data="tableData"-->
+<!--      style="width: 100%">-->
+<!--      <el-table-column-->
+<!--        type="index"-->
+<!--        prop="id"-->
+<!--        label="序号"-->
+<!--        width="135px"-->
+<!--        :show-overflow-tooltip="true">-->
+<!--      </el-table-column>-->
+<!--      <el-table-column-->
+<!--        prop="userName"-->
+<!--        label="姓名">-->
+<!--      </el-table-column>-->
+<!--      <el-table-column-->
+<!--        prop="addTime"-->
+<!--        label="性别"-->
+<!--        :show-overflow-tooltip="true">-->
+<!--      </el-table-column>-->
+<!--      <el-table-column-->
+<!--        prop="affiliatedCampus"-->
+<!--        label="所属校区"-->
+<!--        :show-overflow-tooltip="true">-->
+<!--      </el-table-column>-->
+<!--      <el-table-column-->
+<!--        prop="phoneNum"-->
+<!--        label="手机号码"-->
+<!--        :show-overflow-tooltip="true">-->
+<!--      </el-table-column>-->
+<!--      <el-table-column-->
+<!--        prop="addTime"-->
+<!--        label="添加时间"-->
+<!--        :show-overflow-tooltip="true">-->
+<!--      </el-table-column>-->
+<!--      <el-table-column-->
+<!--        label="操作"-->
+<!--        width="180px">-->
+<!--        <template slot-scope="scope">-->
+<!--          <el-button size="small" @click="showModifyModel(scope.row.id)">修 改</el-button>-->
+<!--          <el-button size="small" type="danger" @click="showDelModel(scope.row.id)">删 除</el-button>-->
+<!--        </template>-->
+<!--      </el-table-column>-->
+<!--    </el-table>-->
   </div>
 </template>
 

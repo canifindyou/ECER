@@ -122,8 +122,8 @@
     },
     data () {
       return {
+        cookieCode: '',
         showModify: false,
-
         labelPosition: 'left',
         radio: '1',
         strategyInfo: {
@@ -216,9 +216,10 @@
         this.strategyInfo.weedsNum = Array.from(new Set(this.strategyInfo.weedsNum))
         $.ajax({
           type: 'PUT',
-          url: this.api + 'strategies',
+          url: this.api + 'strategies;' + this.cookieCode,
           headers: {
             'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
           },
           data: JSON.stringify({
             'id': this.modifyId,
@@ -271,6 +272,11 @@
           }
         },
         deep: true
+      }
+    },
+    mounted () {
+      if (sessionStorage.getItem('jsessionid') != null) {
+        this.cookieCode = 'jsessionid=' + sessionStorage.getItem('jsessionid')
       }
     }
   }

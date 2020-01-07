@@ -47,6 +47,7 @@
     },
     data () {
       return {
+        cookieCode: '',
         showChoose: false,
         fileList: [],
         uploadUrl: '',
@@ -58,7 +59,7 @@
     methods: {
       // 下载模板
       download () {
-        window.location.href = this.api + '/instructions-template.csv'
+        window.location.href = this.api + '/instructions-template.csv;'+this.cookieCode
       },
 
       // 已存在上传文件
@@ -89,7 +90,7 @@
             message: '该品牌型号的指令模板已上传，请上传正确的文件！',
             type: 'warning',
           })
-        }else if(res.status === 51){
+        } else if (res.status === 51) {
           this.$message({
             message: '请在设备品牌管理内添加文件中的品牌类型后，再导入该模板！',
             type: 'warning',
@@ -107,7 +108,7 @@
       // 上传文件
       submitUpload () {
         // :data={name:formData.tempName}
-        this.uploadUrl = 'http://172.16.211.75:8080/templates/upload/'+this.formData.tempName
+        this.uploadUrl = this.api+'/templates/upload/' + this.formData.tempName + ';'+this.cookieCode
         console.log(this.uploadUrl)
         this.$nextTick(() => {// 手动上传
           this.$refs.upload.submit()
@@ -124,6 +125,11 @@
     watch: {
       chooseBrand (newVal) {
         this.showChoose = newVal
+      }
+    },
+    mounted () {
+      if (sessionStorage.getItem('jsessionid') != null) {
+        this.cookieCode = 'jsessionid=' + sessionStorage.getItem('jsessionid')
       }
     }
   }

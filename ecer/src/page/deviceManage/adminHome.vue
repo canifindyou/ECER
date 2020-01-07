@@ -7,13 +7,16 @@
           type="text"
           style="margin-left:20px"
           @click="centerDialogVisible = true"
-          >添加设备</el-button
+        >添加设备
+        </el-button
         >
         <el-button type="text" style="margin-left:20px" @click="batchOperat"
-          >批量操作</el-button
+        >批量操作
+        </el-button
         >
         <el-button type="text" style="margin-left:20px" @click="batchExport"
-          >批量导入</el-button
+        >批量导入
+        </el-button
         >
       </div>
       <div class="tableHead-right">
@@ -21,7 +24,8 @@
           size="mini"
           style="height: 30px;margin:auto 50px "
           @click="searchClick"
-          >搜索</el-button
+        >搜索
+        </el-button
         >
         <template>
           <el-select
@@ -78,7 +82,7 @@
         <el-table-column label="品牌" prop="brandge" align="center">
         </el-table-column>
         <el-table-column label="环境温度" align="center">
-          <template slot-scope="scope"> {{ scope.row.ter }} </template>
+          <template slot-scope="scope"> {{ scope.row.ter }}</template>
         </el-table-column>
         <el-table-column label="当前状态" prop="status" align="center">
         </el-table-column>
@@ -184,13 +188,15 @@
                   scope.row.numCode
                 )
               "
-              >修改</el-button
+            >修改
+            </el-button
             >
             <el-button
               size="mini"
               type="danger"
               @click="handleDelete(scope.row.name, scope.row.id)"
-              >删除</el-button
+            >删除
+            </el-button
             >
           </template>
         </el-table-column>
@@ -387,7 +393,7 @@
           :disabled="
             !(addRoom && addType && addId && addName && addPort && addIp)
           "
-          >确 定</el-button
+        >确 定</el-button
         >
       </span>
     </el-dialog>
@@ -415,678 +421,696 @@
 </template>
 
 <script>
-import editDevice from "./editDevice";
-import batchDialog from "./batchOperat";
-import batchExport from "./upLoad";
-import axios from "axios";
-import qs from "qs";
+  import editDevice from './editDevice'
+  import batchDialog from './batchOperat'
+  import batchExport from './upLoad'
+  import axios from 'axios'
+  import qs from 'qs'
 
-export default {
-  data() {
-    return {
-      /* 此处为添加功能弹窗值绑定值*/
-      timerId: "", //定时器id
-      controllIsDone: false, //下拉框执行是否完成，完成前所有下拉框禁用
-      pages: true,
-      pagesNum: 1,
-      total: 0,
-      schoolLoaded: true, //添加弹窗加载动画
-      test: "",
-      isSearch: false,
-      selectfloorSearch: "", //筛选楼层条件
-      addName: "东二209", //空调名称
-      addIp: "172.16.22.209", //空调ip
-      addId: "01", //空调编号
-      addType: "", //空调型号
-      addBrand: "", //空调品牌
-      addRoom: "", //教室名称
-      addFloor: "", //楼层
-      addBuilding: "", //楼栋
-      addSchoolAera: "", //校区
-      addPort: "8001", //端口号
+  export default {
+    data () {
+      return {
+        cookieCode: '',
+        /* 此处为添加功能弹窗值绑定值*/
+        timerId: '', //定时器id
+        controllIsDone: false, //下拉框执行是否完成，完成前所有下拉框禁用
+        pages: true,
+        pagesNum: 1,
+        total: 0,
+        schoolLoaded: true, //添加弹窗加载动画
+        test: '',
+        isSearch: false,
+        selectfloorSearch: '', //筛选楼层条件
+        addName: '东二209', //空调名称
+        addIp: '172.16.22.209', //空调ip
+        addId: '01', //空调编号
+        addType: '', //空调型号
+        addBrand: '', //空调品牌
+        addRoom: '', //教室名称
+        addFloor: '', //楼层
+        addBuilding: '', //楼栋
+        addSchoolAera: '', //校区
+        addPort: '8001', //端口号
 
-      addNameOptions: [], //空调名称
-      addIpOptions: [], //空调ip
-      addIdOptions: [], //空调编号
-      addTypeOptions: [], //空调型号
-      addBrandOptions: [], //空调品牌
-      addRoomOptions: [], //教室名称
-      addFloorOptions: [], //楼层
-      addBuildingOptions: [], //楼栋
-      addSchoolAeraOptions: [], //校区
+        addNameOptions: [], //空调名称
+        addIpOptions: [], //空调ip
+        addIdOptions: [], //空调编号
+        addTypeOptions: [], //空调型号
+        addBrandOptions: [], //空调品牌
+        addRoomOptions: [], //教室名称
+        addFloorOptions: [], //楼层
+        addBuildingOptions: [], //楼栋
+        addSchoolAeraOptions: [], //校区
 
-      /* 修改设备信息值 */
-      showDialog: false,
-      type: "",
-      room: "",
-      floor: "",
-      build: "",
-      school: "",
-      brand: "",
-      id: "",
-      ip: "",
-      name: "",
-      editid: "",
-      editname: "",
-      editip: "",
-      editport: "",
-      numCode: "",
+        /* 修改设备信息值 */
+        showDialog: false,
+        type: '',
+        room: '',
+        floor: '',
+        build: '',
+        school: '',
+        brand: '',
+        id: '',
+        ip: '',
+        name: '',
+        editid: '',
+        editname: '',
+        editip: '',
+        editport: '',
+        numCode: '',
 
-      /* 批量导入 */
-      showUpLoad: false,
+        /* 批量导入 */
+        showUpLoad: false,
 
-      /*  */
-      showBatch: false, //批量操作弹窗
-      centerDialogVisible: false, //添加设备弹窗控制
-      selectBuild: "", //选择楼栋绑定值，头部搜索
-      searchInput: "", //头部搜索输入框
-      code: this.$route.query.code, //路由标识符
-      buildId: this.$route.query.build
-        ? this.$route.query.build
-        : localStorage.getItem("initBuildId"), //楼栋id
-      floorNum: this.$route.query.fNum
-        ? this.$route.query.fNum
-        : localStorage.getItem("initFloorNum"), //楼层数
-      schoolId: this.$route.query.sch
-        ? this.$route.query.sch
-        : localStorage.getItem("initschoolId"), //校区ID
-      controlItem: [], //控制项下拉框绑定值
-      selfBtnValue: "",
-      options: [
-        //楼层搜索下拉框
-      ],
-      control: [],
-      controlItemLength: "", //下拉框绑定值
-      tableData: [
-        //列表数据
-        // {
-        //   type: "1P",
-        //   brandge: "格力",
-        //   ter: "26",
-        //   status: "通电未开机",
-        //   nums: "200度",
-        //   control: [
-        //     {
-        //       value: "开机",
-        //       label: "开机"
-        //     },
-        //     {
-        //       value: "关机",
-        //       label: "关机"
-        //     },
-        //     {
-        //       value: "高风制冷20度",
-        //       label: "高风制冷20度"
-        //     },
-        //     {
-        //       value: "高风制冷18度",
-        //       label: "高风制冷18度"
-        //     },
-        //     {
-        //       value: "低风制冷18度",
-        //       label: "低风制冷18度"
-        //     }
-        //   ],
-        //   selfControl: false,
-        //   jdControl: true,
-        //   location: "东二209",
-        //   name: "空调一",
-        //   id: "1123",
-        //   ip: "172.16.22.18"
-        // },
-      ]
-    };
-  },
-  components: {
-    editDevice,
-    batchDialog,
-    batchExport
-  },
-  methods: {
-    controllSelectClick(id, event) {
-      console.log(id, event);
-      this.controllIsDone = true;
-
-      axios
-        .get(this.api + "devices/perform", {
-          params: { ids: id, itemName: event }
-        })
-        .then(() => {
-          this.controllIsDone = false;
-        })
-        .catch(() => {
-          console.log("指令执行失败");
-        });
-      setTimeout(() => {
-        this.controllIsDone = false;
-      }, 500);
-    },
-    inintList(List, data) {
-      data.forEach(item => {
-        List.push({
-          type: item.model_name,
-          brandge: item.brand_name,
-          ter: item.log ? item.log.contextT + "℃" : "暂无",
-          status: item.log
-            ? (item.log.relayStatus ? "通电" : "未通电") +
-              (item.log.onOffStatus ? "开机" : "未开机")
-            : "暂无",
-          nums: item.log ? item.log.electricConsume + "度" : "暂无",
-          selfControl: item.log
-            ? item.log.autoStatus == 0
-              ? false
-              : true
-            : "null",
-          control: this.control,
-          jdControl: item.log
-            ? item.log.relayStatus == 0
-              ? false
-              : true
-            : "null",
-          location: item.port,
-          name: item.name,
-          id: item.id,
-          ip: item.ip_address,
-          numCode: item.address_code
-        });
-      });
-    },
-    changePage($event) {
-      //分页页码改变
-      console.log($event);
-      this.pagesNum = $event;
-
-      if (this.isSearch) {
-        this.getPageAfterList();
-      } else {
-        this.getListData();
+        /*  */
+        showBatch: false, //批量操作弹窗
+        centerDialogVisible: false, //添加设备弹窗控制
+        selectBuild: '', //选择楼栋绑定值，头部搜索
+        searchInput: '', //头部搜索输入框
+        code: this.$route.query.code, //路由标识符
+        buildId: this.$route.query.build
+          ? this.$route.query.build
+          : localStorage.getItem('initBuildId'), //楼栋id
+        floorNum: this.$route.query.fNum
+          ? this.$route.query.fNum
+          : localStorage.getItem('initFloorNum'), //楼层数
+        schoolId: this.$route.query.sch
+          ? this.$route.query.sch
+          : localStorage.getItem('initschoolId'), //校区ID
+        controlItem: [], //控制项下拉框绑定值
+        selfBtnValue: '',
+        options: [
+          //楼层搜索下拉框
+        ],
+        control: [],
+        controlItemLength: '', //下拉框绑定值
+        tableData: [
+          //列表数据
+          // {
+          //   type: "1P",
+          //   brandge: "格力",
+          //   ter: "26",
+          //   status: "通电未开机",
+          //   nums: "200度",
+          //   control: [
+          //     {
+          //       value: "开机",
+          //       label: "开机"
+          //     },
+          //     {
+          //       value: "关机",
+          //       label: "关机"
+          //     },
+          //     {
+          //       value: "高风制冷20度",
+          //       label: "高风制冷20度"
+          //     },
+          //     {
+          //       value: "高风制冷18度",
+          //       label: "高风制冷18度"
+          //     },
+          //     {
+          //       value: "低风制冷18度",
+          //       label: "低风制冷18度"
+          //     }
+          //   ],
+          //   selfControl: false,
+          //   jdControl: true,
+          //   location: "东二209",
+          //   name: "空调一",
+          //   id: "1123",
+          //   ip: "172.16.22.18"
+          // },
+        ]
       }
     },
-    prevClick($event) {
-      //上一页按钮事件
-      console.log($event);
+    components: {
+      editDevice,
+      batchDialog,
+      batchExport
     },
-    nextClick($event) {
-      //下一页按钮事件
-      console.log($event);
-    },
-    addDevice() {
-      //添加设备
-      let params = {
-        name: this.addName,
-        ipAddress: this.addIp,
-        port: this.addPort,
-        addressCode: this.addId,
-        roomId: this.addRoom,
-        modelId: this.addBuilding
-      };
-      $.ajax({
-        type: "POST",
-        url: this.api + "devices",
-        data: JSON.stringify(params),
-        contentType: "application/json",
-        success: data => {
-          // 刷新列表
-          console.log(data);
-          this.messageSuccess();
-          this.centerDialogVisible = false;
-        },
-        error: () => {
-          this.messageErr();
-        }
-      });
-    },
-    selectSchool(e) {
-      //校区下拉框数据加载
-      this.addSchoolAeraOptions = [];
-      this.addBuildingOptions = [];
-      this.addFloorOptions = [];
-      this.addFloor = "";
-      this.addBuilding = "";
-      this.addRoomOptions = [];
-      this.addRoom = "";
-      this.constructData("schoolZones", this.addSchoolAeraOptions);
-    },
-    selectbuilding() {
-      //楼栋下拉框数据加载
-      this.addFloorOptions = [];
-      (this.addFloor = ""), //楼层
-        (this.addBuildingOptions = []);
-      this.addRoomOptions = [];
-      this.addRoom = "";
-      this.constructData("buildings", this.addBuildingOptions, {
-        zoneId: this.addSchoolAera
-      });
-    },
-    selectFloor(params) {
-      //楼层下拉数据加载
-      this.addFloorOptions = [];
-      this.addRoomOptions = [];
-      this.addRoom = "";
-      this.pubilcFnAxios(`buildings/${this.addBuilding}/floors`, {})
-        .then(data => {
-          console.log(data);
-          for (let i = 1; i < data + 1; i++) {
-            this.addFloorOptions.push({ label: i + "F", value: i });
-          }
-        })
-        .catch(() => {
-          console.log("请求失败");
-        });
-    },
-    selectRoom() {
-      //加载教室下拉框数据
-      this.addRoomOptions = [];
-      this.constructData(
-        `rooms/${this.addBuilding}/${this.addFloor}`,
-        this.addRoomOptions,
-        {}
-      );
-    },
-    selectBrand() {
-      //加载品牌列表
-      this.addBrandOptions = [];
-      this.addTypeOptions = [];
-      this.addType = "";
-      this.pubilcFnAxios("models/brands", {})
-        .then(data => {
-          for (let i = 0; i < data.length; i++) {
-            this.addBrandOptions.push({ label: data[i], value: data[i] });
-          }
-        })
-        .catch(() => {
-          console.log("请求失败");
-        });
-    },
-    selectType() {
-      //加载型号
-      this.addTypeOptions = [];
-      this.constructData(`/models/${this.addBrand}`, this.addTypeOptions, {});
-    },
-    constructData(urlString, obj, params) {
-      //构造下拉菜单数据结构
-      this.pubilcFnAxios(urlString, params)
-        .then(data => {
-          console.log(data);
-          data.forEach(item => {
-            obj.push({
-              value: item.id,
-              label: item.name || item.modelName
-            });
-          });
-          this.schoolLoaded = false;
-        })
-        .catch(() => {
-          console.log("请求失败");
-        });
-    },
+    methods: {
+      controllSelectClick (id, event) {
+        console.log(id, event)
+        this.controllIsDone = true
 
-    pubilcFnAxios(urlString, params, method) {
-      //公用axios数据请求
-      return new Promise((resolve, reject) => {
         axios
-          .get(this.api + urlString, { params: params })
-          .then(res => {
-            resolve(res.data);
+          .get(this.api + 'devices/perform;' + this.cookieCode, {
+            params: {ids: id, itemName: event},
+            headers: {'X-Requested-With': 'XMLHttpRequest'}
           })
-          .catch(err => {
-            reject("get请求错误");
-          });
-      });
-    },
-
-    buildControlModel() {
-      //构造下拉框绑定值
-      let arr = [];
-      let i = 0;
-      for (i; i < this.controlItemLength; i++) {
-        arr.push({ ["control" + i]: "" });
-      }
-      console.log(arr);
-      return arr;
-    },
-    switchChange(el, id) {
-      //自控状态开关控制
-      //推拉框回调函数
-      console.log(el, id);
-      if (el) {
-        this.pubilcFnAxios("devices/auto/on", { ids: [id].toString() })
-          .then(data => {
-            console.log("自控状态操作成功");
+          .then(() => {
+            this.controllIsDone = false
           })
           .catch(() => {
-            console.log("打开自控状态请求失败");
-          });
-      } else {
-        this.pubilcFnAxios("devices/auto/off", { ids: [id].toString() })
-          .then(data => {
-            console.log("自控状态操作成功");
+            console.log('指令执行失败')
           })
-          .catch(() => {
-            console.log("关闭自控状态请求失败");
-          });
-      }
-    },
-    switchChange2(el, id, selfStatus) {//继电器开关控制
-      // this.tableData[id].selfControl = !this.tableData[id].selfControl;
-      console.log(id);
-      if (el) {
-        this.pubilcFnAxios("devices/relay/on", { ids: [id].toString() })
-          .then(data => {
-            console.log("继电器操作成功");
+        setTimeout(() => {
+          this.controllIsDone = false
+        }, 500)
+      },
+      inintList (List, data) {
+        data.forEach(item => {
+          List.push({
+            type: item.model_name,
+            brandge: item.brand_name,
+            ter: item.log ? item.log.contextT + '℃' : '暂无',
+            status: item.log
+              ? (item.log.relayStatus ? '通电' : '未通电') +
+              (item.log.onOffStatus ? '开机' : '未开机')
+              : '暂无',
+            nums: item.log ? item.log.electricConsume + '度' : '暂无',
+            selfControl: item.log
+              ? item.log.autoStatus == 0
+                ? false
+                : true
+              : 'null',
+            control: this.control,
+            jdControl: item.log
+              ? item.log.relayStatus == 0
+                ? false
+                : true
+              : 'null',
+            location: item.port,
+            name: item.name,
+            id: item.id,
+            ip: item.ip_address,
+            numCode: item.address_code
           })
-          .catch(() => {
-            console.log("打开继电器请求失败");
-          });
-      } else {
-        this.pubilcFnAxios("devices/relay/off", { ids: [id].toString() })
-          .then(data => {
-            console.log("继电器操作成功");
-          })
-          .catch(() => {
-            console.log("关闭继电器请求失败");
-          });
-      }
-    },
-    searchClick() {
-      //搜索功能
-      this.pubilcFnAxios(
-        `devices/${this.schoolId || localStorage.getItem("initschoolId")}/${this
-          .buildId || localStorage.getItem("initBuildId")}/${
-          this.selectfloorSearch
-        }`
-      )
-        .then(data => {
-          this.tableData = [];
-          this.isSearch = true;
-          this.total = data.total;
-          this.controlItemLength = data.list.length; //下拉框绑定值
-          this.controlItem = this.buildControlModel();
-          this.inintList(this.tableData, data.list);
         })
-        .catch(() => {
-          console.log("筛选请求失败");
-        });
-    },
-    editClose() {
-      //修改设备弹窗，子组件调用函数，关闭弹窗
-      console.log("子组件触发成功");
-      this.showDialog = false;
-    },
-    batchOperatClose() {
-      //批量操作弹窗，子组件调用函数，关闭弹窗
-      console.log("子组件触发成功");
-      this.showBatch = false;
-    },
-    handleEdit(id, ip, port, name, code) {
-      //修改按钮绑定事件
+      },
+      changePage ($event) {
+        //分页页码改变
+        console.log($event)
+        this.pagesNum = $event
 
-      this.editid = id.toString();
-      this.editname = name;
-      this.editip = ip;
-      this.editport = port.toString();
-      this.numCode = code.toString();
-      this.showDialog = true;
-      console.log(id, ip, port, name, code);
-    },
-    open(name, id) {
-      //删除提示框
-      this.$confirm(`此操作将删除${name}, 是否继续?`, "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      })
-        .then(() => {
+        if (this.isSearch) {
+          this.getPageAfterList()
+        } else {
+          this.getListData()
+        }
+      },
+      prevClick ($event) {
+        //上一页按钮事件
+        console.log($event)
+      },
+      nextClick ($event) {
+        //下一页按钮事件
+        console.log($event)
+      },
+      addDevice () {
+        //添加设备
+        let params = {
+          name: this.addName,
+          ipAddress: this.addIp,
+          port: this.addPort,
+          addressCode: this.addId,
+          roomId: this.addRoom,
+          modelId: this.addBuilding
+        }
+        $.ajax({
+          type: 'POST',
+          url: this.api + 'devices',
+          data: JSON.stringify(params),
+          contentType: 'application/json',
+          success: data => {
+            // 刷新列表
+            console.log(data)
+            this.messageSuccess()
+            this.centerDialogVisible = false
+          },
+          error: () => {
+            this.messageErr()
+          }
+        })
+      },
+      selectSchool (e) {
+        //校区下拉框数据加载
+        this.addSchoolAeraOptions = []
+        this.addBuildingOptions = []
+        this.addFloorOptions = []
+        this.addFloor = ''
+        this.addBuilding = ''
+        this.addRoomOptions = []
+        this.addRoom = ''
+        this.constructData('schoolZones', this.addSchoolAeraOptions)
+      },
+      selectbuilding () {
+        //楼栋下拉框数据加载
+        this.addFloorOptions = [];
+        (this.addFloor = ''), //楼层
+          (this.addBuildingOptions = [])
+        this.addRoomOptions = []
+        this.addRoom = ''
+        this.constructData('buildings', this.addBuildingOptions, {
+          zoneId: this.addSchoolAera
+        })
+      },
+      selectFloor (params) {
+        //楼层下拉数据加载
+        this.addFloorOptions = []
+        this.addRoomOptions = []
+        this.addRoom = ''
+        this.pubilcFnAxios(`buildings/${this.addBuilding}/floors`, {})
+          .then(data => {
+            console.log(data)
+            for (let i = 1; i < data + 1; i++) {
+              this.addFloorOptions.push({label: i + 'F', value: i})
+            }
+          })
+          .catch(() => {
+            console.log('请求失败')
+          })
+      },
+      selectRoom () {
+        //加载教室下拉框数据
+        this.addRoomOptions = []
+        this.constructData(
+          `rooms/${this.addBuilding}/${this.addFloor}`,
+          this.addRoomOptions,
+          {}
+        )
+      },
+      selectBrand () {
+        //加载品牌列表
+        this.addBrandOptions = []
+        this.addTypeOptions = []
+        this.addType = ''
+        this.pubilcFnAxios('models/brands', {})
+          .then(data => {
+            for (let i = 0; i < data.length; i++) {
+              this.addBrandOptions.push({label: data[i], value: data[i]})
+            }
+          })
+          .catch(() => {
+            console.log('请求失败')
+          })
+      },
+      selectType () {
+        //加载型号
+        this.addTypeOptions = []
+        this.constructData(`/models/${this.addBrand}`, this.addTypeOptions, {})
+      },
+      constructData (urlString, obj, params) {
+        //构造下拉菜单数据结构
+        this.pubilcFnAxios(urlString, params)
+          .then(data => {
+            console.log(data)
+            data.forEach(item => {
+              obj.push({
+                value: item.id,
+                label: item.name || item.modelName
+              })
+            })
+            this.schoolLoaded = false
+          })
+          .catch(() => {
+            console.log('请求失败')
+          })
+      },
+
+      pubilcFnAxios (urlString, params, method) {
+        //公用axios数据请求
+        return new Promise((resolve, reject) => {
           axios
-            .delete(this.api + `/devices/${id}`)
+            .get(this.api + urlString + ';' + this.cookieCode, {
+              params: params,
+              headers: {'X-Requested-With': 'XMLHttpRequest'}
+            })
             .then(res => {
-              console.log(res.data);
-              this.$message({
-                type: "success",
-                message: "删除成功!"
-              });
-              if (this.isSearch) {
-                this.getPageAfterList();
-              } else {
-                this.getListData();
-              }
+              resolve(res.data)
+            })
+            .catch(err => {
+              reject('get请求错误')
+            })
+        })
+      },
+
+      buildControlModel () {
+        //构造下拉框绑定值
+        let arr = []
+        let i = 0
+        for (i; i < this.controlItemLength; i++) {
+          arr.push({['control' + i]: ''})
+        }
+        console.log(arr)
+        return arr
+      },
+      switchChange (el, id) {
+        //自控状态开关控制
+        //推拉框回调函数
+        console.log(el, id)
+        if (el) {
+          this.pubilcFnAxios('devices/auto/on', {ids: [id].toString()})
+            .then(data => {
+              console.log('自控状态操作成功')
             })
             .catch(() => {
-              this.$message({
-                type: "error",
-                message: "删除失败!"
-              });
-            });
+              console.log('打开自控状态请求失败')
+            })
+        } else {
+          this.pubilcFnAxios('devices/auto/off', {ids: [id].toString()})
+            .then(data => {
+              console.log('自控状态操作成功')
+            })
+            .catch(() => {
+              console.log('关闭自控状态请求失败')
+            })
+        }
+      },
+      switchChange2 (el, id, selfStatus) {//继电器开关控制
+        // this.tableData[id].selfControl = !this.tableData[id].selfControl;
+        console.log(id)
+        if (el) {
+          this.pubilcFnAxios('devices/relay/on', {ids: [id].toString()})
+            .then(data => {
+              console.log('继电器操作成功')
+            })
+            .catch(() => {
+              console.log('打开继电器请求失败')
+            })
+        } else {
+          this.pubilcFnAxios('devices/relay/off', {ids: [id].toString()})
+            .then(data => {
+              console.log('继电器操作成功')
+            })
+            .catch(() => {
+              console.log('关闭继电器请求失败')
+            })
+        }
+      },
+      searchClick () {
+        //搜索功能
+        this.pubilcFnAxios(
+          `devices/${this.schoolId || localStorage.getItem('initschoolId')}/${this
+            .buildId || localStorage.getItem('initBuildId')}/${
+            this.selectfloorSearch
+          }`
+        )
+          .then(data => {
+            this.tableData = []
+            this.isSearch = true
+            this.total = data.total
+            this.controlItemLength = data.list.length //下拉框绑定值
+            this.controlItem = this.buildControlModel()
+            this.inintList(this.tableData, data.list)
+          })
+          .catch(() => {
+            console.log('筛选请求失败')
+          })
+      },
+      editClose () {
+        //修改设备弹窗，子组件调用函数，关闭弹窗
+        console.log('子组件触发成功')
+        this.showDialog = false
+      },
+      batchOperatClose () {
+        //批量操作弹窗，子组件调用函数，关闭弹窗
+        console.log('子组件触发成功')
+        this.showBatch = false
+      },
+      handleEdit (id, ip, port, name, code) {
+        //修改按钮绑定事件
+
+        this.editid = id.toString()
+        this.editname = name
+        this.editip = ip
+        this.editport = port.toString()
+        this.numCode = code.toString()
+        this.showDialog = true
+        console.log(id, ip, port, name, code)
+      },
+      open (name, id) {
+        //删除提示框
+        this.$confirm(`此操作将删除${name}, 是否继续?`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
         })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "已取消删除"
-          });
-        });
-    },
-    messageSuccess() {
-      this.$message({
-        showClose: true,
-        message: "操作成功",
-        type: "success"
-      });
-    },
-    messageErr() {
-      this.$message({
-        showClose: true,
-        message: "操作失败，请检查网络",
-        type: "error"
-      });
-    },
-    handleDelete(name, id) {
-      //按钮点击事件
-      this.open(name, id);
-    },
-    batchOperat() {
-      //批量管理点击事件
-      this.showBatch = true;
-    },
-    batchExport() {
-      //批量导入按钮事件
-      this.showUpLoad = true;
-    },
-    exportClose() {
-      //批量导入回调函数
-      this.showUpLoad = false;
-    },
-    openMessage() {
-      this.$notify({
-        title: "警告",
-        message: "存在设备故障",
-        type: "warning",
-        duration: 0,
-        onClick: this.checkedInfo
-      });
-    },
-    checkedInfo() {
-      this.$router.push("/admin/waringInfo");
-      console.log("查看消息");
-    },
-    constructSearchInput() {
-      //构造搜索项下拉框数据
-      for (let i = 0; i < this.floorNum; i++) {
-        this.options.push({ value: `${i + 1}`, label: `${i + 1}F` });
+          .then(() => {
+            axios
+              .delete(this.api + `/devices/${id};` + this.cookieCode, {headers: {'X-Requested-With': 'XMLHttpRequest'}})
+              .then(res => {
+                console.log(res.data)
+                this.$message({
+                  type: 'success',
+                  message: '删除成功!'
+                })
+                if (this.isSearch) {
+                  this.getPageAfterList()
+                } else {
+                  this.getListData()
+                }
+              })
+              .catch(() => {
+                this.$message({
+                  type: 'error',
+                  message: '删除失败!'
+                })
+              })
+          })
+          .catch(() => {
+            this.$message({
+              type: 'info',
+              message: '已取消删除'
+            })
+          })
+      },
+      messageSuccess () {
+        this.$message({
+          showClose: true,
+          message: '操作成功',
+          type: 'success'
+        })
+      },
+      messageErr () {
+        this.$message({
+          showClose: true,
+          message: '操作失败，请检查网络',
+          type: 'error'
+        })
+      },
+      handleDelete (name, id) {
+        //按钮点击事件
+        this.open(name, id)
+      },
+      batchOperat () {
+        //批量管理点击事件
+        this.showBatch = true
+      },
+      batchExport () {
+        //批量导入按钮事件
+        this.showUpLoad = true
+      },
+      exportClose () {
+        //批量导入回调函数
+        this.showUpLoad = false
+      },
+      openMessage () {
+        this.$notify({
+          title: '警告',
+          message: '存在设备故障',
+          type: 'warning',
+          duration: 0,
+          onClick: this.checkedInfo
+        })
+      },
+      checkedInfo () {
+        this.$router.push('/admin/waringInfo')
+        console.log('查看消息')
+      },
+      constructSearchInput () {
+        //构造搜索项下拉框数据
+        for (let i = 0; i < this.floorNum; i++) {
+          this.options.push({value: `${i + 1}`, label: `${i + 1}F`})
+        }
+      },
+      getListData () {
+        let params = {
+          pageNum: this.pagesNum,
+          pageSize: 10
+        }
+        this.pubilcFnAxios(
+          `devices/${this.schoolId || localStorage.getItem('initschoolId')}/${this
+            .buildId || localStorage.getItem('initBuildId')}`,
+          params
+        )
+          .then(data => {
+            this.tableData = []
+            this.total = data.total
+            this.controlItemLength = data.list.length //下拉框绑定值
+            this.controlItem = this.buildControlModel()
+            this.inintList(this.tableData, data.list)
+          })
+          .catch(() => {
+            console.log('请求失败')
+          })
+      },
+      getPageAfterList () {
+        let params = {
+          pageNum: this.pagesNum,
+          pageSize: 10
+        }
+        this.pubilcFnAxios(
+          `devices/${this.schoolId || localStorage.getItem('initschoolId')}/${this
+            .buildId || localStorage.getItem('initBuildId')}/${
+            this.selectfloorSearch
+          }`,
+          params
+        )
+          .then(data => {
+            this.tableData = []
+            this.isSearch = true
+            this.total = data.total
+            this.controlItemLength = data.list.length //下拉框绑定值
+            this.controlItem = this.buildControlModel()
+            this.inintList(this.tableData, data.list)
+          })
+          .catch(() => {
+            console.log('筛选请求失败')
+          })
+      },
+      refresh () {
+        this.timerId = setInterval(() => {
+          console.log('定时器执行' + new Date())
+          if (this.isSearch) {
+            this.getPageAfterList()
+          } else {
+            this.getListData()
+          }
+        }, 20000)
+      },
+      clear () {
+        clearInterval(this.timerId) //清除计时器
+        this.timerId = null //设置为null
       }
     },
-    getListData() {
-      let params = {
-        pageNum: this.pagesNum,
-        pageSize: 10
-      };
-      this.pubilcFnAxios(
-        `devices/${this.schoolId || localStorage.getItem("initschoolId")}/${this
-          .buildId || localStorage.getItem("initBuildId")}`,
-        params
-      )
-        .then(data => {
-          this.tableData = [];
-          this.total = data.total;
-          this.controlItemLength = data.list.length; //下拉框绑定值
-          this.controlItem = this.buildControlModel();
-          this.inintList(this.tableData, data.list);
-        })
-        .catch(() => {
-          console.log("请求失败");
-        });
+    watch: {
+      $route () {
+        //监听路由参数变化触发事件，在这里进行页面切换时请求接口
+        // this.code = this.$route.query.b;
+        this.tableData = []
+        this.buildId = this.$route.query.build
+        this.floorNum = this.$route.query.fNum
+        this.schoolId = this.$route.query.sch
+        localStorage.setItem('initschoolId', this.$route.query.sch)
+        localStorage.setItem('initBuildId', this.$route.query.build)
+        localStorage.setItem('initFloorNum', this.$route.query.fNum)
+        this.options = []
+        this.constructSearchInput()
+        this.pubilcFnAxios('items')
+          .then(data => {
+            this.control = []
+            for (let i = 0; i < data.length; i++) {
+              this.control.push({label: data[i], value: data[i]})
+            }
+            this.getListData()
+          })
+          .catch(() => {
+            console.log('构造列表失败')
+          })
+      }
     },
-    getPageAfterList() {
-      let params = {
-        pageNum: this.pagesNum,
-        pageSize: 10
-      };
-      this.pubilcFnAxios(
-        `devices/${this.schoolId || localStorage.getItem("initschoolId")}/${this
-          .buildId || localStorage.getItem("initBuildId")}/${
-          this.selectfloorSearch
-        }`,
-        params
-      )
-        .then(data => {
-          this.tableData = [];
-          this.isSearch = true;
-          this.total = data.total;
-          this.controlItemLength = data.list.length; //下拉框绑定值
-          this.controlItem = this.buildControlModel();
-          this.inintList(this.tableData, data.list);
-        })
-        .catch(() => {
-          console.log("筛选请求失败");
-        });
+    mounted () {
+      //初始化下拉框绑定值
+      if (sessionStorage.getItem('jsessionid') != null) {
+        this.cookieCode = 'jsessionid=' + sessionStorage.getItem('jsessionid')
+      }
+      if (this.cookieCode !== '') {
+        this.constructSearchInput()
+        console.log(this.$route.query.code)
+        this.pubilcFnAxios('items')
+          .then(data => {
+            this.control = []
+            for (let i = 0; i < data.length; i++) {
+              this.control.push({label: data[i], value: data[i]})
+            }
+            this.getListData()
+          })
+          .catch(() => {
+            console.log('构造列表失败')
+          })
+      }
+      // this.openMessage();
+      // this.refresh()
     },
-    refresh() {
-      this.timerId = setInterval(() => {
-        console.log("定时器执行" + new Date());
-        if (this.isSearch) {
-          this.getPageAfterList();
-        } else {
-          this.getListData();
-        }
-      }, 20000);
-    },
-    clear() {
-      clearInterval(this.timerId); //清除计时器
-      this.timerId = null; //设置为null
+    destroyed () {
+      console.log('页面销毁')
+      this.clear()
     }
-  },
-  watch: {
-    $route() {
-      //监听路由参数变化触发事件，在这里进行页面切换时请求接口
-      // this.code = this.$route.query.b;
-      this.tableData = [];
-      this.buildId = this.$route.query.build;
-      this.floorNum = this.$route.query.fNum;
-      this.schoolId = this.$route.query.sch;
-      localStorage.setItem("initschoolId", this.$route.query.sch);
-      localStorage.setItem("initBuildId", this.$route.query.build);
-      localStorage.setItem("initFloorNum", this.$route.query.fNum);
-      this.options = [];
-      this.constructSearchInput();
-      this.pubilcFnAxios("items")
-        .then(data => {
-          this.control = [];
-          for (let i = 0; i < data.length; i++) {
-            this.control.push({ label: data[i], value: data[i] });
-          }
-          this.getListData();
-        })
-        .catch(() => {
-          console.log("构造列表失败");
-        });
-    }
-  },
-  mounted() {
-    //初始化下拉框绑定值
-    // this.openMessage();
-    this.constructSearchInput();
-    console.log(this.$route.query.code);
-    this.pubilcFnAxios("items")
-      .then(data => {
-        this.control = [];
-        for (let i = 0; i < data.length; i++) {
-          this.control.push({ label: data[i], value: data[i] });
-        }
-        this.getListData();
-      })
-      .catch(() => {
-        console.log("构造列表失败");
-      });
-    // this.refresh()
-  },
-  destroyed() {
-    console.log("页面销毁");
-    this.clear();
   }
-};
 </script>
 
 <style scoped>
-.tableHead {
-  height: 50px;
-  border-bottom: 1px solid #000;
-  line-height: 50px;
-  /* padding: 0 0 0 5px; */
-}
-.tableHead .tableHead-left {
-  display: inline-block;
-  width: 49%;
-}
+  .tableHead {
+    height: 50px;
+    border-bottom: 1px solid #000;
+    line-height: 50px;
+    /* padding: 0 0 0 5px; */
+  }
 
-.el-icon-refresh {
-  float: left;
-  margin-left: 20px;
-  font-size: 34px;
-  font-weight: 900;
-  color: #5daf34;
-  padding-top: 7px;
-}
+  .tableHead .tableHead-left {
+    display: inline-block;
+    width: 49%;
+  }
 
-.tableHead-left {
-  float: left;
-}
+  .el-icon-refresh {
+    float: left;
+    margin-left: 20px;
+    font-size: 34px;
+    font-weight: 900;
+    color: #5daf34;
+    padding-top: 7px;
+  }
 
-.tableHead .tableHead-right {
-  display: inline-flex;
-  flex-direction: row-reverse;
-  width: 50%;
-}
-.tableHead .tableHead-right .el-input-sellf {
-  position: relative;
-  font-size: 14px;
-  display: inline-block;
-  /* width: 100%; */
-}
-.tableHead .tableHead-right .tableSearch {
-  border-radius: 5px;
-  height: 40px;
-  width: 50px;
-}
+  .tableHead-left {
+    float: left;
+  }
 
-.dialogContent {
-  /* background: red; */
-  height: 100%;
-  width: 100%;
-  text-align: center;
-}
-.dialogContent .dialogContentItem {
-  height: 30px;
-  margin: 0 0 20px 0;
-}
-.dialogContent .dialogContentItem .dItemText {
-  margin-right: 15px;
-}
-.numStyle {
-  margin: 0 0 20px -27px;
-}
-.ipStyle {
-  margin: 0 0 20px -15px;
-}
-.nameStyle {
-  margin: 0 0 20px -29px;
-}
+  .tableHead .tableHead-right {
+    display: inline-flex;
+    flex-direction: row-reverse;
+    width: 50%;
+  }
+
+  .tableHead .tableHead-right .el-input-sellf {
+    position: relative;
+    font-size: 14px;
+    display: inline-block;
+    /* width: 100%; */
+  }
+
+  .tableHead .tableHead-right .tableSearch {
+    border-radius: 5px;
+    height: 40px;
+    width: 50px;
+  }
+
+  .dialogContent {
+    /* background: red; */
+    height: 100%;
+    width: 100%;
+    text-align: center;
+  }
+
+  .dialogContent .dialogContentItem {
+    height: 30px;
+    margin: 0 0 20px 0;
+  }
+
+  .dialogContent .dialogContentItem .dItemText {
+    margin-right: 15px;
+  }
+
+  .numStyle {
+    margin: 0 0 20px -27px;
+  }
+
+  .ipStyle {
+    margin: 0 0 20px -15px;
+  }
+
+  .nameStyle {
+    margin: 0 0 20px -29px;
+  }
 </style>

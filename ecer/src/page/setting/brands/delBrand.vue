@@ -29,6 +29,7 @@
     },
     data () {
       return {
+        cookieCode: '',
         showDel: false
       }
     },
@@ -37,7 +38,10 @@
         let self = this
         $.ajax({
           type: 'DELETE',
-          url: this.api + 'models',
+          url: this.api + 'models;' + this.cookieCode,
+          headers:{
+            'X-Requested-With': 'XMLHttpRequest'
+          },
           data: {
             'id': self.delId,
           },
@@ -64,6 +68,11 @@
     watch: {
       delBrand (newVal) {
         this.showDel = newVal
+      }
+    },
+    mounted () {
+      if (sessionStorage.getItem('jsessionid') != null) {
+        this.cookieCode = 'jsessionid=' + sessionStorage.getItem('jsessionid')
       }
     }
   }

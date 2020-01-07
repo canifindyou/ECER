@@ -29,6 +29,7 @@
     },
     data () {
       return {
+        cookieCode: '',
         showDel: false
       }
     },
@@ -36,28 +37,12 @@
       delTemp () {
         console.log(this.delId)
         let self = this
-        // $.ajax({
-        //   type: 'DELETE',
-        //   url: this.api + 'templates/' + this.delId,
-        //   success (data) {
-        //     console.log(self.delId)
-        //     console.log(data)
-        //     let jsonData = JSON.parse(data)
-        //     if (jsonData === true) {
-        //       self.$message({
-        //         message: '该控制项模板删除成功！',
-        //         type: 'success'
-        //       })
-        //     } else if (jsonData.status === 1) {// 校区名重复
-        //       self.$message.error('存在该品牌型号的设备或控制项模板，无法删除！')
-        //     }
-        //     self.closeModel()
-        //   }
-        // })
-
         $.ajax({
           type: 'DELETE',
-          url: this.api + 'templates',
+          url: this.api + 'templates;' + this.cookieCode,
+          headers:{
+            'X-Requested-With': 'XMLHttpRequest'
+          },
           data: {
             'id': self.delId,
           },
@@ -85,6 +70,11 @@
     watch: {
       delOrder (newVal) {
         this.showDel = newVal
+      }
+    },
+    mounted () {
+      if (sessionStorage.getItem('jsessionid') != null) {
+        this.cookieCode = 'jsessionid=' + sessionStorage.getItem('jsessionid')
       }
     }
   }
