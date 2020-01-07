@@ -11,17 +11,17 @@
       height="270px"
       style="width: 90%">
       <el-table-column
-        prop="userNum"
+        prop="id"
         label="用户工号"
         width="135px"
         :show-overflow-tooltip="true">
       </el-table-column>
       <el-table-column
-        prop="userName"
+        prop="name"
         label="用户姓名">
       </el-table-column>
       <el-table-column
-        prop="addTime"
+        prop="createTime"
         label="添加时间"
         width="110px"
         :show-overflow-tooltip="true">
@@ -61,44 +61,33 @@
       return {
         manageUsers: true,
         addUser: false,
-        modifyId:0,
-        modifyUser:false,
+        modifyId: 0,
+        modifyUser: false,
         delId: 0,
         delUser: false,
-        tableData: [{
-          id: '1',
-          userNum: '316202061035',
-          userName: '王小虎',
-          addTime: '2019-11-07'
-        }, {
-          id: '2',
-          userNum: '11111',
-          userName: '王小虎',
-          addTime: '2019-11-07'
-        }, {
-          id: '3',
-          userNum: '11111',
-          userName: '王小虎',
-          addTime: '2019-11-07'
-        }, {
-          id: '4',
-          userNum: '11111',
-          userName: '王小虎',
-          addTime: '2019-11-07'
-        }, {
-          id: '5',
-          userNum: '11111',
-          userName: '王小虎',
-          addTime: '2019-11-07'
-        }]
+        tableData: []
       }
     },
     methods: {
+      getList () {
+        let self = this
+        $.ajax({
+          type: 'GET',
+          url: this.api + 'users',
+          success (data) {
+            for (let i = 0;i<data.length;i++){
+              data[i].createTime=data[i].createTime.split(' ')[0]
+            }
+            self.tableData = data
+          }
+        })
+      },
+
       showAddModel () {
         this.addUser = true
       },
 
-      showModifyModel(id){
+      showModifyModel (id) {
         this.modifyId = id
         this.modifyUser = true
       },
@@ -121,6 +110,9 @@
         this.$emit('closeModel')
       }
     },
+    mounted () {
+      this.getList()
+    }
   }
 </script>
 

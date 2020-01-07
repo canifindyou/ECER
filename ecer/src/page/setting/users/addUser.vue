@@ -57,7 +57,7 @@
         this.addUser = false
         this.$emit('closeModel')
       }
-    }
+    },
   }
 </script>
 

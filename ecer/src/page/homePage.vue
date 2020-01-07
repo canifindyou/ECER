@@ -13,7 +13,7 @@
         <manage-brands v-if="showBrandsModel" @closeModel="closeModel"></manage-brands>
         <manage-orders v-if="showOrdersModel" @closeModel="closeModel"></manage-orders>
         <global-control v-if="showGlobalControl" @closeModel="closeModel"></global-control>
-       
+
       </el-main>
     </el-container>
     <!--  </el-container>-->
@@ -28,8 +28,6 @@
   import manageOrders from './setting/manageOrders'
   import globalControl from './setting/globalControl'
 
- 
-
   export default {
     name: 'homePage',
     components: {
@@ -39,10 +37,11 @@
       manageBrands,
       manageOrders,
       globalControl,
-      
+
     },
     data () {
       return {
+        cookieCode: '',
         showStaffsModel: false,
         showGroupsModel: false,
         showStrategiesModel: false,
@@ -68,7 +67,7 @@
         }
       },
 
-      updateNav(){
+      updateNav () {
         this.$refs.changeCSS.initLeftNav()
       },
 
@@ -81,8 +80,31 @@
         this.showGlobalControl = false
         // this.$emit('chooseModel')
         this.$refs.changeCSS.changeCss()
+      },
+
+      getUrlParam (sUrl, sKey) {
+        var left = sUrl.indexOf('?') + 1
+        var right = sUrl.lastIndexOf('#')
+        var parasString = sUrl.slice(left, right)
+        var paras = parasString.split('&')
+        var parasjson = {}
+        paras.forEach(function (value, index, arr) {
+          var a = value.split('=')
+          parasjson[a[0]] !== undefined ? parasjson[a[0]] = [].concat(parasjson[a[0]], a[1]) : parasjson[a[0]] = a[1]
+        })
+        let result = arguments[1] !== void 0 ? (parasjson[arguments[1]] || '') : parasjson
+        console.log(result)
+        return result
       }
-    }
+    }, mounted () {
+      let url = window.location.href
+      this.cookieCode = this.getUrlParam(url, 'JSESSIONID')
+      console.log(this.cookieCode)
+      if (typeof (Storage) !== 'undefined') {
+        // 存储
+        sessionStorage.setItem('jsessionid', this.cookieCode)
+      }
+    },
   }
 </script>
 
