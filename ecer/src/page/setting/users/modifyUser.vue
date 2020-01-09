@@ -2,13 +2,13 @@
   <el-dialog
     title="修改用户"
     top="100px"
-    :visible.sync="modifyUser"
+    :visible.sync="showModify"
     :close-on-press-escape="false"
     :close-on-click-modal="false"
     :before-close="closeModel"
     append-to-body>
     <hr class="boundary">
-    <user-form></user-form>
+    <user-form :modifyData="modifyData"></user-form>
     <hr class="boundary">
     <div slot="footer" class="dialog-footer">
       <el-button @click="closeModel">取 消</el-button>
@@ -19,81 +19,51 @@
 
 <script>
   import userForm from './public/userForm'
+
   export default {
-    components:{
+    components: {
       userForm
     },
     props: {
-      modifyId:String,
+      modifyId: String,
       modifyUser: Boolean
     },
     data () {
       return {
+        cookieCode:'',
+        showModify: false,
         labelPosition: 'left',
-        userData: {
-          userNum: '',
-          userName: '',
-        },
-        textData: [{
-          'name': '文津校区', 'children': [{
-            'name': '东二', 'children': [{
-              'name': '一层', 'children': [{
-                'name': '109', 'device': ['1', '2']
-              },
-                {
-                  'name': '110', 'device': ['1', '2']
-                }]
-            }]
-          }]
-        }],
-
-        data: [{
-          label: '一级 1',
-          children: [{
-            label: '二级 1-1',
-            children: [{
-              label: '三级 1-1-1'
-            }]
-          }]
-        }, {
-          label: '一级 2',
-          children: [{
-            label: '二级 2-1',
-            children: [{
-              label: '三级 2-1-1'
-            }]
-          }, {
-            label: '二级 2-2',
-            children: [{
-              label: '三级 2-2-1'
-            }]
-          }]
-        }, {
-          label: '一级 3',
-          children: [{
-            label: '二级 3-1',
-            children: [{
-              label: '三级 3-1-1'
-            }]
-          }, {
-            label: '二级 3-2',
-            children: [{
-              label: '三级 3-2-1'
-            }]
-          }]
-        }],
-        defaultProps: {
-          children: 'children',
-          label: 'name'
-        }
+        userData: {},
+        modifyData:{}
       }
     },
     methods: {
       closeModel () {
-        this.modifyUser = false
+        this.showModify = false
         this.$emit('closeModel')
       }
     },
+    watch: {
+      modifyUser (newVal) {
+        let self = this
+        $.ajax({
+          type: 'GET',
+          url: this.api + 'users/' + this.modifyId + ';' + this.cookieCode,
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+          },
+          success (data) {
+            self.modifyData = data
+          }
+        })
+        this.showModify = newVal
+      }
+    },
+    mounted () {
+      if (sessionStorage.getItem('jsessionid') != null) {
+        this.cookieCode = 'jsessionid=' + sessionStorage.getItem('jsessionid')
+      }
+    }
   }
 </script>
 

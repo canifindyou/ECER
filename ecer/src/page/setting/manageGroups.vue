@@ -213,7 +213,7 @@
           if (newCampus) {// 存在校区名
             $.ajax({
               type: 'POST',
-              url: self.api + 'schoolZones;' + this.cookieCode,
+              url: self.api + 'schoolZones;' + self.cookieCode,
               headers: {
                 'X-Requested-With': 'XMLHttpRequest'
               },
@@ -268,7 +268,7 @@
             if (newBuilding && newFloor) {// 楼栋名&层数均存在
               $.ajax({
                 type: 'POST',
-                url: self.api + 'buildings;' + this.cookieCode,
+                url: self.api + 'buildings;' + self.cookieCode,
                 headers: {
                   'Content-Type': 'application/json',
                   'X-Requested-With': 'XMLHttpRequest'
@@ -335,7 +335,7 @@
             if (newClassroom && roomFloor) {// 教室名&楼层均存在
               $.ajax({
                 type: 'POST',
-                url: self.api + 'rooms;' + this.cookieCode,
+                url: self.api + 'rooms;' + self.cookieCode,
                 headers: {
                   'Content-Type': 'application/json',
                   'X-Requested-With': 'XMLHttpRequest'
@@ -423,7 +423,7 @@
           if (newCampus) {// 校区名存在数据
             $.ajax({
               type: 'PUT',
-              url: self.api + 'schoolZones;' + this.cookieCode,
+              url: self.api + 'schoolZones;' + self.cookieCode,
               headers: {'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest'},
               dataType: 'json',
               data: JSON.stringify({
@@ -480,7 +480,7 @@
           if (newBuilding && newFloor) {// 调用修改楼栋接口
             $.ajax({
               type: 'PUT',
-              url: self.api + 'buildings;' + this.cookieCode,
+              url: self.api + 'buildings;' + self.cookieCode,
               headers: {
                 'Content-Type': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
@@ -547,7 +547,7 @@
           if (newClassroom) {// 教室名存在数据
             $.ajax({
               type: 'PUT',
-              url: self.api + 'rooms;' + this.cookieCode,
+              url: self.api + 'rooms;' + self.cookieCode,
               headers: {
                 'Content-Type': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'

@@ -14,7 +14,7 @@
       <hr class="boundary">
       <div slot="footer" class="dialog-footer">
         <el-button @click="closeModel">关 闭</el-button>
-        <el-button type="danger" @click="">删 除</el-button>
+        <el-button type="danger" @click="delSuc">删 除</el-button>
       </div>
     </el-dialog>
   </div>
@@ -29,17 +29,40 @@
     },
     data () {
       return {
-
+        cookieCode:'',
+        showDel: false
       }
     },
     methods: {
+      delSuc(){
+        let self = this
+        $.ajax({
+          type: 'DELETE',
+          url: this.api + 'users/' + this.delId + ';' + this.cookieCode,
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+          },
+          success (data) {
+            console.log(data)
+            self.closeModel()
+          }
+        })
+      },
+
       closeModel () {
-        this.delUser = false
+        this.showDel = false
         this.$emit('closeModel')
       }
     },
     watch: {
-
+      delUser (newVal) {
+        this.showDel = newVal
+      }
+    },
+    mounted () {
+      if (sessionStorage.getItem('jsessionid') != null) {
+        this.cookieCode = 'jsessionid=' + sessionStorage.getItem('jsessionid')
+      }
     }
   }
 </script>
