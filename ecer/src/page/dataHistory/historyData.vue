@@ -1,10 +1,8 @@
 <template>
-  <div>
+  <div >
     <searchHead :flag="true" :pageFlag="1" @searchHistory="searchHistory"></searchHead>
-
-    <div style="margin:10px 0 0 0">
       <template>
-        <el-table :data="tableData" align="center" style="width: 100%">
+        <el-table :data="tableData" align="center" style="width: 100%;">
           <el-table-column align="center" prop="name" label="空调名称">
           </el-table-column>
           <el-table-column align="center" prop="buzzer_status" label="蜂鸣器">
@@ -29,7 +27,7 @@
 
         </el-table>
       </template>
-    </div>
+  
     <div style="text-align:center;margin:20px 0 0 0 ">
       <!-- <el-switch v-model="pages"> </el-switch> -->
       <el-pagination
@@ -162,10 +160,10 @@
       },
 
       pubilcFnAxios (urlString, params, method) {
-        //公用axios数据请求
+        //公用axios数据请求 this.cookieCode
         return new Promise((resolve, reject) => {
           axios
-            .get(this.api + urlString + ';' + this.cookieCode, {
+            .get(this.api + urlString + ';' +  "jsessionid=A588EFB8F288FA386456CD272F98963E", {
               params: params,
               headers: {'X-Requested-With': 'XMLHttpRequest'}
             })

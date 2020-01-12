@@ -30,4 +30,6 @@ html, body {
   min-width: 1024px;
   height: 100%;
 }
+.el-table td{
+		    padding: 0}
 </style>

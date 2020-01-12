@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div >
     <div class="tableHead">
       <div class="tableHead-left">
         <i class="el-icon-refresh"></i>
@@ -1091,6 +1091,7 @@
     height: 100%;
     width: 100%;
     text-align: center;
+    
   }
 
   .dialogContent .dialogContentItem {
