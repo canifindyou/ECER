@@ -630,7 +630,7 @@
         }
         $.ajax({
           type: 'POST',
-          url: this.api + 'devices',
+          url: this.api + 'devices;'+this.cookieCode,
           data: JSON.stringify(params),
           contentType: 'application/json',
           success: data => {

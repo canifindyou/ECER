@@ -275,7 +275,7 @@
     watch: {
       modifyData (newVal) {
         this.userData.userNum = newVal.id
-        this.userData.userName = newVal.name 
+        this.userData.userName = newVal.name
         this.userData.deviceId = newVal.devices
       }
     }

@@ -79,6 +79,7 @@
     methods: {
       changePage (el) {
         this.pageNum = el
+        let self = this
         if (this.isSearch) {
           this.requestObj['pageNum'] = this.pageNum
           this.requestObj['pageSize'] = 10
@@ -92,15 +93,45 @@
               console.log('失败')
             })
         } else {
-          this.pubilcFnAxios('/dataLogs', {pageNum: this.pageNum, pageSize: 10})
-            .then(data => {
+          // this.pubilcFnAxios('/dataLogs', {pageNum: this.pageNum, pageSize: 10})
+          //   .then(data => {
+          //     console.log(data)
+          //     this.total = data.total
+          //     this.tableData = data.list
+          //   })
+          //   .catch(() => {
+          //     console.log('失败')
+          //   })
+
+          $.ajax({
+            type: 'GET',
+            url: this.api + 'dataLogs',
+            headers: {
+              'X-Requested-With': 'XMLHttpRequest',
+            },
+            xhrFields: {
+              withCredentials: true //允许跨域带Cookie
+            },
+            data: {
+              pageNum: this.pageNum,
+              pageSize: 10
+            },
+            success (data) {
               console.log(data)
-              this.total = data.total
-              this.tableData = data.list
-            })
-            .catch(() => {
-              console.log('失败')
-            })
+              self.total = data.total
+              self.tableData = data.list
+            }
+          })
+
+          // this.pubilcFnAxios('/dataLogs?pageNum='+this.pageNum+'&pageSize='+10)
+          //   .then(data => {
+          //     console.log(data)
+          //     this.total = data.total
+          //     this.tableData = data.list
+          //   })
+          //   .catch(() => {
+          //     console.log('失败')
+          //   })
         }
       },
       searchHistory (data) {

@@ -29,21 +29,32 @@
     },
     data () {
       return {
-        cookieCode:'',
+        cookieCode: '',
         showDel: false
       }
     },
     methods: {
-      delSuc(){
+      delSuc () {
         let self = this
         $.ajax({
           type: 'DELETE',
-          url: this.api + 'users/' + this.delId + ';' + this.cookieCode,
+          url: this.api + 'users;' + this.cookieCode,
           headers: {
             'X-Requested-With': 'XMLHttpRequest',
           },
+          data: {
+            id: this.delId
+          },
           success (data) {
             console.log(data)
+            if (data===true){
+              self.$message({
+                type:'success',
+                message:'用户删除成功！'
+              })
+            }else{
+              self.$message.error('用户删除失败！')
+            }
             self.closeModel()
           }
         })
