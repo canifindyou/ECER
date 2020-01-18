@@ -62,7 +62,6 @@
     },
     data () {
       return {
-        cookieCode: '',
         manageBrands: true,
         addBrand: false,
         modifyInfo: {},
@@ -77,9 +76,12 @@
         let self = this
         $.ajax({
           type: 'GET',
-          url: this.api + 'models;' + this.cookieCode,
+          url: this.api + 'models',
           headers:{
             'X-Requested-With': 'XMLHttpRequest'
+          },
+          xhrFields: {
+            withCredentials: true
           },
           async: false,
           success (data) {
@@ -121,12 +123,7 @@
       }
     },
     mounted () {
-      if (sessionStorage.getItem('jsessionid') != null) {
-        this.cookieCode = 'jsessionid=' + sessionStorage.getItem('jsessionid')
-      }
-      if (this.cookieCode !== '') {
         this.showBrandsList()
-      }
     }
   }
 </script>

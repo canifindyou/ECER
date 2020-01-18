@@ -90,7 +90,6 @@
     },
     data () {
       return {
-        cookieCode: '',
         chooseGroup: false,
         flag2: '', //校区id
         deviceIds: [], //已选设备id数组
@@ -123,17 +122,15 @@
       //调用接口
       pubilcFnAxios (urlString, params) {
         return new Promise((resolve, reject) => {
-          axios
-            .get(this.api + urlString + ';' + this.cookieCode, {
-              params: params,
-              headers: {'X-Requested-With': 'XMLHttpRequest'}
-            })
-            .then(res => {
-              resolve(res.data)
-            })
-            .catch(err => {
-              reject('get请求错误')
-            })
+          axios.get(this.api + urlString, {
+            params: params,
+            headers: {'X-Requested-With': 'XMLHttpRequest'},
+            withCredentials: true
+          }).then(res => {
+            resolve(res.data)
+          }).catch(err => {
+            reject('get请求错误')
+          })
         })
       },
 
@@ -320,9 +317,12 @@
         // 调用应用接口
         $.ajax({
           type: 'POST',
-          url: this.api + 'strategies/apply?strategyId=' + this.useId + '&deviceIds=' + idArr + ';' + this.cookieCode,
+          url: this.api + 'strategies/apply?strategyId=' + this.useId + '&deviceIds=' + idArr,
           headers: {
             'X-Requested-With': 'XMLHttpRequest'
+          },
+          xhrFields: {
+            withCredentials: true
           },
           success (data) {
             if (data === true) {
@@ -442,20 +442,9 @@
                     text: item.name,
                     roomId: item.room_id,
                     buildId: item.model_id,
-                    deleteId:
-                      'l' +
-                      this.flag2 +
-                      'l' +
-                      item.model_id +
-                      'f' +
-                      this.flag2 +
-                      'f' +
-                      item.model_id +
-                      'f' +
-                      str[3]
+                    deleteId: 'l' + this.flag2 + 'l' + item.model_id + 'f' + this.flag2 + 'f' + item.model_id + 'f' + str[3]
                   })
                 })
-
                 let obj = {}
                 this.selectDeviceList = arr.reduce((cur, next) => {
                   obj[next.id] ? '' : (obj[next.id] = true && cur.push(next))
@@ -475,20 +464,9 @@
                     text: item.name,
                     roomId: item.room_id,
                     buildId: item.model_id,
-                    deleteId:
-                      'l' +
-                      this.flag2 +
-                      'l' +
-                      item.model_id +
-                      'f' +
-                      this.flag2 +
-                      'f' +
-                      item.model_id +
-                      'f' +
-                      str[3]
+                    deleteId: 'l' + this.flag2 + 'l' + item.model_id + 'f' + this.flag2 + 'f' + item.model_id + 'f' + str[3]
                   })
                 })
-
                 let obj = {}
                 this.selectDeviceList = arr.reduce((cur, next) => {
                   obj[next.id] ? '' : (obj[next.id] = true && cur.push(next))
@@ -498,8 +476,6 @@
               })
             }
           }
-
-          // this.addItem(arr, this.selectDeviceList);
         }
       },
 
@@ -507,9 +483,10 @@
         //公用数据请求
         //公用axios数据请求
         return new Promise((resolve, reject) => {
-          axios.get(this.api + urlString + ';' + this.cookieCode, {
+          axios.get(this.api + urlString, {
             params: params,
-            headers: {'X-Requested-With': 'XMLHttpRequest'}
+            headers: {'X-Requested-With': 'XMLHttpRequest'},
+            withCredentials: true
           }).then(res => {
             resolve(res.data.list)
           })
@@ -524,11 +501,6 @@
         this.chooseGroup = newVal
       },
     },
-    mounted () {
-      if (sessionStorage.getItem('jsessionid') != null) {
-        this.cookieCode = 'jsessionid=' + sessionStorage.getItem('jsessionid')
-      }
-    }
   }
 </script>
 

@@ -29,7 +29,6 @@
     },
     data () {
       return {
-        cookieCode: '',
         showAdd: false,
         labelPosition: 'left',
         userData: {},
@@ -48,11 +47,14 @@
         let self = this
         $.ajax({
           type: 'POST',
-          url: this.api + 'users;' + this.cookieCode,
+          url: this.api + 'users',
           dataType: 'JSON',
           headers: {
             'Content-Type': 'application/json',
             'X-Requested-With': 'XMLHttpRequest',
+          },
+          xhrFields: {
+            withCredentials: true
           },
           data: JSON.stringify({
             'id': this.userData.userNum,
@@ -90,11 +92,6 @@
         this.showAdd = newVal
       }
     },
-    mounted () {
-      if (sessionStorage.getItem('jsessionid') != null) {
-        this.cookieCode = 'jsessionid=' + sessionStorage.getItem('jsessionid')
-      }
-    }
   }
 </script>
 

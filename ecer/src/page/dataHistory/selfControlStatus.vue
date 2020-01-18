@@ -49,7 +49,6 @@
   export default {
     data () {
       return {
-        cookieCode: '',
         requestObj: {},
         tableData: [],
         total: 10,
@@ -68,9 +67,10 @@
         if (this.isSearch) {
           this.requestObj['pageNum'] = this.pageNum
           this.requestObj['pageSize'] = 10
-          axios.get(this.api + '/deviceAutoStatus;' + this.cookieCode, {
+          axios.get(this.api + '/deviceAutoStatus', {
             params: this.requestObj,
-            headers: {'X-Requested-With': 'XMLHttpRequest'}
+            headers: {'X-Requested-With': 'XMLHttpRequest'},
+            withCredentials: true
           })
             .then(res => {
               res.data.list.forEach(item => {
@@ -82,9 +82,10 @@
             })
             .catch()
         } else {
-          axios.get(this.api + '/deviceAutoStatus;' + this.cookieCode, {
+          axios.get(this.api + '/deviceAutoStatus', {
             params: {pageNum: this.pageNum, pageSize: 10},
-            headers: {'X-Requested-With': 'XMLHttpRequest'}
+            headers: {'X-Requested-With': 'XMLHttpRequest'},
+            withCredentials: true
           })
             .then(res => {
               res.data.list.forEach(item => {
@@ -101,9 +102,10 @@
         console.log(el, index)
         if (el) {
           console.log('打开自控')
-          axios.get(this.api + 'devices/auto/on;' + this.cookieCode, {
+          axios.get(this.api + 'devices/auto/on', {
             params: {ids: [index].toString()},
-            headers: {'X-Requested-With': 'XMLHttpRequest'}
+            headers: {'X-Requested-With': 'XMLHttpRequest'},
+            withCredentials: true
           })
             .then(() => {
               console.log('打开成功')
@@ -113,14 +115,13 @@
             })
         } else {
           console.log('关闭自控')
-          axios.get(this.api + 'devices/auto/off;' + this.cookieCode, {
+          axios.get(this.api + 'devices/auto/off', {
             params: {ids: [index].toString()},
-            headers: {'X-Requested-With': 'XMLHttpRequest'}
-          })
-            .then(() => {
+            headers: {'X-Requested-With': 'XMLHttpRequest'},
+            withCredentials: true
+          }).then(() => {
               console.log('关闭成功')
-            })
-            .catch(() => {
+            }).catch(() => {
               console.log('关闭失败')
             })
         }
@@ -130,9 +131,10 @@
         this.isSearch = true
         console.log('自控状态历史搜索事件')
         console.log(data)
-        axios.get(this.api + '/deviceAutoStatus;' + this.cookieCode, {
+        axios.get(this.api + '/deviceAutoStatus', {
           params: data,
-          headers: {'X-Requested-With': 'XMLHttpRequest'}
+          headers: {'X-Requested-With': 'XMLHttpRequest'},
+          withCredentials: true
         })
           .then(res => {
             res.data.list.forEach(item => {
@@ -143,10 +145,12 @@
             this.tableData = res.data.list
           })
           .catch()
-
       },
       getTableData () {
-        axios.get(this.api + '/deviceAutoStatus;' + this.cookieCode, {headers: {'X-Requested-With': 'XMLHttpRequest'}})
+        axios.get(this.api + '/deviceAutoStatus', {
+          headers: {'X-Requested-With': 'XMLHttpRequest'},
+          withCredentials: true
+        })
           .then(res => {
             res.data.list.forEach(item => {
               this.total = res.data.total
@@ -158,22 +162,15 @@
           .catch()
       },
       format (name, flag, flag2) {
-
         if (name.auto_status) {
           return '开启'
         } else {
-
           return '关闭'
         }
       }
     },
     mounted () {
-      if (sessionStorage.getItem('jsessionid') != null) {
-        this.cookieCode = 'jsessionid=' + sessionStorage.getItem('jsessionid')
-      }
-      if (this.cookieCode !== '') {
-        this.getTableDate()
-      }
+      this.getTableDate()
     }
   }
 </script>

@@ -89,16 +89,6 @@
         console.log(parasString)
         return parasString
       }
-    }, created () {
-        let url = window.location.href
-        console.log(url)
-        this.cookieCode = this.getUrlParam(url, 'JSESSIONID')
-        console.log(this.cookieCode)
-        if (typeof (Storage) !== 'undefined') {
-          // 存储
-          sessionStorage.setItem('jsessionid', this.cookieCode)
-          console.log('1')
-        }
     },
   }
 </script>

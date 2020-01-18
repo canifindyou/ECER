@@ -94,7 +94,6 @@
     },
     data () {
       return {
-        cookieCode: '',
         isExport: false,
         percentage: 0,
         innerLog: false, //日志弹窗
@@ -472,23 +471,17 @@
       },
       publicAxios (urlString, params) {
         return new Promise((resolve, reject) => {
-          axios.get(this.api + urlString + ';' + this.cookieCode, {
+          axios.get(this.api + urlString, {
             params: params,
-            headers: {'X-Requested-With': 'XMLHttpRequest'}
-          })
-            .then(res => {
+            headers: {'X-Requested-With': 'XMLHttpRequest'},
+            withCredentials: true
+          }).then(res => {
               resolve(res.data)
-            })
-            .catch(error => {
+            }).catch(error => {
               reject('axios回调失败')
               return
             })
         })
-      }
-    },
-    mounted () {
-      if (sessionStorage.getItem('jsessionid') != null) {
-        this.cookieCode = 'jsessionid=' + sessionStorage.getItem('jsessionid')
       }
     }
   }

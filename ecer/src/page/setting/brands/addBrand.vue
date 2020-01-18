@@ -31,7 +31,6 @@
     },
     data () {
       return {
-        cookieCode: '',
         showAdd: false,
         labelPosition: 'left',
         deviceData: {
@@ -45,10 +44,13 @@
         let self = this
         $.ajax({
           type: 'POST',
-          url: this.api + 'models;' + this.cookieCode,
+          url: this.api + 'models',
           headers: {
             'Content-Type': 'application/json',
             'X-Requested-With': 'XMLHttpRequest'
+          },
+          xhrFields: {
+            withCredentials: true
           },
           data: JSON.stringify({
             'brandName': self.deviceData.brandName,
@@ -87,11 +89,6 @@
         this.showAdd = newVal
       }
     },
-    mounted () {
-      if (sessionStorage.getItem('jsessionid') != null) {
-        this.cookieCode = 'jsessionid=' + sessionStorage.getItem('jsessionid')
-      }
-    }
   }
 </script>
 

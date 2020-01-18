@@ -242,7 +242,6 @@
     },
     data () {
       return {
-        cookieCode: '',
         loading: false,
         pickerOptions1: {
           disabledDate (time) {
@@ -408,7 +407,6 @@
                   console.log('批量自控失败执行失败')
                 })
             }
-
             break
           case '继电器设置':
             if (this.controlselfItem == 0) {
@@ -449,32 +447,20 @@
           this.selectData = []
           this.allOptions = []
 
-          this.pubilcFnAxios(`rooms/${this.flag}/${node.data.label}`)
-            .then(data => {
-              let arr = []
-              data.forEach(item => {
-                arr.push({
-                  name: item.name,
-                  label:
-                    'r' +
-                    this.flag2 +
-                    'r' +
-                    this.flag +
-                    'r' +
-                    node.data.label +
-                    'r' +
-                    item.id
-                }) //label 包含校区id + 楼栋id + r + 楼层id + 教室id
-              })
-
-              this.selectData = []
-              this.allOptions = []
-
-              this.buildSelectDate(arr)
+          this.pubilcFnAxios(`rooms/${this.flag}/${node.data.label}`).then(data => {
+            let arr = []
+            data.forEach(item => {
+              arr.push({
+                name: item.name,
+                label: 'r' + this.flag2 + 'r' + this.flag + 'r' + node.data.label + 'r' + item.id
+              }) //label 包含校区id + 楼栋id + r + 楼层id + 教室id
             })
-            .catch(() => {
-              console.log('初始化树形结构请求出错')
-            })
+            this.selectData = []
+            this.allOptions = []
+            this.buildSelectDate(arr)
+          }).catch(() => {
+            console.log('初始化树形结构请求出错')
+          })
         }
         this.checkAll = this.findItem(this.selectData, this.checkedItem)
       },
@@ -482,92 +468,83 @@
         //公用数据请求
         //公用axios数据请求
         return new Promise((resolve, reject) => {
-          axios
-            .get(this.api + urlString+ ';' + this.cookieCode, {params: params,headers: {'X-Requested-With': 'XMLHttpRequest'}})
-            .then(res => {
-              resolve(res.data)
-            })
-            .catch(err => {
-              reject('get请求错误')
-            })
+          axios.get(this.api + urlString, {
+            params: params,
+            headers: {'X-Requested-With': 'XMLHttpRequest'},
+            withCredentials: true
+          }).then(res => {
+            resolve(res.data)
+          }).catch(err => {
+            reject('get请求错误')
+          })
         })
       },
       pubilcFnAxiosDevice (urlString, params) {
         //公用数据请求
         //公用axios数据请求
         return new Promise((resolve, reject) => {
-          axios
-            .get(this.api + urlString+ ';' + this.cookieCode, {params: params, headers: {'X-Requested-With': 'XMLHttpRequest'}})
-            .then(res => {
-              resolve(res.data.list)
-            })
-            .catch(err => {
-              reject('get请求错误')
-            })
+          axios.get(this.api + urlString, {
+            params: params,
+            headers: {'X-Requested-With': 'XMLHttpRequest'},
+            withCredentials: true
+          }).then(res => {
+            resolve(res.data.list)
+          }).catch(err => {
+            reject('get请求错误')
+          })
         })
       },
       loadNode (node, resolve) {
         //点击层级加载子层级的数据
         let schoolId = []
         if (node.level == 0) {
-          this.pubilcFnAxios('schoolZones', {})
-            .then(data => {
-              let arr = []
-              data.forEach(item => {
-                arr.push({name: item.name, label: item.id})
-              })
-
-              return resolve(arr, arr)
+          this.pubilcFnAxios('schoolZones', {}).then(data => {
+            let arr = []
+            data.forEach(item => {
+              arr.push({name: item.name, label: item.id})
             })
-            .catch()
+            return resolve(arr, arr)
+          }).catch()
         }
         if (node.level > 4) return resolve([])
         setTimeout(() => {
           if (node.level == 1) {
             //文津校区子菜单加载数据
-            this.pubilcFnAxios('buildings', {zoneId: node.data.label})
-              .then(data => {
-                let arr = []
-                data.forEach(item => {
-                  arr.push({name: item.name, label: item.id})
-                })
-
-                return resolve(arr) //返回数组作为数据填充
+            this.pubilcFnAxios('buildings', {zoneId: node.data.label}).then(data => {
+              let arr = []
+              data.forEach(item => {
+                arr.push({name: item.name, label: item.id})
               })
-              .catch(() => {
-                console.log('初始化树形结构请求出错')
-              })
+              return resolve(arr) //返回数组作为数据填充
+            }).catch(() => {
+              console.log('初始化树形结构请求出错')
+            })
           }
           if (node.level == 2) {
             //楼栋子菜单加载数据
             this.flag = node.data.label
-            this.pubilcFnAxios(`buildings/${node.data.label}/floors`)
-              .then(data => {
-                let arr = []
-                for (let i = 1; i < data + 1; i++) {
-                  //根据返回楼层数，创建楼层
-                  arr.push({name: i + '层', label: i, leaf: true})
-                }
-                return resolve(arr)
-              })
-              .catch(() => {
-                console.log('初始化树形结构请求出错')
-              })
+            this.pubilcFnAxios(`buildings/${node.data.label}/floors`).then(data => {
+              let arr = []
+              for (let i = 1; i < data + 1; i++) {
+                //根据返回楼层数，创建楼层
+                arr.push({name: i + '层', label: i, leaf: true})
+              }
+              return resolve(arr)
+            }).catch(() => {
+              console.log('初始化树形结构请求出错')
+            })
           }
           if (node.level == 3) {
             //楼层子菜单加载数据
-            this.pubilcFnAxios(`rooms/${this.flag}/${node.data.label}`)
-              .then(data => {
-                let arr = []
-                data.forEach(item => {
-                  arr.push({name: item.name, label: item.id, leaf: true})
-                })
-
-                return resolve(arr)
+            this.pubilcFnAxios(`rooms/${this.flag}/${node.data.label}`).then(data => {
+              let arr = []
+              data.forEach(item => {
+                arr.push({name: item.name, label: item.id, leaf: true})
               })
-              .catch(() => {
-                console.log('初始化树形结构请求出错')
-              })
+              return resolve(arr)
+            }).catch(() => {
+              console.log('初始化树形结构请求出错')
+            })
           }
         }, 500)
       },
@@ -575,7 +552,6 @@
       selectItemLoadData (node, date) {
         // 展开层级，加载
         // 选择层级，展示可选择的数据，填充数据功能
-
         if (date.level == 2) {
           //楼栋层级展开时，需要将楼栋id值保存
           this.flag = date.data.label
@@ -583,30 +559,26 @@
         if (date.level == 1) {
           //文津校区子菜单加载数据
           this.flag2 = date.data.label //校区id
-          this.pubilcFnAxios('buildings', {zoneId: date.data.label})
-            .then(data => {
-              let arr = []
-              data.forEach(item => {
-                arr.push({
-                  name: item.name,
-                  label: 'l' + date.data.label + 'l' + item.id
-                })
+          this.pubilcFnAxios('buildings', {zoneId: date.data.label}).then(data => {
+            let arr = []
+            data.forEach(item => {
+              arr.push({
+                name: item.name,
+                label: 'l' + date.data.label + 'l' + item.id
               })
-              console.log(arr)
-              this.selectData = []
-              this.allOptions = []
-
-              this.buildSelectDate(arr)
             })
-            .catch(() => {
-              console.log('初始化树形结构请求出错')
-            })
+            console.log(arr)
+            this.selectData = []
+            this.allOptions = []
+            this.buildSelectDate(arr)
+          }).catch(() => {
+            console.log('初始化树形结构请求出错')
+          })
         }
         if (date.level == 2) {
           //楼栋子菜单加载数据
           this.flag = date.data.label //当前楼栋id
-          this.pubilcFnAxios(`buildings/${date.data.label}/floors`)
-            .then(data => {
+          this.pubilcFnAxios(`buildings/${date.data.label}/floors`).then(data => {
               let arr = []
               for (let i = 1; i < data + 1; i++) {
                 //根据返回楼层数，创建楼层
@@ -617,13 +589,10 @@
                 })
               }
               console.log(arr)
-
               this.selectData = []
               this.allOptions = []
-
               this.buildSelectDate(arr)
-            })
-            .catch(() => {
+            }).catch(() => {
               console.log('初始化树形结构请求出错')
             })
         }
@@ -631,12 +600,10 @@
           //楼层子菜单加载数据
         }
         // this.id = node.id;
-
         console.log(this.checkAll)
       },
       buildSelectDate (data) {
         // 测试函数，动态改变选择框中的数据
-
         let len = data.length
         for (let i = 0; i < len; i++) {
           this.selectData.push(data[i])
@@ -740,20 +707,9 @@
                     text: item.name,
                     roomId: item.room_id,
                     buildId: item.model_id,
-                    deleteId:
-                      'l' +
-                      this.flag2 +
-                      'l' +
-                      item.model_id +
-                      'f' +
-                      this.flag2 +
-                      'f' +
-                      item.model_id +
-                      'f' +
-                      str[3]
+                    deleteId: 'l' + this.flag2 + 'l' + item.model_id + 'f' + this.flag2 + 'f' + item.model_id + 'f' + str[3]
                   })
                 })
-
                 let obj = {}
                 this.selectDeviceList = arr.reduce((cur, next) => {
                   obj[next.id] ? '' : (obj[next.id] = true && cur.push(next))
@@ -773,20 +729,9 @@
                     text: item.name,
                     roomId: item.room_id,
                     buildId: item.model_id,
-                    deleteId:
-                      'l' +
-                      this.flag2 +
-                      'l' +
-                      item.model_id +
-                      'f' +
-                      this.flag2 +
-                      'f' +
-                      item.model_id +
-                      'f' +
-                      str[3]
+                    deleteId: 'l' + this.flag2 + 'l' + item.model_id + 'f' + this.flag2 + 'f' + item.model_id + 'f' + str[3]
                   })
                 })
-
                 let obj = {}
                 this.selectDeviceList = arr.reduce((cur, next) => {
                   obj[next.id] ? '' : (obj[next.id] = true && cur.push(next))
@@ -823,20 +768,13 @@
       },
       getControlItem () {
         this.control = []
-        this.pubilcFnAxios('items')
-          .then(data => {
-            data.forEach(item => {
-              this.control.push({value: item, label: item})
-            })
+        this.pubilcFnAxios('items').then(data => {
+          data.forEach(item => {
+            this.control.push({value: item, label: item})
           })
-          .catch(() => {
-            console.log('控制项数据请求失败')
-          })
-      }
-    },
-    mounted () {
-      if (sessionStorage.getItem('jsessionid') != null) {
-        this.cookieCode = 'jsessionid=' + sessionStorage.getItem('jsessionid')
+        }).catch(() => {
+          console.log('控制项数据请求失败')
+        })
       }
     }
   }

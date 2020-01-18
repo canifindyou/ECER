@@ -29,7 +29,6 @@
     },
     data () {
       return {
-        cookieCode: '',
         showDel: false
       }
     },
@@ -38,9 +37,12 @@
         let self = this
         $.ajax({
           type: 'DELETE',
-          url: this.api + 'strategies/' + this.delId+';' + this.cookieCode,
+          url: this.api + 'strategies/' + this.delId,
           headers:{
             'X-Requested-With': 'XMLHttpRequest'
+          },
+          xhrFields: {
+            withCredentials: true
           },
           success (data) {
             if (data === true) {
@@ -69,11 +71,6 @@
         this.showDel = newVal
       }
     },
-    mounted () {
-      if (sessionStorage.getItem('jsessionid') != null) {
-        this.cookieCode = 'jsessionid=' + sessionStorage.getItem('jsessionid')
-      }
-    }
   }
 </script>
 

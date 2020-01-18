@@ -23,7 +23,6 @@
     },
     data () {
       return {
-        cookieCode: '',
         labelPosition: 'left',
         campusId: 0,
         buildingId: 0,
@@ -46,9 +45,12 @@
         $.ajax({
           type: 'GET',
           async: false,
-          url: this.api + 'schoolZones;' + this.cookieCode,
+          url: this.api + 'schoolZones',
           headers: {
             'X-Requested-With': 'XMLHttpRequest'
+          },
+          xhrFields: {
+            withCredentials: true
           },
           success (data) {
             if (data.length === 0) {
@@ -69,9 +71,12 @@
         $.ajax({
           type: 'GET',
           async: false,
-          url: this.api + 'buildings;' + this.cookieCode,
+          url: this.api + 'buildings',
           headers: {
             'X-Requested-With': 'XMLHttpRequest'
+          },
+          xhrFields: {
+            withCredentials: true
           },
           data: {'zoneId': id},
           success (data) {
@@ -99,9 +104,12 @@
         $.ajax({
           type: 'GET',
           async: false,
-          url: this.api + 'buildings/' + buildingId + '/floors;' + this.cookieCode,
+          url: this.api + 'buildings/' + buildingId + '/floors',
           headers: {
             'X-Requested-With': 'XMLHttpRequest'
+          },
+          xhrFields: {
+            withCredentials: true
           },
           success (data) {
             if (data.length === 0) {
@@ -137,9 +145,12 @@
                   $.ajax({
                     type: 'GET',
                     async: false,
-                    url: this.api + 'rooms/' + buildingId + '/' + f + ';' + this.cookieCode,
+                    url: this.api + 'rooms/' + buildingId + '/' + f,
                     headers: {
                       'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    xhrFields: {
+                      withCredentials: true
                     },
                     success (data) {
                       if (data.length === 0) {
@@ -166,9 +177,12 @@
           $.ajax({
             type: 'GET',
             async: false,
-            url: this.api + 'devices/' + data.id + ';' + this.cookieCode,
+            url: this.api + 'devices/' + data.id,
             headers: {
               'X-Requested-With': 'XMLHttpRequest'
+            },
+            xhrFields: {
+              withCredentials: true
             },
             success (data) {
               self.getDeviceId(checked, indeterminate, data)
@@ -179,9 +193,12 @@
           $.ajax({
             type: 'GET',
             async: false,
-            url: this.api + 'devices/' + this.campusId + '/' + data.id + ';' + this.cookieCode,
+            url: this.api + 'devices/' + this.campusId + '/' + data.id,
             headers: {
               'X-Requested-With': 'XMLHttpRequest'
+            },
+            xhrFields: {
+              withCredentials: true
             },
             success (data) {
               self.getDeviceId(checked, indeterminate, data)
@@ -193,9 +210,12 @@
           $.ajax({
             type: 'GET',
             async: false,
-            url: this.api + 'devices/' + this.campusId + '/' + this.buildingId + '/' + this.floorId + ';' + this.cookieCode,
+            url: this.api + 'devices/' + this.campusId + '/' + this.buildingId + '/' + this.floorId,
             headers: {
               'X-Requested-With': 'XMLHttpRequest'
+            },
+            xhrFields: {
+              withCredentials: true
             },
             success (data) {
               self.getDeviceId(checked, indeterminate, data)
@@ -205,9 +225,12 @@
           $.ajax({
             type: 'GET',
             async: false,
-            url: this.api + 'devices/' + this.campusId + '/' + this.buildingId + '/' + this.floorId + '/' + data.id + ';' + this.cookieCode,
+            url: this.api + 'devices/' + this.campusId + '/' + this.buildingId + '/' + this.floorId + '/' + data.id,
             headers: {
               'X-Requested-With': 'XMLHttpRequest'
+            },
+            xhrFields: {
+              withCredentials: true
             },
             success (data) {
               self.getDeviceId(checked, indeterminate, data)
@@ -265,12 +288,7 @@
       }
     },
     mounted () {
-      if (sessionStorage.getItem('jsessionid') != null) {
-        this.cookieCode = 'jsessionid=' + sessionStorage.getItem('jsessionid')
-      }
-      if (this.cookieCode !== '') {
-        this.getCampuses()
-      }
+      this.getCampuses()
     },
     watch: {
       modifyData (newVal) {

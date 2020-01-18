@@ -51,7 +51,6 @@
     },
     data () {
       return {
-        cookieCode: '',
         deviceCount: 0,
         showDelGroup: false,
         showDelTip: false,
@@ -66,9 +65,12 @@
         if (this.delGroupType === '校区') {// 删除校区
           $.ajax({
             type: 'DELETE',
-            url: this.api + 'schoolZones;' + this.cookieCode,
+            url: this.api + 'schoolZones',
             headers: {
               'X-Requested-With': 'XMLHttpRequest'
+            },
+            xhrFields: {
+              withCredentials: true
             },
             data: {'id': this.delId},
             success (data) {
@@ -88,9 +90,12 @@
         } else if (this.delGroupType === '楼栋') {// 删除校区
           $.ajax({
             type: 'DELETE',
-            url: this.api + 'buildings;' + this.cookieCode,
+            url: this.api + 'buildings',
             headers:{
               'X-Requested-With': 'XMLHttpRequest'
+            },
+            xhrFields: {
+              withCredentials: true
             },
             data: {'id': this.delId},
             success (data) {
@@ -110,9 +115,12 @@
         } else if (this.delGroupType === '教室') {
           $.ajax({
             type: 'DELETE',
-            url: this.api + 'rooms;' + this.cookieCode,
+            url: this.api + 'rooms',
             headers:{
               'X-Requested-With': 'XMLHttpRequest'
+            },
+            xhrFields: {
+              withCredentials: true
             },
             data: {'id': this.delId},
             success (data) {
@@ -165,11 +173,6 @@
         // }
       }
     },
-    mounted () {
-      if (sessionStorage.getItem('jsessionid') != null) {
-        this.cookieCode = 'jsessionid=' + sessionStorage.getItem('jsessionid')
-      }
-    }
   }
 </script>
 

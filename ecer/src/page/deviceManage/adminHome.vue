@@ -1,5 +1,5 @@
 <template>
-  <div >
+  <div>
     <div class="tableHead">
       <div class="tableHead-left">
         <i class="el-icon-refresh"></i>
@@ -430,7 +430,6 @@
   export default {
     data () {
       return {
-        cookieCode: '',
         /* 此处为添加功能弹窗值绑定值*/
         timerId: '', //定时器id
         controllIsDone: false, //下拉框执行是否完成，完成前所有下拉框禁用
@@ -553,18 +552,15 @@
       controllSelectClick (id, event) {
         console.log(id, event)
         this.controllIsDone = true
-
-        axios
-          .get(this.api + 'devices/perform;' + this.cookieCode, {
-            params: {ids: id, itemName: event},
-            headers: {'X-Requested-With': 'XMLHttpRequest'}
-          })
-          .then(() => {
-            this.controllIsDone = false
-          })
-          .catch(() => {
-            console.log('指令执行失败')
-          })
+        axios.get(this.api + 'devices/perform', {
+          params: {ids: id, itemName: event},
+          headers: {'X-Requested-With': 'XMLHttpRequest'},
+          withCredentials: true,
+        }).then(() => {
+          this.controllIsDone = false
+        }).catch(() => {
+          console.log('指令执行失败')
+        })
         setTimeout(() => {
           this.controllIsDone = false
         }, 500)
@@ -630,7 +626,13 @@
         }
         $.ajax({
           type: 'POST',
-          url: this.api + 'devices;'+this.cookieCode,
+          url: this.api + 'devices',
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          xhrFields: {
+            withCredentials: true
+          },
           data: JSON.stringify(params),
           contentType: 'application/json',
           success: data => {
@@ -732,17 +734,15 @@
       pubilcFnAxios (urlString, params, method) {
         //公用axios数据请求
         return new Promise((resolve, reject) => {
-          axios
-            .get(this.api + urlString + ';' + this.cookieCode, {
-              params: params,
-              headers: {'X-Requested-With': 'XMLHttpRequest'}
-            })
-            .then(res => {
-              resolve(res.data)
-            })
-            .catch(err => {
-              reject('get请求错误')
-            })
+          axios.get(this.api + urlString, {
+            params: params,
+            headers: {'X-Requested-With': 'XMLHttpRequest'},
+            withCredentials: true,
+          }).then(res => {
+            resolve(res.data)
+          }).catch(err => {
+            reject('get请求错误')
+          })
         })
       },
 
@@ -782,42 +782,33 @@
         // this.tableData[id].selfControl = !this.tableData[id].selfControl;
         console.log(id)
         if (el) {
-          this.pubilcFnAxios('devices/relay/on', {ids: [id].toString()})
-            .then(data => {
-              console.log('继电器操作成功')
-            })
-            .catch(() => {
-              console.log('打开继电器请求失败')
-            })
+          this.pubilcFnAxios('devices/relay/on', {ids: [id].toString()}).then(data => {
+            console.log('继电器操作成功')
+          }).catch(() => {
+            console.log('打开继电器请求失败')
+          })
         } else {
-          this.pubilcFnAxios('devices/relay/off', {ids: [id].toString()})
-            .then(data => {
-              console.log('继电器操作成功')
-            })
-            .catch(() => {
-              console.log('关闭继电器请求失败')
-            })
+          this.pubilcFnAxios('devices/relay/off', {ids: [id].toString()}).then(data => {
+            console.log('继电器操作成功')
+          }).catch(() => {
+            console.log('关闭继电器请求失败')
+          })
         }
       },
       searchClick () {
         //搜索功能
         this.pubilcFnAxios(
-          `devices/${this.schoolId || localStorage.getItem('initschoolId')}/${this
-            .buildId || localStorage.getItem('initBuildId')}/${
-            this.selectfloorSearch
-          }`
-        )
-          .then(data => {
-            this.tableData = []
-            this.isSearch = true
-            this.total = data.total
-            this.controlItemLength = data.list.length //下拉框绑定值
-            this.controlItem = this.buildControlModel()
-            this.inintList(this.tableData, data.list)
-          })
-          .catch(() => {
-            console.log('筛选请求失败')
-          })
+          `devices/${this.schoolId || localStorage.getItem('initschoolId')}/${this.buildId || localStorage.getItem('initBuildId')}/${this.selectfloorSearch}`
+        ).then(data => {
+          this.tableData = []
+          this.isSearch = true
+          this.total = data.total
+          this.controlItemLength = data.list.length //下拉框绑定值
+          this.controlItem = this.buildControlModel()
+          this.inintList(this.tableData, data.list)
+        }).catch(() => {
+          console.log('筛选请求失败')
+        })
       },
       editClose () {
         //修改设备弹窗，子组件调用函数，关闭弹窗
@@ -831,7 +822,6 @@
       },
       handleEdit (id, ip, port, name, code) {
         //修改按钮绑定事件
-
         this.editid = id.toString()
         this.editname = name
         this.editip = ip
@@ -848,33 +838,32 @@
           type: 'warning'
         })
           .then(() => {
-            axios
-              .delete(this.api + `/devices/${id};` + this.cookieCode, {headers: {'X-Requested-With': 'XMLHttpRequest'}})
-              .then(res => {
-                console.log(res.data)
-                this.$message({
-                  type: 'success',
-                  message: '删除成功!'
-                })
-                if (this.isSearch) {
-                  this.getPageAfterList()
-                } else {
-                  this.getListData()
-                }
+            axios.delete(this.api + `/devices/${id}`, {
+              headers: {'X-Requested-With': 'XMLHttpRequest'},
+              withCredentials: true,
+            }).then(res => {
+              console.log(res.data)
+              this.$message({
+                type: 'success',
+                message: '删除成功!'
               })
-              .catch(() => {
-                this.$message({
-                  type: 'error',
-                  message: '删除失败!'
-                })
+              if (this.isSearch) {
+                this.getPageAfterList()
+              } else {
+                this.getListData()
+              }
+            }).catch(() => {
+              this.$message({
+                type: 'error',
+                message: '删除失败!'
               })
-          })
-          .catch(() => {
-            this.$message({
-              type: 'info',
-              message: '已取消删除'
             })
+          }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
           })
+        })
       },
       messageSuccess () {
         this.$message({
@@ -930,18 +919,14 @@
           pageNum: this.pagesNum,
           pageSize: 10
         }
-        this.pubilcFnAxios(
-          `devices/${this.schoolId || localStorage.getItem('initschoolId')}/${this
-            .buildId || localStorage.getItem('initBuildId')}`,
-          params
-        )
+        this.pubilcFnAxios(`devices/${this.schoolId || localStorage.getItem('initschoolId')}/${this.buildId || localStorage.getItem('initBuildId')}`, params)
           .then(data => {
-            this.tableData = []
-            this.total = data.total
-            this.controlItemLength = data.list.length //下拉框绑定值
-            this.controlItem = this.buildControlModel()
-            this.inintList(this.tableData, data.list)
-          })
+          this.tableData = []
+          this.total = data.total
+          this.controlItemLength = data.list.length //下拉框绑定值
+          this.controlItem = this.buildControlModel()
+          this.inintList(this.tableData, data.list)
+        })
           .catch(() => {
             console.log('请求失败')
           })
@@ -1013,24 +998,19 @@
     },
     mounted () {
       //初始化下拉框绑定值
-      if (sessionStorage.getItem('jsessionid') != null) {
-        this.cookieCode = 'jsessionid=' + sessionStorage.getItem('jsessionid')
-      }
-      if (this.cookieCode !== '') {
-        this.constructSearchInput()
-        console.log(this.$route.query.code)
-        this.pubilcFnAxios('items')
-          .then(data => {
-            this.control = []
-            for (let i = 0; i < data.length; i++) {
-              this.control.push({label: data[i], value: data[i]})
-            }
-            this.getListData()
-          })
-          .catch(() => {
-            console.log('构造列表失败')
-          })
-      }
+      this.constructSearchInput()
+      console.log(this.$route.query.code)
+      this.pubilcFnAxios('items')
+        .then(data => {
+          this.control = []
+          for (let i = 0; i < data.length; i++) {
+            this.control.push({label: data[i], value: data[i]})
+          }
+          this.getListData()
+        })
+        .catch(() => {
+          console.log('构造列表失败')
+        })
       // this.openMessage();
       // this.refresh()
     },
@@ -1091,7 +1071,7 @@
     height: 100%;
     width: 100%;
     text-align: center;
-    
+
   }
 
   .dialogContent .dialogContentItem {

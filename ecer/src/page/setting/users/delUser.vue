@@ -29,7 +29,6 @@
     },
     data () {
       return {
-        cookieCode: '',
         showDel: false
       }
     },
@@ -38,9 +37,12 @@
         let self = this
         $.ajax({
           type: 'DELETE',
-          url: this.api + 'users;' + this.cookieCode,
+          url: this.api + 'users',
           headers: {
             'X-Requested-With': 'XMLHttpRequest',
+          },
+          xhrFields: {
+            withCredentials: true
           },
           data: {
             id: this.delId
@@ -70,11 +72,6 @@
         this.showDel = newVal
       }
     },
-    mounted () {
-      if (sessionStorage.getItem('jsessionid') != null) {
-        this.cookieCode = 'jsessionid=' + sessionStorage.getItem('jsessionid')
-      }
-    }
   }
 </script>
 

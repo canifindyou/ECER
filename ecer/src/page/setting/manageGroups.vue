@@ -77,7 +77,6 @@
     },
     data () {
       return {
-        cookieCode: '',
         manageGroups: true,
         clickList: true,//分组是否可点
         haveCampuses: true,
@@ -213,9 +212,12 @@
           if (newCampus) {// 存在校区名
             $.ajax({
               type: 'POST',
-              url: self.api + 'schoolZones;' + self.cookieCode,
+              url: self.api + 'schoolZones',
               headers: {
                 'X-Requested-With': 'XMLHttpRequest'
+              },
+              xhrFields: {
+                withCredentials: true
               },
               dataType: 'json',
               data: {'name': newCampus},
@@ -268,10 +270,13 @@
             if (newBuilding && newFloor) {// 楼栋名&层数均存在
               $.ajax({
                 type: 'POST',
-                url: self.api + 'buildings;' + self.cookieCode,
+                url: self.api + 'buildings',
                 headers: {
                   'Content-Type': 'application/json',
                   'X-Requested-With': 'XMLHttpRequest'
+                },
+                xhrFields: {
+                  withCredentials: true
                 },
                 dataType: 'json',
                 data: JSON.stringify({
@@ -335,10 +340,13 @@
             if (newClassroom && roomFloor) {// 教室名&楼层均存在
               $.ajax({
                 type: 'POST',
-                url: self.api + 'rooms;' + self.cookieCode,
+                url: self.api + 'rooms',
                 headers: {
                   'Content-Type': 'application/json',
                   'X-Requested-With': 'XMLHttpRequest'
+                },
+                xhrFields: {
+                  withCredentials: true
                 },
                 dataType: 'json',
                 data: JSON.stringify({
@@ -423,8 +431,14 @@
           if (newCampus) {// 校区名存在数据
             $.ajax({
               type: 'PUT',
-              url: self.api + 'schoolZones;' + self.cookieCode,
-              headers: {'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest'},
+              url: self.api + 'schoolZones',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+              },
+              xhrFields: {
+                withCredentials: true
+              },
               dataType: 'json',
               data: JSON.stringify({
                 'id': self.campusId,
@@ -480,10 +494,13 @@
           if (newBuilding && newFloor) {// 调用修改楼栋接口
             $.ajax({
               type: 'PUT',
-              url: self.api + 'buildings;' + self.cookieCode,
+              url: self.api + 'buildings',
               headers: {
                 'Content-Type': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
+              },
+              xhrFields: {
+                withCredentials: true
               },
               dataType: 'json',
               data: JSON.stringify({
@@ -547,10 +564,13 @@
           if (newClassroom) {// 教室名存在数据
             $.ajax({
               type: 'PUT',
-              url: self.api + 'rooms;' + self.cookieCode,
+              url: self.api + 'rooms',
               headers: {
                 'Content-Type': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
+              },
+              xhrFields: {
+                withCredentials: true
               },
               dataType: 'json',
               data: JSON.stringify({
@@ -641,9 +661,12 @@
         $.ajax({
           type: 'GET',
           async: false,
-          url: this.api + 'schoolZones;' + this.cookieCode,
+          url: this.api + 'schoolZones',
           headers: {
             'X-Requested-With': 'XMLHttpRequest'
+          },
+          xhrFields: {
+            withCredentials: true
           },
           success (data) {
             if (data.length === 0) {
@@ -665,9 +688,12 @@
         this.clickList = true
         $.ajax({
             type: 'GET',
-            url: this.api + 'buildings;' + this.cookieCode,
+            url: this.api + 'buildings',
             headers: {
               'X-Requested-With': 'XMLHttpRequest'
+            },
+            xhrFields: {
+              withCredentials: true
             },
             data: {'zoneId': id},
             success (data) {
@@ -694,9 +720,12 @@
         // 根据选中的楼栋id获取教室列表
         $.ajax({
           type: 'GET',
-          url: this.api + 'rooms/' + id + ';' + this.cookieCode,
-          headers:{
+          url: this.api + 'rooms/' + id,
+          headers: {
             'X-Requested-With': 'XMLHttpRequest'
+          },
+          xhrFields: {
+            withCredentials: true
           },
           success (data) {
             if (data.length === 0) {
@@ -727,12 +756,7 @@
       }
     },
     mounted () {
-      if (sessionStorage.getItem('jsessionid') != null) {
-        this.cookieCode = 'jsessionid=' + sessionStorage.getItem('jsessionid')
-      }
-      if (this.cookieCode !== '') {
         this.getCampusesList()
-      }
     }
   }
 </script>

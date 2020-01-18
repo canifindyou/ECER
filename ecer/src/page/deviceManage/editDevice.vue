@@ -185,7 +185,6 @@
 
     data () {
       return {
-        cookieCode: '',
         showEdit: this.showDialog,
         id: '',
         ip: '',
@@ -318,17 +317,15 @@
       pubilcFnAxios (urlString, params, method) {
         //公用axios数据请求
         return new Promise((resolve, reject) => {
-          axios
-            .get(this.api + urlString + ';' + this.cookieCode, {
-              params: params,
-              headers: {'X-Requested-With': 'XMLHttpRequest'}
-            })
-            .then(res => {
-              resolve(res.data)
-            })
-            .catch(err => {
-              reject('get请求错误')
-            })
+          axios.get(this.api + urlString, {
+            params: params,
+            headers: {'X-Requested-With': 'XMLHttpRequest'},
+            withCredentials: true
+          }).then(res => {
+            resolve(res.data)
+          }).catch(err => {
+            reject('get请求错误')
+          })
         })
       },
 

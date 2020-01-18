@@ -59,7 +59,6 @@
     },
     data () {
       return {
-        cookieCode: '',
         manageOrders: true,
         selectId: 0,
         key: 0,
@@ -78,9 +77,12 @@
         $.ajax({
           type: 'GET',
           async: false,
-          url: this.api + 'templates;' + this.cookieCode,
+          url: this.api + 'templates',
           headers: {
             'X-Requested-With': 'XMLHttpRequest'
+          },
+          xhrFields: {
+            withCredentials: true
           },
           success (data) {
             console.log(data)
@@ -116,9 +118,12 @@
         })
         $.ajax({
           type: 'GET',
-          url: this.api + 'templates/' + id + '/instructs;' + this.cookieCode,
+          url: this.api + 'templates/' + id + '/instructs',
           headers: {
             'X-Requested-With': 'XMLHttpRequest'
+          },
+          xhrFields: {
+            withCredentials: true
           },
           success (data) {
             self.tableData = data
@@ -149,9 +154,12 @@
             if (newTempName) {// 调用修改校区接口
               $.ajax({
                 type: 'PUT',
-                url: self.api + 'templates/' + self.selectId + '/' + newTempName + ';' + this.cookieCode,
+                url: self.api + 'templates/' + self.selectId + '/' + newTempName,
                 headers: {
                   'X-Requested-With': 'XMLHttpRequest'
+                },
+                xhrFields: {
+                  withCredentials: true
                 },
                 success (data) {
                   let jsonData = JSON.parse(data)
@@ -212,14 +220,9 @@
       }
     },
     mounted () {
-      if (sessionStorage.getItem('jsessionid') != null) {
-        this.cookieCode = 'jsessionid=' + sessionStorage.getItem('jsessionid')
-      }
-      if (this.cookieCode !== '') {
-        this.getTempList()
-        if (this.templateData.length !== 0) {
-          this.selectOrder(this.templateData[0].id, this.templateData[0].name)
-        }
+      this.getTempList()
+      if (this.templateData.length !== 0) {
+        this.selectOrder(this.templateData[0].id, this.templateData[0].name)
       }
     }
   }

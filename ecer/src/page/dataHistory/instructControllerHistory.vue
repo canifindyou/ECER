@@ -41,7 +41,6 @@
   export default {
     data () {
       return {
-        cookieCode: '',
         isSearch: false,
         pages: '',
         total: 10,
@@ -171,16 +170,15 @@
       pubilcFnAxios (urlString, params, method) {
         //公用axios数据请求
         return new Promise((resolve, reject) => {
-          axios.get(this.api + urlString + ';' + this.cookieCode, {
+          axios.get(this.api + urlString, {
             params: params,
-            headers: {'X-Requested-With': 'XMLHttpRequest'}
+            headers: {'X-Requested-With': 'XMLHttpRequest'},
+            withCredentials: true
+          }).then(res => {
+            resolve(res.data)
+          }).catch(err => {
+            reject('get请求错误')
           })
-            .then(res => {
-              resolve(res.data)
-            })
-            .catch(err => {
-              reject('get请求错误')
-            })
         })
       },
     },
@@ -188,12 +186,7 @@
       searchHead
     },
     mounted () {
-      if (sessionStorage.getItem('jsessionid') != null) {
-        this.cookieCode = 'jsessionid=' + sessionStorage.getItem('jsessionid')
-      }
-      if (this.cookieCode !== '') {
-        this.getTableDate()
-      }
+      this.getTableDate()
     }
   }
 </script>

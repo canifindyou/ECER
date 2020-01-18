@@ -59,7 +59,6 @@
     },
     data () {
       return {
-        cookieCode: '',
         manageUsers: true,
         addUser: false,
         modifyId: 0,
@@ -74,9 +73,12 @@
         let self = this
         $.ajax({
           type: 'GET',
-          url: this.api + 'users;' + this.cookieCode,
+          url: this.api + 'users',
           headers: {
             'X-Requested-With': 'XMLHttpRequest'
+          },
+          xhrFields: {
+            withCredentials: true
           },
           success (data) {
             for (let i = 0; i < data.length; i++) {
@@ -116,12 +118,7 @@
       }
     },
     mounted () {
-      if (sessionStorage.getItem('jsessionid') != null) {
-        this.cookieCode = 'jsessionid=' + sessionStorage.getItem('jsessionid')
-      }
-      if (this.cookieCode !== '') {
-        this.getList()
-      }
+      this.getList()
     }
   }
 </script>

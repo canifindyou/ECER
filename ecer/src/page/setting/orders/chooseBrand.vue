@@ -25,6 +25,7 @@
           :on-exceed="handleExceed"
           :multiple="false"
           :auto-upload="false"
+          :with-credentials="true"
         >
           <i class="el-icon-upload"></i>
           <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
@@ -59,7 +60,7 @@
     methods: {
       // 下载模板
       download () {
-        window.location.href = this.api + '/instructions-template.csv;'+this.cookieCode
+        window.location.href = this.api + '/instructions-template.csv'
       },
 
       // 已存在上传文件
@@ -108,7 +109,7 @@
       // 上传文件
       submitUpload () {
         // :data={name:formData.tempName}
-        this.uploadUrl = this.api+'/templates/upload/' + this.formData.tempName + ';'+this.cookieCode
+        this.uploadUrl = this.api+'/templates/upload/' + this.formData.tempName
         console.log(this.uploadUrl)
         this.$nextTick(() => {// 手动上传
           this.$refs.upload.submit()
@@ -127,11 +128,6 @@
         this.showChoose = newVal
       }
     },
-    mounted () {
-      if (sessionStorage.getItem('jsessionid') != null) {
-        this.cookieCode = 'jsessionid=' + sessionStorage.getItem('jsessionid')
-      }
-    }
   }
 </script>
 

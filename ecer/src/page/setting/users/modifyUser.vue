@@ -30,7 +30,6 @@
     },
     data () {
       return {
-        cookieCode:'',
         showModify: false,
         labelPosition: 'left',
         userData: {},
@@ -48,9 +47,12 @@
         let self = this
         $.ajax({
           type: 'GET',
-          url: this.api + 'users/' + this.modifyId + ';' + this.cookieCode,
+          url: this.api + 'users/' + this.modifyId,
           headers: {
             'X-Requested-With': 'XMLHttpRequest',
+          },
+          xhrFields: {
+            withCredentials: true
           },
           success (data) {
             self.modifyData = data
@@ -59,11 +61,6 @@
         this.showModify = newVal
       }
     },
-    mounted () {
-      if (sessionStorage.getItem('jsessionid') != null) {
-        this.cookieCode = 'jsessionid=' + sessionStorage.getItem('jsessionid')
-      }
-    }
   }
 </script>
 

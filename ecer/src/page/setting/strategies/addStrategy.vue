@@ -27,44 +27,45 @@
     components: {
       strategyInfo
     },
-    data() {
+    data () {
       return {
-        cookieCode: '',
         showAdd: false,
-        strategyInfo:{}
+        strategyInfo: {}
       }
     },
     methods: {
-      getNewData(newData){
+      getNewData (newData) {
         this.strategyInfo = newData
       },
 
-      addSucc() {
-        let self = this;
-        console.log(this.strategyInfo.weedsNum,)
+      addSucc () {
+        let self = this
         $.ajax({
           type: 'POST',
-          url:this.api+'strategies;' + this.cookieCode,
+          url: this.api + 'strategies',
           headers: {
             'Content-Type': 'application/json',
             'X-Requested-With': 'XMLHttpRequest'
           },
-          data:JSON.stringify({
-            'name':this.strategyInfo.strategyName,
-            'userId':'demoData',
-            'weeks':{
-              'days':this.strategyInfo.weedsNum,
-              'startTime':this.strategyInfo.startTimeHour+':'+this.strategyInfo.startTimeMin+':00',
-              'endTime':this.strategyInfo.endTimeHour+':'+this.strategyInfo.endTimeMin+':00',
+          xhrFields: {
+            withCredentials: true
+          },
+          data: JSON.stringify({
+            'name': this.strategyInfo.strategyName,
+            'userId': 'demoData',
+            'weeks': {
+              'days': this.strategyInfo.weedsNum,
+              'startTime': this.strategyInfo.startTimeHour + ':' + this.strategyInfo.startTimeMin + ':00',
+              'endTime': this.strategyInfo.endTimeHour + ':' + this.strategyInfo.endTimeMin + ':00',
               'summerLowestT': this.strategyInfo.transPowerSTemp,
               'summerHighestT': this.strategyInfo.failPowerSTemp,
               'summerConstantT': this.strategyInfo.callbackSTemp,
               'winterLowestT': this.strategyInfo.transPowerWTemp,
               'winterHighestT': this.strategyInfo.failPowerWTemp,
-              'winterConstantT':this.strategyInfo.callbackWTemp
+              'winterConstantT': this.strategyInfo.callbackWTemp
             }
           }),
-          success(data){
+          success (data) {
             console.log(data)
             if (data === true) {
               self.closeModel()
@@ -72,29 +73,24 @@
                 message: '策略添加成功！',
                 type: 'success'
               })
-            }else {
+            } else {
               self.$message.error('添加失败请重试！')
             }
           }
         })
       },
 
-      closeModel() {
+      closeModel () {
         this.showAdd = false
         this.$refs.strategyInfo.clearData()
         this.$emit('closeModel')
       },
     },
     watch: {
-      addStrategy(newVal) {
+      addStrategy (newVal) {
         this.showAdd = newVal
       }
     },
-    mounted () {
-      if (sessionStorage.getItem('jsessionid') != null) {
-        this.cookieCode = 'jsessionid=' + sessionStorage.getItem('jsessionid')
-      }
-    }
   }
 </script>
 

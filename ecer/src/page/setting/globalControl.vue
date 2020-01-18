@@ -72,7 +72,6 @@
   export default {
     data () {
       return {
-        cookieCode: '',
         globalControl: true,
         labelPosition: 'left',
         controlData: {},
@@ -84,9 +83,12 @@
         $.ajax({
           type: 'GET',
           async: false,
-          url: this.api + 'globalConfig;' + this.cookieCode,
+          url: this.api + 'globalConfig',
           headers: {
             'X-Requested-With': 'XMLHttpRequest'
+          },
+          xhrFields: {
+            withCredentials: true
           },
           success (data) {
             self.controlData = data[0]
@@ -98,11 +100,14 @@
         let self = this
         $.ajax({
           type: 'PUT',
-          url: this.api + 'globalConfig;' + this.cookieCode,
+          url: this.api + 'globalConfig',
           // url: 'http://192.168.1.106:8080/globalConfig',
           headers: {
             'Content-Type': 'application/json',
             'X-Requested-With': 'XMLHttpRequest'
+          },
+          xhrFields: {
+            withCredentials: true
           },
           data: JSON.stringify({
             'maxT': this.controlData.maxT,
@@ -140,12 +145,7 @@
       }
     },
     mounted () {
-      if (sessionStorage.getItem('jsessionid') != null) {
-        this.cookieCode = 'jsessionid=' + sessionStorage.getItem('jsessionid')
-      }
-      if (this.cookieCode !== '') {
-        this.getControlData()
-      }
+      this.getControlData()
     }
   }
 </script>

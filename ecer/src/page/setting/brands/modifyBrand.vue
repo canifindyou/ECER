@@ -32,7 +32,6 @@
     },
     data () {
       return {
-        cookieCode: '',
         showModify: false,
         name: '修改品牌型号',
         labelPosition: 'left',
@@ -48,10 +47,13 @@
         let self = this
         $.ajax({
           type: 'PUT',
-          url: this.api + 'models;' + this.cookieCode,
+          url: this.api + 'models',
           headers: {
             'Content-Type': 'application/json',
             'X-Requested-With': 'XMLHttpRequest'
+          },
+          xhrFields: {
+            withCredentials: true
           },
           data: JSON.stringify({
             'id': self.modifyId,
@@ -93,11 +95,6 @@
         this.deviceData.brandType = newVal.modelName
       }
     },
-    mounted () {
-      if (sessionStorage.getItem('jsessionid') != null) {
-        this.cookieCode = 'jsessionid=' + sessionStorage.getItem('jsessionid')
-      }
-    }
   }
 </script>
 
