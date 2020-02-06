@@ -47,7 +47,7 @@
         let self = this
         $.ajax({
           type: 'GET',
-          url: this.api + 'users/' + this.modifyId,
+          url: this.api + 'users/' + this.modifyId+'/devices',
           headers: {
             'X-Requested-With': 'XMLHttpRequest',
           },
@@ -55,6 +55,7 @@
             withCredentials: true
           },
           success (data) {
+            // console.log(data)
             self.modifyData = data
           }
         })

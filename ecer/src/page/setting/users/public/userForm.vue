@@ -59,6 +59,7 @@
               self.groupList = data
               for (let i = 0; i < data.length; i++) {
                 self.groupList[i].code = 0//证明是校区
+                self.groupList[i].key = i + 1//唯一id
                 self.getBuildings(data[i].id)
               }
             }
@@ -87,7 +88,10 @@
                 if (id === self.groupList[i].id) {
                   self.groupList[i].children = data
                   for (let j = 0; j < data.length; j++) {
+                    let num = j + 1
+                    let key = self.groupList[i].key + '-' + num
                     self.groupList[i].children[j].code = 1//楼栋
+                    self.groupList[i].children[j].key = key//唯一id
                   }
                 }
               }
@@ -122,7 +126,8 @@
                     if (buildingId === building[j].id) {
                       building[j].children = []
                       for (let f = 1; f <= data; f++) {
-                        building[j].children.push({name: f + '层', children: [], code: 2})//层
+                        let key = building[j].key + '-' + f
+                        building[j].children.push({name: f + '层', children: [], code: 2, key: key})//层
                       }
                       self.getClassroom(campusId, buildingId)
                     }
@@ -158,9 +163,13 @@
                       } else {
                         building[j].children[f - 1].children = data
                         for (let c = 0; c < data.length; c++) {
+                          let num = c + 1
+                          let key = building[j].children[f - 1].key + '-' + num
                           building[j].children[f - 1].children[c].code = 3
+                          building[j].children[f - 1].children[c].key = key
                         }
                       }
+                      console.log(self.groupList)
                     }
                   })
                 }
@@ -291,10 +300,35 @@
       this.getCampuses()
     },
     watch: {
+      groupList (newVal) {
+        console.log(newVal)
+      },
+
       modifyData (newVal) {
+        let roomId = []
+        console.log(newVal)
         this.userData.userNum = newVal.id
         this.userData.userName = newVal.name
-        this.userData.deviceId = newVal.devices
+        for (let i = 0; i < newVal.devices.length; i++) {
+          this.userData.deviceId.push(newVal.devices[i].id)
+          roomId.push(newVal.devices[i].roomId)
+        }
+        roomId = Array.from(new Set(roomId))
+        for (let j = 0; j < roomId.length; j++) {
+          $.ajax({
+            type: 'GET',
+            url: this.api + 'location?roomId=' + roomId[j],
+            headers: {
+              'X-Requested-With': 'XMLHttpRequest'
+            },
+            xhrFields: {
+              withCredentials: true
+            },
+            success (data) {
+              console.log(data)
+            }
+          })
+        }
       }
     }
   }
