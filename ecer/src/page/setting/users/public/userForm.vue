@@ -9,8 +9,9 @@
     </el-form-item>
     <el-form-item label="分组选择">
       <div class="groupSelect">
-        <el-tree :data="groupList" :props="defaultProps" show-checkbox accordion
-                 @check-change="handleCheckChange" @node-click="handleNodeClick"></el-tree>
+        <el-tree v-if="updateData" :data="groupList" :props="defaultProps" show-checkbox accordion node-key="key"
+                 :default-checked-keys="checkedKey" @check-change="handleCheckChange"
+                 @node-click="handleNodeClick"></el-tree>
       </div>
     </el-form-item>
   </el-form>
@@ -19,10 +20,12 @@
 <script>
   export default {
     props: {
+      checkType: String,
       modifyData: Object
     },
     data () {
       return {
+        updateData: false,
         labelPosition: 'left',
         campusId: 0,
         buildingId: 0,
@@ -36,7 +39,9 @@
         defaultProps: {
           children: 'children',
           label: 'name'
-        }
+        },
+        checkedKey: [],
+        roomId: []
       }
     },
     methods: {
@@ -167,9 +172,19 @@
                           let key = building[j].children[f - 1].key + '-' + num
                           building[j].children[f - 1].children[c].code = 3
                           building[j].children[f - 1].children[c].key = key
+                          if (self.roomId.length !== 0) {
+                            //如果roomId不为空说明是修改
+                            for (let r = 0; r < self.roomId.length; r++) {
+                              if (self.roomId[r] === building[j].children[f - 1].children[c].id) {
+                                // 将唯一的key存入
+                                self.checkedKey.push(building[j].children[f - 1].children[c].key)
+                                self.checkedKey = Array.from(new Set(self.checkedKey))
+                                console.log(self.checkedKey)
+                              }
+                            }
+                          }
                         }
                       }
-                      console.log(self.groupList)
                     }
                   })
                 }
@@ -179,6 +194,7 @@
         }
       },
 
+      // 查找设备
       handleCheckChange (data, checked, indeterminate) {
         let self = this
         if (data.code === 0) {//校区
@@ -249,7 +265,7 @@
       },
 
       getDeviceId (checked, indeterminate, data) {
-        if (checked === true) {
+        if (checked === true) {//本身被选中
           for (let i = 0; i < data.list.length; i++) {
             this.userData.deviceId.push(data.list[i].id)
           }
@@ -268,13 +284,22 @@
               }
             }
           }
-          console.log(this.userData.deviceId)
         }
-        this.$emit('getNewData', this.userData)
+        console.log(this.checkType)
+        if (this.checkType === 'Add') {
+          this.$emit('getNewData', this.userData)
+        } else {
+          this.$emit('getModifyData', this.userData)
+        }
       },
 
       handleChange () {
-        this.$emit('getNewData', this.userData)
+        console.log(this.checkType)
+        if (this.checkType === 'Add') {
+          this.$emit('getNewData', this.userData)
+        } else {
+          this.$emit('getModifyData', this.userData)
+        }
       },
 
       handleNodeClick (data) {
@@ -294,10 +319,17 @@
           userName: '',
           deviceId: [],
         }
+        this.checkedKey = []
+        this.roomId = []
+        this.updateData = false
+        console.log(this.checkedKey)
       }
     },
     mounted () {
-      this.getCampuses()
+      if (this.checkType === 'Add') {
+        this.updateData = true
+        this.getCampuses()
+      }
     },
     watch: {
       groupList (newVal) {
@@ -305,30 +337,25 @@
       },
 
       modifyData (newVal) {
-        let roomId = []
-        console.log(newVal)
-        this.userData.userNum = newVal.id
-        this.userData.userName = newVal.name
-        for (let i = 0; i < newVal.devices.length; i++) {
-          this.userData.deviceId.push(newVal.devices[i].id)
-          roomId.push(newVal.devices[i].roomId)
+        let type = typeof newVal
+        if (type === 'object') {
+          this.userData.userNum = newVal.id
+          this.userData.userName = newVal.name
+          for (let i = 0; i < newVal.devices.length; i++) {
+            this.userData.deviceId.push(newVal.devices[i].id)
+            this.roomId.push(newVal.devices[i].roomId)
+          }
+          this.roomId = Array.from(new Set(this.roomId))
+          console.log(this.roomId)
+          console.log(this.checkedKey)
+          this.updateData = true
+          this.getCampuses()
+        } else {
+          console.log('~~~~~')
         }
-        roomId = Array.from(new Set(roomId))
-        for (let j = 0; j < roomId.length; j++) {
-          $.ajax({
-            type: 'GET',
-            url: this.api + 'location?roomId=' + roomId[j],
-            headers: {
-              'X-Requested-With': 'XMLHttpRequest'
-            },
-            xhrFields: {
-              withCredentials: true
-            },
-            success (data) {
-              console.log(data)
-            }
-          })
-        }
+        // this.$nextTick(() => {
+
+        // })
       }
     }
   }

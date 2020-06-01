@@ -266,6 +266,19 @@
       if (this.strategiesList.length !== 0) {
         this.selectStrategy(this.strategiesList[0].id, this.strategiesList[0].name)
       }
+      $.ajax({
+        type:'GET',
+        url:this.api+'/userInfo',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        xhrFields: {
+          withCredentials: true
+        },
+        success(data){
+          console.log(data)
+        }
+      })
     }
   }
 </script>

@@ -8,7 +8,7 @@
     :before-close="closeModel"
     append-to-body>
     <hr class="boundary">
-    <user-form @getNewData="getNewData" ref="userInfo"></user-form>
+    <user-form :checkType="checkType" @getNewData="getNewData" ref="userInfo"></user-form>
     <hr class="boundary">
     <div slot="footer" class="dialog-footer">
       <el-button @click="closeModel">取 消</el-button>
@@ -29,6 +29,7 @@
     },
     data () {
       return {
+        checkType: 'Add',
         showAdd: false,
         labelPosition: 'left',
         userData: {},
