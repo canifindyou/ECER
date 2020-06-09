@@ -2,7 +2,7 @@
   <div>
     <div class="tableHead">
       <div class="tableHead-left">
-        <i class="el-icon-refresh"></i>
+        <i class="el-icon-refresh" @click="refreshPage"></i>
         <el-button
           type="text"
           style="margin-left:20px"
@@ -622,7 +622,7 @@
           port: this.addPort,
           addressCode: this.addId,
           roomId: this.addRoom,
-          modelId: this.addBuilding
+          modelId: this.addBrand
         }
         $.ajax({
           type: 'POST',
@@ -882,6 +882,11 @@
       handleDelete (name, id) {
         //按钮点击事件
         this.open(name, id)
+      },
+
+      refreshPage () {
+        //刷新页面事件
+        location. reload()
       },
       batchOperat () {
         //批量管理点击事件
