@@ -18,6 +18,12 @@
         >批量导入
         </el-button
         >
+
+<!--        <el-button type="text" style="margin-left:20px" @click="Progress"-->
+<!--        >测试-->
+<!--        </el-button-->
+<!--        >-->
+
       </div>
       <div class="tableHead-right">
         <el-button
@@ -44,6 +50,11 @@
           </el-select>
         </template>
       </div>
+    </div>
+
+<!--    进度条-->
+    <div v-if="showProgress">
+      <el-progress :text-inside="true" :stroke-width="20" :percentage="percentage" :status = status></el-progress>
     </div>
 
     <template>
@@ -89,8 +100,9 @@
         <el-table-column label="已用电量" prop="nums" align="center">
         </el-table-column>
         <el-table-column label="控制" prop="control" width="200" align="center">
-          <template slot-scope="props">
+          <template slot-scope="props" >
             <el-select
+              v-if="props.row.selfControl != 'null'"
               v-model="controlItem[props.$index]['control' + props.$index]"
               placeholder="请选择"
               size="small"
@@ -112,6 +124,7 @@
               >
               </el-option>
             </el-select>
+            <span v-else>暂无</span>
           </template>
         </el-table-column>
         <el-table-column label="自控状态" prop="selfControl" align="center">
@@ -217,6 +230,18 @@
       </div>
     </template>
     <!-- 添加弹窗 -->
+
+    <el-dialog
+      title="测试"
+      :visible.sync="showTestPage"
+      width="650px"
+      style="border-bottom: 1px #eee solid;"
+    >
+      <div style="width: 200px ">
+
+        <el-progress type="circle" :percentage="0" status=""></el-progress>
+      </div>
+    </el-dialog>
 
     <el-dialog
       title="添加设备"
@@ -482,7 +507,12 @@
         showUpLoad: false,
 
         /*  */
+        timer: null,
+        showProgress: false, //进度条
+        percentage:0,//进度条百分比
+        status: "",
         showBatch: false, //批量操作弹窗
+        showTestPage: false,
         centerDialogVisible: false, //添加设备弹窗控制
         selectBuild: '', //选择楼栋绑定值，头部搜索
         searchInput: '', //头部搜索输入框
@@ -550,6 +580,8 @@
     },
     methods: {
       controllSelectClick (id, event) {
+        this.Progress();
+        var temp = true;
         console.log(id, event)
         this.controllIsDone = true
         axios.get(this.api + 'devices/perform', {
@@ -560,10 +592,12 @@
           this.controllIsDone = false
         }).catch(() => {
           console.log('指令执行失败')
+          temp = false;
         })
         setTimeout(() => {
           this.controllIsDone = false
         }, 500)
+        this.ProgressEnd(temp);
       },
       inintList (List, data) {
         data.forEach(item => {
@@ -622,7 +656,7 @@
           port: this.addPort,
           addressCode: this.addId,
           roomId: this.addRoom,
-          modelId: this.addBrand
+          modelId: this.addType
         }
         $.ajax({
           type: 'POST',
@@ -711,7 +745,7 @@
       selectType () {
         //加载型号
         this.addTypeOptions = []
-        this.constructData(`/models/${this.addBrand}`, this.addTypeOptions, {})
+        this.constructData(`/models/${this. addBrand}`, this.addTypeOptions, {})
       },
       constructData (urlString, obj, params) {
         //构造下拉菜单数据结构
@@ -760,40 +794,51 @@
         //自控状态开关控制
         //推拉框回调函数
         console.log(el, id)
+        this.Progress();
         if (el) {
           this.pubilcFnAxios('devices/auto/on', {ids: [id].toString()})
             .then(data => {
               console.log('自控状态操作成功')
+              this.ProgressEnd(true);
+
             })
             .catch(() => {
               console.log('打开自控状态请求失败')
+              this.ProgressEnd(false);
             })
         } else {
           this.pubilcFnAxios('devices/auto/off', {ids: [id].toString()})
             .then(data => {
               console.log('自控状态操作成功')
+              this.ProgressEnd(true);
             })
             .catch(() => {
               console.log('关闭自控状态请求失败')
+              this.ProgressEnd(false);
             })
         }
       },
       switchChange2 (el, id, selfStatus) {//继电器开关控制
         // this.tableData[id].selfControl = !this.tableData[id].selfControl;
         console.log(id)
+        this.Progress();
+        var temp = true;
         if (el) {
           this.pubilcFnAxios('devices/relay/on', {ids: [id].toString()}).then(data => {
             console.log('继电器操作成功')
           }).catch(() => {
             console.log('打开继电器请求失败')
+            temp = false;
           })
         } else {
           this.pubilcFnAxios('devices/relay/off', {ids: [id].toString()}).then(data => {
             console.log('继电器操作成功')
           }).catch(() => {
             console.log('关闭继电器请求失败')
+            temp = false;
           })
         }
+        this.Progress(temp);
       },
       searchClick () {
         //搜索功能
@@ -883,9 +928,33 @@
         //按钮点击事件
         this.open(name, id)
       },
+      Progress () {
+        // alert("test");
+        this.status = "";
+        this.percentage = 0;
+        this.showProgress = true;
+        this.timer = setInterval(()=>{
+          if(this.percentage<99){
+            this.percentage++;
+          }
+        }, 15);
+      },
+      ProgressEnd (ProgressStatus) {
+        if(ProgressStatus){
+           this.percentage = 100;
+          this.status = "success";
+        }else {
+          this.status = "exception";
+          alert("操作失败");
+        }
+        this.showProgress = false;
+        this.timer = null;
+        this.percentage = 0;
+      },
 
       refreshPage () {
         //刷新页面事件
+        // alert("test");
         location. reload()
       },
       batchOperat () {
@@ -1021,6 +1090,7 @@
     },
     destroyed () {
       console.log('页面销毁')
+      clearInterval(this.timer);
       this.clear()
     }
   }

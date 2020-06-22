@@ -4,17 +4,23 @@
     <div style="margin:10px 0 0 0">
       <template>
         <el-table :data="tableData" align="center" style="width: 100%">
-          <el-table-column align="center" prop="name" label="空调名称">
+          <el-table-column align="center" prop="deviceName" label="空调名称">
           </el-table-column>
-          <el-table-column align="center" prop="controllWay" label="控制方式">
+          <el-table-column align="center"label="控制方式">
+            <template slot-scope="scope">
+              {{scope.row.userName == null ? "自动":"手动"}}控制
+            </template>
           </el-table-column>
-          <el-table-column align="center" prop="controllRouce" label="用户名称">
+          <el-table-column align="center" prop="userName" label="用户名称">
           </el-table-column>
-          <el-table-column align="center" prop="controllItem" label="控制项">
+          <el-table-column align="center" prop="instructName" label="控制项">
           </el-table-column>
-          <el-table-column align="center" prop="controllResult" label="控制结果">
+          <el-table-column align="center" label="控制结果">
+            <template slot-scope="scope">
+              {{scope.row.result == 0 ? "成功":"失败"}}
+            </template>
           </el-table-column>
-          <el-table-column align="center" prop="controllTime" label="控制时间">
+          <el-table-column align="center" prop="createTime" label="控制时间">
           </el-table-column>
 
         </el-table>
