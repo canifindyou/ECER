@@ -146,7 +146,8 @@
           })
           .catch()
       },
-      getTableData () {
+      getTableDate () {
+        // console.log('自控状态测试事件')
         axios.get(this.api + '/deviceAutoStatus', {
           headers: {'X-Requested-With': 'XMLHttpRequest'},
           withCredentials: true
